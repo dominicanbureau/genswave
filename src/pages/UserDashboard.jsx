@@ -220,7 +220,7 @@ function UserDashboard() {
       'chat': 'Chat con Agente',
       'account': 'Mi Cuenta'
     };
-    return titles[activeTab] || 'Studio Dashboard';
+    return titles[activeTab] || 'Genswave Dashboard';
   };
 
   if (loading) {
@@ -399,7 +399,7 @@ function Sidebar({ activeTab, setActiveTab, user, onLogout, isMobileOpen, setIsM
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
           >
-            Studio
+            Genswave
           </motion.h2>
           <motion.button
             className="mobile-close-btn"

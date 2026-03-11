@@ -436,7 +436,7 @@ function InfoSection() {
         <div className="info-grid">
           <InfoCard
             title="Email"
-            content="contacto@studio.com"
+            content="contacto@genswave.com"
             description="Respuesta en 24 horas"
             delay={0.2}
             isInView={isInView}

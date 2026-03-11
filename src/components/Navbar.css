@@ -23,6 +23,26 @@
   cursor: pointer;
 }
 
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.logo-icon {
+  width: 32px;
+  height: 20px;
+  color: var(--black);
+}
+
+.logo-text {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--black);
+  font-family: 'Sora', sans-serif;
+  letter-spacing: -0.5px;
+}
+
 .nav-menu {
   display: flex;
   list-style: none;
@@ -164,6 +184,26 @@
   font-size: 1.5rem;
   font-weight: 700;
   color: var(--black);
+}
+
+.mobile-logo .logo-container {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.mobile-logo .logo-icon {
+  width: 28px;
+  height: 18px;
+  color: var(--black);
+}
+
+.mobile-logo .logo-text {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--black);
+  font-family: 'Sora', sans-serif;
+  letter-spacing: -0.5px;
 }
 
 .close-btn {

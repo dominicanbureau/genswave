@@ -235,7 +235,7 @@ function Login() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <h1>Studio</h1>
+            <h1>Genswave</h1>
             <p>Transforma tus ideas en experiencias digitales excepcionales</p>
           </motion.div>
           

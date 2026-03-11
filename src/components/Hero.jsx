@@ -24,22 +24,39 @@ function Hero() {
 
     window.addEventListener('appointmentSubmitted', handleAppointmentSubmitted);
     
-    // Force video play with multiple attempts
+    // Enhanced video play for mobile
     const playVideo = () => {
       if (videoRef.current) {
-        videoRef.current.play()
-          .then(() => {
-            console.log('Video playing successfully');
-          })
-          .catch(error => {
-            console.log('Video autoplay prevented, retrying...', error);
-            // Retry after a short delay
-            setTimeout(() => {
-              if (videoRef.current) {
-                videoRef.current.play().catch(e => console.log('Retry failed:', e));
-              }
-            }, 1000);
-          });
+        const video = videoRef.current;
+        
+        // Set video properties for better mobile compatibility
+        video.muted = true;
+        video.playsInline = true;
+        video.autoplay = true;
+        
+        const playPromise = video.play();
+        
+        if (playPromise !== undefined) {
+          playPromise
+            .then(() => {
+              console.log('Video playing successfully');
+            })
+            .catch(error => {
+              console.log('Video autoplay prevented, trying fallback...', error);
+              
+              // Mobile fallback: try to play on any user interaction
+              const playOnInteraction = () => {
+                video.play().catch(e => console.log('Mobile play failed:', e));
+                document.removeEventListener('touchstart', playOnInteraction);
+                document.removeEventListener('click', playOnInteraction);
+                document.removeEventListener('scroll', playOnInteraction);
+              };
+              
+              document.addEventListener('touchstart', playOnInteraction, { once: true });
+              document.addEventListener('click', playOnInteraction, { once: true });
+              document.addEventListener('scroll', playOnInteraction, { once: true });
+            });
+        }
       }
     };
 
@@ -49,21 +66,19 @@ function Hero() {
     // Also try after a short delay
     const playTimeout = setTimeout(playVideo, 500);
     
-    // Try on user interaction
-    const handleInteraction = () => {
-      playVideo();
-      document.removeEventListener('click', handleInteraction);
-      document.removeEventListener('touchstart', handleInteraction);
+    // Try on page visibility change (mobile browsers often pause videos)
+    const handleVisibilityChange = () => {
+      if (!document.hidden && videoRef.current) {
+        playVideo();
+      }
     };
     
-    document.addEventListener('click', handleInteraction, { once: true });
-    document.addEventListener('touchstart', handleInteraction, { once: true });
+    document.addEventListener('visibilitychange', handleVisibilityChange);
 
     return () => {
       window.removeEventListener('appointmentSubmitted', handleAppointmentSubmitted);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
       clearTimeout(playTimeout);
-      document.removeEventListener('click', handleInteraction);
-      document.removeEventListener('touchstart', handleInteraction);
     };
   }, []);
 

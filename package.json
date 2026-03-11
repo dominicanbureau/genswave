@@ -1,0 +1,54 @@
+{
+  "name": "studio-landing",
+  "version": "1.0.0",
+  "description": "Landing page con sistema de citas y panel de administración",
+  "type": "module",
+  "scripts": {
+    "dev": "node start-dev.js",
+    "dev-old": "concurrently \"npm run server\" \"npm run client\"",
+    "client": "vite",
+    "server": "nodemon server.js",
+    "build": "vite build",
+    "preview": "vite preview",
+    "start": "node server.js",
+    "postinstall": "npm run setup-production",
+    "setup-production": "node setup-production.js",
+    "migrate-db": "node migrate-production.js",
+    "health-check": "node health-check.js",
+    "verify-deployment": "node verify-deployment.js",
+    "check-server": "node check-server.js",
+    "check-admin": "node check-admin.js",
+    "migrate": "node migrate-final-features.js",
+    "fix-messages": "node fix-messages-table.js",
+    "setup-complete": "node setup-complete.js",
+    "install-deps": "node install-deps.js",
+    "setup": "npm run install-deps && npm run setup-complete"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.20.2",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "express-session": "^1.17.3",
+    "form-data": "^4.0.5",
+    "framer-motion": "^10.16.16",
+    "multer": "^2.1.1",
+    "node-fetch": "^3.3.2",
+    "pg": "^8.11.3",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.20.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.2.1",
+    "concurrently": "^8.2.2",
+    "nodemon": "^3.0.1",
+    "vite": "^5.0.8"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

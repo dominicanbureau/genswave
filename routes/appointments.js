@@ -1,0 +1,99 @@
+import express from 'express';
+import db from '../database.js';
+
+const router = express.Router();
+
+// Middleware to check authentication
+const requireAuth = (req, res, next) => {
+    if (!req.session.userId) {
+        return res.status(401).json({ error: 'No autorizado' });
+    }
+    next();
+};
+
+// Create appointment
+router.post('/', async (req, res) => {
+    try {
+        const { name, email, phone, businessName, service, message, preferredDate } = req.body;
+
+        const result = await db.query(
+            `INSERT INTO appointments (name, email, phone, business_name, service, message, preferred_date) 
+             VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
+            [name, email, phone, businessName || null, service, message, preferredDate]
+        );
+
+        res.json({ success: true, appointment: result.rows[0] });
+    } catch (error) {
+        console.error('Error al crear cita:', error);
+        res.status(500).json({ error: 'Error al crear la cita' });
+    }
+});
+
+// Get all appointments (admin only) or user appointments
+router.get('/', requireAuth, async (req, res) => {
+    try {
+        const userId = req.session.userId;
+        const isAdmin = req.session.user?.role === 'admin';
+        
+        let query, params;
+        
+        if (isAdmin) {
+            query = 'SELECT * FROM appointments ORDER BY created_at DESC';
+            params = [];
+        } else {
+            query = 'SELECT * FROM appointments WHERE user_id = $1 ORDER BY created_at DESC';
+            params = [userId];
+        }
+        
+        const result = await db.query(query, params);
+        res.json(result.rows);
+    } catch (error) {
+        console.error('Error al obtener citas:', error);
+        res.status(500).json({ error: 'Error al obtener las citas' });
+    }
+});
+
+// Update appointment status (admin only)
+router.patch('/:id/status', requireAuth, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { status } = req.body;
+
+        const result = await db.query(
+            'UPDATE appointments SET status = $1 WHERE id = $2 RETURNING *',
+            [status, id]
+        );
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ error: 'Cita no encontrada' });
+        }
+
+        res.json({ success: true, appointment: result.rows[0] });
+    } catch (error) {
+        console.error('Error al actualizar cita:', error);
+        res.status(500).json({ error: 'Error al actualizar la cita' });
+    }
+});
+
+// Delete appointment (admin only)
+router.delete('/:id', requireAuth, async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const result = await db.query(
+            'DELETE FROM appointments WHERE id = $1 RETURNING *',
+            [id]
+        );
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ error: 'Cita no encontrada' });
+        }
+
+        res.json({ success: true });
+    } catch (error) {
+        console.error('Error al eliminar cita:', error);
+        res.status(500).json({ error: 'Error al eliminar la cita' });
+    }
+});
+
+export default router;

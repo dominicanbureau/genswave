@@ -1,0 +1,368 @@
+.process-page {
+  width: 100%;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Hero Section */
+.process-hero {
+  min-height: 40vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8rem 2rem 2rem;
+  background: linear-gradient(180deg, #ffffff 0%, #f5f5f7 100%);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+.process-hero-header {
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+  text-align: center;
+  will-change: auto;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+}
+
+.process-hero h1 {
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  text-transform: uppercase;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+/* Timeline Section */
+.timeline-section {
+  padding: 8rem 2rem;
+  background: var(--white);
+  position: relative;
+}
+
+.timeline-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.timeline-line {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 2px;
+  background: linear-gradient(180deg, var(--black), var(--gray-medium));
+  transform: translateX(-50%);
+  z-index: 1;
+}
+
+/* Process Step */
+.process-step {
+  position: relative;
+  margin-bottom: 8rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  align-items: center;
+}
+
+.process-step.left {
+  grid-template-areas: "card marker";
+}
+
+.process-step.right {
+  grid-template-areas: "marker card";
+}
+
+.process-step.left .step-card {
+  grid-area: card;
+  text-align: right;
+}
+
+.process-step.right .step-card {
+  grid-area: card;
+  text-align: left;
+}
+
+.step-marker {
+  grid-area: marker;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: var(--black);
+  color: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  font-weight: 700;
+  position: relative;
+  z-index: 2;
+  margin: 0 auto;
+  cursor: pointer;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.step-card {
+  background: var(--white);
+  padding: 3rem;
+  border-radius: 20px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  will-change: auto;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+}
+
+.step-header h2 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  letter-spacing: -1px;
+  margin-bottom: 0.5rem;
+  will-change: auto;
+}
+
+.step-header h3 {
+  font-size: 1.3rem;
+  font-weight: 400;
+  color: var(--gray-medium);
+  margin-bottom: 1rem;
+  will-change: auto;
+}
+
+.step-duration {
+  display: inline-block;
+  padding: 0.4rem 1rem;
+  background: var(--gray-light);
+  border-radius: 50px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--gray-dark);
+}
+
+.step-description {
+  margin: 2rem 0;
+  font-size: 1.05rem;
+  line-height: 1.8;
+  color: var(--gray-dark);
+}
+
+/* Activities */
+.step-activities {
+  margin: 2rem 0;
+}
+
+.step-activities h4 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  opacity: 0.8;
+}
+
+.activities-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.8rem;
+}
+
+.activity-item {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.5rem 0;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.activity-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--black);
+  flex-shrink: 0;
+}
+
+.activity-item span {
+  font-size: 0.95rem;
+  opacity: 0.8;
+}
+
+/* Deliverables */
+.step-deliverables {
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.step-deliverables h4 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  opacity: 0.8;
+}
+
+.deliverables-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+}
+
+.deliverable-tag {
+  padding: 0.6rem 1.2rem;
+  background: var(--black);
+  color: var(--white);
+  border-radius: 50px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+/* Methodology Section */
+.methodology-section {
+  padding: 8rem 2rem;
+  background: var(--gray-light);
+}
+
+.methodology-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.methodology-content h2 {
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: 700;
+  letter-spacing: -2px;
+  margin-bottom: 1rem;
+}
+
+.methodology-content > p {
+  font-size: 1.2rem;
+  color: var(--gray-medium);
+  margin-bottom: 4rem;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.methodology-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+}
+
+.methodology-card {
+  background: var(--white);
+  padding: 2.5rem 2rem;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  will-change: auto;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+}
+
+.methodology-card h3 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  letter-spacing: -0.5px;
+}
+
+.methodology-card p {
+  font-size: 1rem;
+  line-height: 1.7;
+  color: var(--gray-medium);
+}
+
+/* CTA Section */
+.process-cta {
+  padding: 10rem 2rem;
+  background: var(--white);
+  color: var(--black);
+  text-align: center;
+}
+
+.process-cta .cta-content h2 {
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: 700;
+  letter-spacing: -2px;
+  margin-bottom: 1rem;
+  color: var(--black);
+}
+
+.process-cta .cta-content p {
+  font-size: 1.3rem;
+  color: var(--gray-medium);
+  margin-bottom: 3rem;
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.process-cta .cta-button {
+  display: inline-block;
+  padding: 1.2rem 3rem;
+  background: var(--black);
+  color: var(--white);
+  text-decoration: none;
+  border-radius: 50px;
+  font-size: 1.1rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .process-step {
+    grid-template-columns: 1fr;
+    grid-template-areas: "marker" "card" !important;
+    gap: 2rem;
+  }
+  
+  .step-card {
+    text-align: left !important;
+  }
+  
+  .timeline-line {
+    left: 40px;
+  }
+  
+  .step-marker {
+    margin: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .process-hero,
+  .timeline-section,
+  .methodology-section {
+    padding: 6rem 1.5rem 4rem;
+  }
+  
+  .activities-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .step-card {
+    padding: 2rem;
+  }
+  
+  .step-header h2 {
+    font-size: 2rem;
+  }
+  
+  .methodology-grid {
+    grid-template-columns: 1fr;
+  }
+}

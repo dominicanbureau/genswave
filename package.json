@@ -11,7 +11,6 @@
     "build": "vite build",
     "preview": "vite preview",
     "start": "node server.js",
-    "postinstall": "npm run setup-production",
     "setup-production": "node setup-production.js",
     "migrate-db": "node migrate-production.js",
     "health-check": "node health-check.js",
@@ -40,13 +39,13 @@
     "pg": "^8.11.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^6.20.0"
+    "react-router-dom": "^6.20.0",
+    "@vitejs/plugin-react": "^4.2.1",
+    "vite": "^5.0.8"
   },
   "devDependencies": {
-    "@vitejs/plugin-react": "^4.2.1",
     "concurrently": "^8.2.2",
-    "nodemon": "^3.0.1",
-    "vite": "^5.0.8"
+    "nodemon": "^3.0.1"
   },
   "engines": {
     "node": ">=18.0.0"

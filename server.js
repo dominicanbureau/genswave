@@ -55,10 +55,10 @@ app.use(session({
     resave: false,
     saveUninitialized: false,
     cookie: { 
-        secure: isProduction && process.env.HTTPS === 'true',
+        secure: false, // Render maneja HTTPS automáticamente
         maxAge: 24 * 60 * 60 * 1000, // 24 hours
         httpOnly: true,
-        sameSite: isProduction ? 'strict' : 'lax'
+        sameSite: 'lax'
     }
 }));
 

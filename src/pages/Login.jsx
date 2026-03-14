@@ -24,6 +24,14 @@ function Login() {
 
   useEffect(() => {
     checkAuth();
+    
+    // Check URL parameters to determine initial mode
+    const urlParams = new URLSearchParams(window.location.search);
+    const mode = urlParams.get('mode');
+    
+    if (mode === 'register') {
+      setIsLogin(false);
+    }
   }, []);
 
   const checkAuth = async () => {

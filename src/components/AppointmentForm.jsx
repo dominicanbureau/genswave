@@ -75,7 +75,7 @@ function AppointmentForm() {
         
         // Redirect to login after 1.5 seconds
         setTimeout(() => {
-          window.location.href = '/login';
+          window.location.href = '/login?mode=register';
         }, 1500);
       } else {
         setMessage({ text: 'Error al enviar la solicitud. Intenta de nuevo.', type: 'error' });
@@ -221,7 +221,7 @@ function AppointmentForm() {
             <motion.button
               type="button"
               className="create-account-btn"
-              onClick={() => window.location.href = '/login'}
+              onClick={() => window.location.href = '/login?mode=register'}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
             >

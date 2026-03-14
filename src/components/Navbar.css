@@ -21,26 +21,19 @@
   font-weight: 600;
   letter-spacing: -0.5px;
   cursor: pointer;
-}
-
-.logo-container {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
 }
 
-.logo-icon {
-  width: 32px;
-  height: 20px;
+.logo-image {
+  height: 40px;
+  width: auto;
   color: var(--black);
+  transition: all 0.3s ease;
 }
 
-.logo-text {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--black);
-  font-family: 'Sora', sans-serif;
-  letter-spacing: -0.5px;
+.logo-image:hover {
+  transform: scale(1.05);
 }
 
 .nav-menu {
@@ -184,26 +177,14 @@
   font-size: 1.5rem;
   font-weight: 700;
   color: var(--black);
-}
-
-.mobile-logo .logo-container {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
 }
 
-.mobile-logo .logo-icon {
-  width: 28px;
-  height: 18px;
+.mobile-logo-image {
+  height: 36px;
+  width: auto;
   color: var(--black);
-}
-
-.mobile-logo .logo-text {
-  font-size: 1.3rem;
-  font-weight: 700;
-  color: var(--black);
-  font-family: 'Sora', sans-serif;
-  letter-spacing: -0.5px;
 }
 
 .close-btn {

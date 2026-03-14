@@ -89,28 +89,11 @@ function Navbar() {
               transition={{ duration: 0.6 }}
               whileHover={{ scale: 1.05 }}
             >
-              <div className="logo-container">
-                <svg className="logo-icon" viewBox="0 0 100 60" fill="none">
-                  <path d="M10 30C10 30 20 10 35 10C50 10 60 30 60 30C60 30 70 50 85 50C90 50 90 30 90 30" 
-                        stroke="currentColor" 
-                        strokeWidth="3" 
-                        strokeLinecap="round" 
-                        fill="none"/>
-                  <path d="M15 35C15 35 25 15 40 15C55 15 65 35 65 35C65 35 75 55 90 55" 
-                        stroke="currentColor" 
-                        strokeWidth="2" 
-                        strokeLinecap="round" 
-                        fill="none" 
-                        opacity="0.6"/>
-                  <path d="M5 25C5 25 15 5 30 5C45 5 55 25 55 25C55 25 65 45 80 45" 
-                        stroke="currentColor" 
-                        strokeWidth="2" 
-                        strokeLinecap="round" 
-                        fill="none" 
-                        opacity="0.4"/>
-                </svg>
-                <span className="logo-text">Genswave</span>
-              </div>
+              <img 
+                src="/genswave-logo.svg" 
+                alt="Genswave" 
+                className="logo-image"
+              />
             </motion.div>
           </Link>
 
@@ -183,28 +166,11 @@ function Navbar() {
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: 0.2 }}
                 >
-                  <div className="logo-container">
-                    <svg className="logo-icon" viewBox="0 0 100 60" fill="none">
-                      <path d="M10 30C10 30 20 10 35 10C50 10 60 30 60 30C60 30 70 50 85 50C90 50 90 30 90 30" 
-                            stroke="currentColor" 
-                            strokeWidth="3" 
-                            strokeLinecap="round" 
-                            fill="none"/>
-                      <path d="M15 35C15 35 25 15 40 15C55 15 65 35 65 35C65 35 75 55 90 55" 
-                            stroke="currentColor" 
-                            strokeWidth="2" 
-                            strokeLinecap="round" 
-                            fill="none" 
-                            opacity="0.6"/>
-                      <path d="M5 25C5 25 15 5 30 5C45 5 55 25 55 25C55 25 65 45 80 45" 
-                            stroke="currentColor" 
-                            strokeWidth="2" 
-                            strokeLinecap="round" 
-                            fill="none" 
-                            opacity="0.4"/>
-                    </svg>
-                    <span className="logo-text">Genswave</span>
-                  </div>
+                  <img 
+                    src="/genswave-logo.svg" 
+                    alt="Genswave" 
+                    className="mobile-logo-image"
+                  />
                 </motion.div>
                 <motion.button
                   className="close-btn"

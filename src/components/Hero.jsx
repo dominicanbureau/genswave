@@ -24,12 +24,12 @@ function Hero() {
 
     window.addEventListener('appointmentSubmitted', handleAppointmentSubmitted);
     
-    // Enhanced video play for mobile with aggressive strategies
+    // Ultra-aggressive video autoplay for mobile
     const playVideo = async () => {
       if (videoRef.current) {
         const video = videoRef.current;
         
-        // Set video properties for maximum mobile compatibility
+        // Set all possible video properties for mobile compatibility
         video.muted = true;
         video.playsInline = true;
         video.autoplay = true;
@@ -38,100 +38,117 @@ function Hero() {
         video.setAttribute('playsinline', 'true');
         video.setAttribute('webkit-playsinline', 'true');
         video.setAttribute('muted', 'true');
+        video.setAttribute('autoplay', 'true');
+        video.setAttribute('loop', 'true');
         
-        // Force load the video
-        video.load();
+        // Force properties directly
+        Object.defineProperty(video, 'muted', { value: true, writable: false });
+        Object.defineProperty(video, 'volume', { value: 0, writable: false });
         
         try {
-          // Force play immediately
-          const playPromise = video.play();
-          if (playPromise !== undefined) {
-            await playPromise;
-            console.log('Video playing successfully');
-          }
+          // Multiple immediate play attempts
+          await video.play();
+          console.log('Video playing successfully');
         } catch (error) {
-          console.log('Video autoplay prevented, setting up mobile fallbacks...', error);
+          console.log('Initial autoplay failed, trying aggressive fallbacks...', error);
           
-          // Immediate retry without waiting for interaction
-          setTimeout(async () => {
-            try {
-              await video.play();
-              console.log('Video started on retry');
-            } catch (e) {
-              console.log('Retry failed, setting up interaction listeners');
-            }
-          }, 100);
+          // Immediate aggressive retries
+          const retryAttempts = [50, 100, 200, 500, 1000];
+          retryAttempts.forEach((delay, index) => {
+            setTimeout(async () => {
+              try {
+                video.currentTime = 0;
+                await video.play();
+                console.log(`Video started on retry attempt ${index + 1}`);
+              } catch (e) {
+                console.log(`Retry ${index + 1} failed:`, e);
+              }
+            }, delay);
+          });
           
-          // Multiple mobile fallback strategies
-          const playOnInteraction = async (event) => {
+          // Set up interaction listeners with immediate trigger
+          const playOnAnyInteraction = async (event) => {
             try {
-              event.preventDefault();
+              video.currentTime = 0;
               await video.play();
-              console.log('Video started on user interaction');
+              console.log('Video started on user interaction:', event.type);
+              
               // Remove all listeners once successful
-              document.removeEventListener('touchstart', playOnInteraction);
-              document.removeEventListener('touchend', playOnInteraction);
-              document.removeEventListener('touchmove', playOnInteraction);
-              document.removeEventListener('click', playOnInteraction);
-              document.removeEventListener('scroll', playOnInteraction);
-              document.removeEventListener('keydown', playOnInteraction);
-              window.removeEventListener('focus', playOnInteraction);
-              window.removeEventListener('load', playOnInteraction);
+              document.removeEventListener('touchstart', playOnAnyInteraction, true);
+              document.removeEventListener('touchend', playOnAnyInteraction, true);
+              document.removeEventListener('touchmove', playOnAnyInteraction, true);
+              document.removeEventListener('click', playOnAnyInteraction, true);
+              document.removeEventListener('scroll', playOnAnyInteraction, true);
+              document.removeEventListener('keydown', playOnAnyInteraction, true);
+              document.removeEventListener('mousemove', playOnAnyInteraction, true);
+              window.removeEventListener('focus', playOnAnyInteraction, true);
+              window.removeEventListener('blur', playOnAnyInteraction, true);
+              window.removeEventListener('resize', playOnAnyInteraction, true);
             } catch (e) {
-              console.log('Mobile play attempt failed:', e);
+              console.log('Interaction play failed:', e);
             }
           };
           
-          // Add multiple event listeners for maximum coverage
-          document.addEventListener('touchstart', playOnInteraction, { passive: false });
-          document.addEventListener('touchend', playOnInteraction, { passive: false });
-          document.addEventListener('touchmove', playOnInteraction, { passive: false });
-          document.addEventListener('click', playOnInteraction, { passive: false });
-          document.addEventListener('scroll', playOnInteraction, { passive: false });
-          document.addEventListener('keydown', playOnInteraction, { passive: false });
-          window.addEventListener('focus', playOnInteraction, { passive: false });
-          window.addEventListener('load', playOnInteraction, { passive: false });
+          // Add listeners with capture phase for maximum coverage
+          document.addEventListener('touchstart', playOnAnyInteraction, { capture: true, passive: false });
+          document.addEventListener('touchend', playOnAnyInteraction, { capture: true, passive: false });
+          document.addEventListener('touchmove', playOnAnyInteraction, { capture: true, passive: false });
+          document.addEventListener('click', playOnAnyInteraction, { capture: true, passive: false });
+          document.addEventListener('scroll', playOnAnyInteraction, { capture: true, passive: false });
+          document.addEventListener('keydown', playOnAnyInteraction, { capture: true, passive: false });
+          document.addEventListener('mousemove', playOnAnyInteraction, { capture: true, passive: false });
+          window.addEventListener('focus', playOnAnyInteraction, { capture: true, passive: false });
+          window.addEventListener('blur', playOnAnyInteraction, { capture: true, passive: false });
+          window.addEventListener('resize', playOnAnyInteraction, { capture: true, passive: false });
         }
       }
     };
 
-    // Try to play immediately
+    // Try to play immediately when component mounts
     playVideo();
     
-    // Try multiple times with different delays for mobile browsers
-    const timeouts = [100, 500, 1000, 2000];
+    // Try multiple times with different delays
+    const timeouts = [10, 50, 100, 250, 500, 1000, 2000, 3000];
     const timeoutIds = timeouts.map(delay => 
       setTimeout(playVideo, delay)
     );
     
-    // Try on page visibility change (mobile browsers often pause videos)
+    // Try on various browser events
     const handleVisibilityChange = () => {
       if (!document.hidden && videoRef.current) {
-        playVideo();
+        setTimeout(playVideo, 100);
       }
     };
     
-    // Try on window focus (mobile browsers)
     const handleWindowFocus = () => {
       if (videoRef.current) {
-        playVideo();
+        setTimeout(playVideo, 100);
       }
     };
     
-    // Try on orientation change (mobile)
     const handleOrientationChange = () => {
       setTimeout(playVideo, 500);
+    };
+    
+    const handlePageShow = () => {
+      setTimeout(playVideo, 100);
     };
     
     document.addEventListener('visibilitychange', handleVisibilityChange);
     window.addEventListener('focus', handleWindowFocus);
     window.addEventListener('orientationchange', handleOrientationChange);
+    window.addEventListener('pageshow', handlePageShow);
+    window.addEventListener('DOMContentLoaded', playVideo);
+    window.addEventListener('load', playVideo);
 
     return () => {
       window.removeEventListener('appointmentSubmitted', handleAppointmentSubmitted);
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       window.removeEventListener('focus', handleWindowFocus);
       window.removeEventListener('orientationchange', handleOrientationChange);
+      window.removeEventListener('pageshow', handlePageShow);
+      window.removeEventListener('DOMContentLoaded', playVideo);
+      window.removeEventListener('load', playVideo);
       timeoutIds.forEach(clearTimeout);
     };
   }, []);

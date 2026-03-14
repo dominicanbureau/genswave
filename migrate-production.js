@@ -161,6 +161,16 @@ async function runProductionMigrations() {
             )
         `);
 
+        // 7.1. Ensure description column exists (for existing databases)
+        try {
+            await db.query(`
+                ALTER TABLE quick_codes 
+                ADD COLUMN IF NOT EXISTS description TEXT NOT NULL DEFAULT 'Código de acceso rápido'
+            `);
+        } catch (error) {
+            console.log('⚠️  Description column already exists or could not be added');
+        }
+
         // 8. Create admin user if not exists
         console.log('👤 Creating admin user...');
         const adminExists = await db.query('SELECT id FROM users WHERE email = $1', ['admin@studio.com']);
@@ -178,6 +188,22 @@ async function runProductionMigrations() {
 
         // 9. Insert sample quick codes
         console.log('🔢 Setting up quick codes...');
+        
+        // Check if description column exists before inserting
+        const columnCheck = await db.query(`
+            SELECT column_name 
+            FROM information_schema.columns 
+            WHERE table_name = 'quick_codes' AND column_name = 'description'
+        `);
+        
+        if (columnCheck.rows.length === 0) {
+            console.log('⚠️  Description column not found, adding it...');
+            await db.query(`
+                ALTER TABLE quick_codes 
+                ADD COLUMN description TEXT NOT NULL DEFAULT 'Código de acceso rápido'
+            `);
+        }
+
         const quickCodes = [
             { code: 'WELCOME10', description: '10% de descuento para nuevos clientes' },
             { code: 'PREMIUM20', description: '20% de descuento en servicios premium' },

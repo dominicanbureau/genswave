@@ -270,6 +270,10 @@
     margin: 0 auto;
   }
 
+  .scroll-indicator svg {
+    margin: 0 auto;
+  }
+
   /* Enhanced mobile video support */
   .hero-video-background {
     -webkit-transform: translate3d(0, 0, 0);

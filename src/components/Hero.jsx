@@ -24,76 +24,74 @@ function Hero() {
 
     window.addEventListener('appointmentSubmitted', handleAppointmentSubmitted);
     
-    // Simplified but more effective video autoplay
-    const playVideo = () => {
+    // Immediate video autoplay - bypass all browser restrictions
+    const startVideoImmediately = () => {
       const video = videoRef.current;
       if (!video) return;
       
-      // Ensure video is properly configured
+      console.log('🎬 Starting video immediately...');
+      
+      // Force all necessary properties
       video.muted = true;
+      video.volume = 0;
+      video.defaultMuted = true;
       video.playsInline = true;
       video.autoplay = true;
       video.loop = true;
-      video.volume = 0;
       
-      // Force play immediately
-      const attemptPlay = async () => {
-        try {
-          video.currentTime = 0;
-          const playPromise = video.play();
-          if (playPromise !== undefined) {
-            await playPromise;
-            console.log('✅ Video playing successfully');
-            return true;
-          }
-        } catch (error) {
-          console.log('❌ Video play failed:', error.message);
-          return false;
-        }
-      };
+      // Set attributes directly on DOM
+      video.setAttribute('muted', 'true');
+      video.setAttribute('playsinline', 'true');
+      video.setAttribute('autoplay', 'true');
+      video.setAttribute('webkit-playsinline', 'true');
       
-      // Try to play immediately
-      attemptPlay();
-      
-      // Set up single interaction listener that removes itself
-      const playOnInteraction = async (event) => {
-        console.log('🎬 Attempting video play on:', event.type);
-        const success = await attemptPlay();
-        if (success) {
-          // Remove listener after successful play
-          document.removeEventListener('touchstart', playOnInteraction);
-          document.removeEventListener('click', playOnInteraction);
-          document.removeEventListener('scroll', playOnInteraction);
-          document.removeEventListener('keydown', playOnInteraction);
-        }
-      };
-      
-      // Add minimal interaction listeners
-      document.addEventListener('touchstart', playOnInteraction, { once: true, passive: true });
-      document.addEventListener('click', playOnInteraction, { once: true, passive: true });
-      document.addEventListener('scroll', playOnInteraction, { once: true, passive: true });
-      document.addEventListener('keydown', playOnInteraction, { once: true, passive: true });
+      // Force play immediately without waiting
+      video.play().then(() => {
+        console.log('✅ Video playing successfully!');
+      }).catch(() => {
+        // If blocked, force play on any interaction
+        const forcePlay = () => {
+          video.play().then(() => {
+            console.log('✅ Video started after interaction!');
+          }).catch(() => {
+            console.log('❌ Video play failed');
+          });
+        };
+        
+        // Listen for any user interaction
+        document.addEventListener('touchstart', forcePlay, { once: true, passive: true });
+        document.addEventListener('click', forcePlay, { once: true, passive: true });
+        document.addEventListener('scroll', forcePlay, { once: true, passive: true });
+        document.addEventListener('mousemove', forcePlay, { once: true, passive: true });
+        
+        // Also try periodically
+        const interval = setInterval(() => {
+          video.play().then(() => {
+            console.log('✅ Video started via interval!');
+            clearInterval(interval);
+          }).catch(() => {
+            // Keep trying
+          });
+        }, 500);
+        
+        // Stop trying after 10 seconds
+        setTimeout(() => clearInterval(interval), 10000);
+      });
     };
 
-    // Try to play when video loads
+    // Start video as soon as possible
     const video = videoRef.current;
     if (video) {
-      if (video.readyState >= 3) {
-        // Video is already loaded
-        playVideo();
-      } else {
-        // Wait for video to load
-        video.addEventListener('loadeddata', playVideo, { once: true });
-        video.addEventListener('canplay', playVideo, { once: true });
-      }
+      // Try immediately
+      startVideoImmediately();
+      
+      // Also try when video loads
+      video.addEventListener('loadedmetadata', startVideoImmediately);
+      video.addEventListener('canplay', startVideoImmediately);
     }
-    
-    // Also try after component mount
-    const mountTimeout = setTimeout(playVideo, 100);
 
     return () => {
       window.removeEventListener('appointmentSubmitted', handleAppointmentSubmitted);
-      clearTimeout(mountTimeout);
     };
   }, []);
 
@@ -134,10 +132,12 @@ function Hero() {
         loop 
         muted 
         playsInline
-        preload="metadata"
+        preload="auto"
         controls={false}
         disablePictureInPicture
         controlsList="nodownload nofullscreen noremoteplayback"
+        webkit-playsinline="true"
+        x5-playsinline="true"
       >
         <source src="/backgroundstudio.mp4" type="video/mp4" />
       </video>

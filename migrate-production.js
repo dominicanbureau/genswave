@@ -151,24 +151,38 @@ async function runProductionMigrations() {
 
         // 7. Create quick_codes table
         console.log('📋 Creating quick_codes table...');
-        await db.query(`
-            CREATE TABLE IF NOT EXISTS quick_codes (
-                id SERIAL PRIMARY KEY,
-                code VARCHAR(10) UNIQUE NOT NULL,
-                description TEXT NOT NULL,
-                is_active BOOLEAN DEFAULT TRUE,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            )
+        
+        // Check if the table exists and what columns it has
+        const tableExists = await db.query(`
+            SELECT column_name 
+            FROM information_schema.columns 
+            WHERE table_name = 'quick_codes'
+            ORDER BY ordinal_position
         `);
-
-        // 7.1. Ensure description column exists (for existing databases)
-        try {
+        
+        if (tableExists.rows.length === 0) {
+            // Create new table with simple structure
             await db.query(`
-                ALTER TABLE quick_codes 
-                ADD COLUMN IF NOT EXISTS description TEXT NOT NULL DEFAULT 'Código de acceso rápido'
+                CREATE TABLE quick_codes (
+                    id SERIAL PRIMARY KEY,
+                    code VARCHAR(10) UNIQUE NOT NULL,
+                    description TEXT NOT NULL,
+                    is_active BOOLEAN DEFAULT TRUE,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
             `);
-        } catch (error) {
-            console.log('⚠️  Description column already exists or could not be added');
+        } else {
+            // Table exists, check if it has the old structure with name/email columns
+            const hasNameColumn = tableExists.rows.some(row => row.column_name === 'name');
+            const hasDescriptionColumn = tableExists.rows.some(row => row.column_name === 'description');
+            
+            if (hasNameColumn && !hasDescriptionColumn) {
+                // Old structure, add description column
+                await db.query(`
+                    ALTER TABLE quick_codes 
+                    ADD COLUMN IF NOT EXISTS description TEXT DEFAULT 'Código de acceso rápido'
+                `);
+            }
         }
 
         // 8. Create admin user if not exists
@@ -189,34 +203,68 @@ async function runProductionMigrations() {
         // 9. Insert sample quick codes
         console.log('🔢 Setting up quick codes...');
         
-        // Check if description column exists before inserting
-        const columnCheck = await db.query(`
+        // Check table structure to determine how to insert
+        const columns = await db.query(`
             SELECT column_name 
             FROM information_schema.columns 
-            WHERE table_name = 'quick_codes' AND column_name = 'description'
+            WHERE table_name = 'quick_codes'
+            ORDER BY ordinal_position
         `);
         
-        if (columnCheck.rows.length === 0) {
-            console.log('⚠️  Description column not found, adding it...');
-            await db.query(`
-                ALTER TABLE quick_codes 
-                ADD COLUMN description TEXT NOT NULL DEFAULT 'Código de acceso rápido'
-            `);
-        }
-
+        const columnNames = columns.rows.map(row => row.column_name);
+        const hasNameColumn = columnNames.includes('name');
+        const hasEmailColumn = columnNames.includes('email');
+        const hasDescriptionColumn = columnNames.includes('description');
+        
         const quickCodes = [
-            { code: 'WELCOME10', description: '10% de descuento para nuevos clientes' },
-            { code: 'PREMIUM20', description: '20% de descuento en servicios premium' },
-            { code: 'REFERRAL15', description: '15% de descuento por referido' }
+            { 
+                code: 'WELCOME10', 
+                description: '10% de descuento para nuevos clientes',
+                name: 'Código de Bienvenida',
+                email: 'admin@genswave.com'
+            },
+            { 
+                code: 'PREMIUM20', 
+                description: '20% de descuento en servicios premium',
+                name: 'Código Premium',
+                email: 'admin@genswave.com'
+            },
+            { 
+                code: 'REFERRAL15', 
+                description: '15% de descuento por referido',
+                name: 'Código de Referido',
+                email: 'admin@genswave.com'
+            }
         ];
 
         for (const quickCode of quickCodes) {
             const exists = await db.query('SELECT id FROM quick_codes WHERE code = $1', [quickCode.code]);
             if (exists.rows.length === 0) {
-                await db.query(
-                    'INSERT INTO quick_codes (code, description) VALUES ($1, $2)',
-                    [quickCode.code, quickCode.description]
-                );
+                if (hasNameColumn && hasEmailColumn && hasDescriptionColumn) {
+                    // Full structure with name, email, and description
+                    await db.query(`
+                        INSERT INTO quick_codes (code, name, email, description, expires_at) 
+                        VALUES ($1, $2, $3, $4, $5)
+                    `, [
+                        quickCode.code, 
+                        quickCode.name, 
+                        quickCode.email, 
+                        quickCode.description,
+                        new Date(Date.now() + 365 * 24 * 60 * 60 * 1000) // 1 year from now
+                    ]);
+                } else if (hasDescriptionColumn) {
+                    // Simple structure with just code and description
+                    await db.query(
+                        'INSERT INTO quick_codes (code, description) VALUES ($1, $2)',
+                        [quickCode.code, quickCode.description]
+                    );
+                } else {
+                    // Minimal structure with just code
+                    await db.query(
+                        'INSERT INTO quick_codes (code) VALUES ($1)',
+                        [quickCode.code]
+                    );
+                }
             }
         }
 

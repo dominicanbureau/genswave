@@ -24,132 +24,70 @@ function Hero() {
 
     window.addEventListener('appointmentSubmitted', handleAppointmentSubmitted);
     
-    // Ultra-aggressive video autoplay for mobile
-    const playVideo = async () => {
-      if (videoRef.current) {
-        const video = videoRef.current;
-        
-        // Set all possible video properties for mobile compatibility
-        video.muted = true;
-        video.playsInline = true;
-        video.autoplay = true;
-        video.defaultMuted = true;
-        video.volume = 0;
-        video.setAttribute('playsinline', 'true');
-        video.setAttribute('webkit-playsinline', 'true');
-        video.setAttribute('muted', 'true');
-        video.setAttribute('autoplay', 'true');
-        video.setAttribute('loop', 'true');
-        
-        // Force properties directly
-        Object.defineProperty(video, 'muted', { value: true, writable: false });
-        Object.defineProperty(video, 'volume', { value: 0, writable: false });
-        
+    // Simplified but more effective video autoplay
+    const playVideo = () => {
+      const video = videoRef.current;
+      if (!video) return;
+      
+      // Ensure video is properly configured
+      video.muted = true;
+      video.playsInline = true;
+      video.autoplay = true;
+      video.loop = true;
+      video.volume = 0;
+      
+      // Force play immediately
+      const attemptPlay = async () => {
         try {
-          // Multiple immediate play attempts
+          video.currentTime = 0;
           await video.play();
-          console.log('Video playing successfully');
+          console.log('✅ Video playing successfully');
+          return true;
         } catch (error) {
-          console.log('Initial autoplay failed, trying aggressive fallbacks...', error);
-          
-          // Immediate aggressive retries
-          const retryAttempts = [50, 100, 200, 500, 1000];
-          retryAttempts.forEach((delay, index) => {
-            setTimeout(async () => {
-              try {
-                video.currentTime = 0;
-                await video.play();
-                console.log(`Video started on retry attempt ${index + 1}`);
-              } catch (e) {
-                console.log(`Retry ${index + 1} failed:`, e);
-              }
-            }, delay);
-          });
-          
-          // Set up interaction listeners with immediate trigger
-          const playOnAnyInteraction = async (event) => {
-            try {
-              video.currentTime = 0;
-              await video.play();
-              console.log('Video started on user interaction:', event.type);
-              
-              // Remove all listeners once successful
-              document.removeEventListener('touchstart', playOnAnyInteraction, true);
-              document.removeEventListener('touchend', playOnAnyInteraction, true);
-              document.removeEventListener('touchmove', playOnAnyInteraction, true);
-              document.removeEventListener('click', playOnAnyInteraction, true);
-              document.removeEventListener('scroll', playOnAnyInteraction, true);
-              document.removeEventListener('keydown', playOnAnyInteraction, true);
-              document.removeEventListener('mousemove', playOnAnyInteraction, true);
-              window.removeEventListener('focus', playOnAnyInteraction, true);
-              window.removeEventListener('blur', playOnAnyInteraction, true);
-              window.removeEventListener('resize', playOnAnyInteraction, true);
-            } catch (e) {
-              console.log('Interaction play failed:', e);
-            }
-          };
-          
-          // Add listeners with capture phase for maximum coverage
-          document.addEventListener('touchstart', playOnAnyInteraction, { capture: true, passive: false });
-          document.addEventListener('touchend', playOnAnyInteraction, { capture: true, passive: false });
-          document.addEventListener('touchmove', playOnAnyInteraction, { capture: true, passive: false });
-          document.addEventListener('click', playOnAnyInteraction, { capture: true, passive: false });
-          document.addEventListener('scroll', playOnAnyInteraction, { capture: true, passive: false });
-          document.addEventListener('keydown', playOnAnyInteraction, { capture: true, passive: false });
-          document.addEventListener('mousemove', playOnAnyInteraction, { capture: true, passive: false });
-          window.addEventListener('focus', playOnAnyInteraction, { capture: true, passive: false });
-          window.addEventListener('blur', playOnAnyInteraction, { capture: true, passive: false });
-          window.addEventListener('resize', playOnAnyInteraction, { capture: true, passive: false });
+          console.log('❌ Video play failed:', error.message);
+          return false;
         }
-      }
+      };
+      
+      // Try to play immediately
+      attemptPlay();
+      
+      // Set up single interaction listener that removes itself
+      const playOnInteraction = async () => {
+        const success = await attemptPlay();
+        if (success) {
+          // Remove listener after successful play
+          document.removeEventListener('touchstart', playOnInteraction);
+          document.removeEventListener('click', playOnInteraction);
+          document.removeEventListener('scroll', playOnInteraction);
+        }
+      };
+      
+      // Add minimal interaction listeners
+      document.addEventListener('touchstart', playOnInteraction, { once: true, passive: true });
+      document.addEventListener('click', playOnInteraction, { once: true, passive: true });
+      document.addEventListener('scroll', playOnInteraction, { once: true, passive: true });
     };
 
-    // Try to play immediately when component mounts
-    playVideo();
-    
-    // Try multiple times with different delays
-    const timeouts = [10, 50, 100, 250, 500, 1000, 2000, 3000];
-    const timeoutIds = timeouts.map(delay => 
-      setTimeout(playVideo, delay)
-    );
-    
-    // Try on various browser events
-    const handleVisibilityChange = () => {
-      if (!document.hidden && videoRef.current) {
-        setTimeout(playVideo, 100);
+    // Try to play when video loads
+    const video = videoRef.current;
+    if (video) {
+      if (video.readyState >= 3) {
+        // Video is already loaded
+        playVideo();
+      } else {
+        // Wait for video to load
+        video.addEventListener('loadeddata', playVideo, { once: true });
+        video.addEventListener('canplay', playVideo, { once: true });
       }
-    };
+    }
     
-    const handleWindowFocus = () => {
-      if (videoRef.current) {
-        setTimeout(playVideo, 100);
-      }
-    };
-    
-    const handleOrientationChange = () => {
-      setTimeout(playVideo, 500);
-    };
-    
-    const handlePageShow = () => {
-      setTimeout(playVideo, 100);
-    };
-    
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    window.addEventListener('focus', handleWindowFocus);
-    window.addEventListener('orientationchange', handleOrientationChange);
-    window.addEventListener('pageshow', handlePageShow);
-    window.addEventListener('DOMContentLoaded', playVideo);
-    window.addEventListener('load', playVideo);
+    // Also try after component mount
+    const mountTimeout = setTimeout(playVideo, 100);
 
     return () => {
       window.removeEventListener('appointmentSubmitted', handleAppointmentSubmitted);
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-      window.removeEventListener('focus', handleWindowFocus);
-      window.removeEventListener('orientationchange', handleOrientationChange);
-      window.removeEventListener('pageshow', handlePageShow);
-      window.removeEventListener('DOMContentLoaded', playVideo);
-      window.removeEventListener('load', playVideo);
-      timeoutIds.forEach(clearTimeout);
+      clearTimeout(mountTimeout);
     };
   }, []);
 
@@ -190,17 +128,10 @@ function Hero() {
         loop 
         muted 
         playsInline
-        preload="auto"
+        preload="metadata"
         controls={false}
-        webkit-playsinline="true"
-        x5-playsinline="true"
-        x5-video-player-type="h5"
-        x5-video-player-fullscreen="true"
-        x-webkit-airplay="allow"
         disablePictureInPicture
         controlsList="nodownload nofullscreen noremoteplayback"
-        data-setup="{}"
-        poster=""
       >
         <source src="/backgroundstudio.mp4" type="video/mp4" />
       </video>

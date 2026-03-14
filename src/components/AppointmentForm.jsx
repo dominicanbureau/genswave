@@ -72,6 +72,11 @@ function AppointmentForm() {
         
         // Dispatch event to clear Hero input
         window.dispatchEvent(new CustomEvent('appointmentSubmitted'));
+        
+        // Redirect to login after 1.5 seconds
+        setTimeout(() => {
+          window.location.href = '/login';
+        }, 1500);
       } else {
         setMessage({ text: 'Error al enviar la solicitud. Intenta de nuevo.', type: 'error' });
       }

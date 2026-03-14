@@ -186,6 +186,20 @@ function Hero() {
             Iniciemos
           </motion.button>
         </motion.div>
+
+        <motion.div
+          className="hero-login-text"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 1.2 }}
+        >
+          <p>
+            ¿Ya tienes una cuenta?{' '}
+            <a href="/login" className="login-link">
+              <strong>Inicia sesión</strong>
+            </a>
+          </p>
+        </motion.div>
       </motion.div>
 
       <motion.div 

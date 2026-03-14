@@ -139,6 +139,29 @@
   transform: translateY(-2px);
 }
 
+.hero-login-text {
+  text-align: center;
+  margin-top: 1rem;
+}
+
+.hero-login-text p {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.9rem;
+  color: var(--gray-medium);
+  margin: 0;
+}
+
+.login-link {
+  color: var(--black);
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.login-link:hover {
+  color: #333;
+  text-decoration: underline;
+}
+
 .scroll-indicator {
   position: absolute;
   bottom: 2rem;
@@ -207,5 +230,13 @@
   .start-button {
     width: 100%;
     padding: 1.2rem 2rem;
+  }
+  
+  .hero-login-text {
+    margin-top: 1.5rem;
+  }
+  
+  .hero-login-text p {
+    font-size: 0.85rem;
   }
 }

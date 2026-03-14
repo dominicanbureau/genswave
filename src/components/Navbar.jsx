@@ -90,7 +90,7 @@ function Navbar() {
               whileHover={{ scale: 1.05 }}
             >
               <img 
-                src="/genswave-logo.svg" 
+                src="/genswave-logo.png" 
                 alt="Genswave" 
                 className="logo-image"
               />
@@ -167,7 +167,7 @@ function Navbar() {
                   transition={{ delay: 0.2 }}
                 >
                   <img 
-                    src="/genswave-logo.svg" 
+                    src="/genswave-logo.png" 
                     alt="Genswave" 
                     className="mobile-logo-image"
                   />

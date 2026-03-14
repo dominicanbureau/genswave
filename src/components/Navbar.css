@@ -28,8 +28,8 @@
 .logo-image {
   height: 40px;
   width: auto;
-  color: var(--black);
   transition: all 0.3s ease;
+  filter: brightness(0); /* Hace la imagen negra para que se vea bien en navbar claro */
 }
 
 .logo-image:hover {
@@ -184,7 +184,7 @@
 .mobile-logo-image {
   height: 36px;
   width: auto;
-  color: var(--black);
+  filter: brightness(0); /* Hace la imagen negra para que se vea bien en navbar claro */
 }
 
 .close-btn {

@@ -330,58 +330,94 @@
   border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
-/* Visual */
+/* Visual 3D Icons */
 .service-visual {
-  perspective: 1000px;
+  perspective: 1200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.visual-container {
+.visual-container-3d {
   width: 100%;
   height: 500px;
   position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.visual-card {
-  width: 100%;
-  height: 100%;
-  border-radius: 30px;
-  position: relative;
-  overflow: hidden;
+.icon-wrapper {
   transform-style: preserve-3d;
+  width: 300px;
+  height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.service-section.dark .visual-card {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.service-section.light .visual-card {
-  background: rgba(0, 0, 0, 0.02);
-  border: 1px solid rgba(0, 0, 0, 0.05);
-}
-
-.visual-gradient {
-  position: absolute;
+.service-icon-3d {
   width: 100%;
   height: 100%;
-  opacity: 0.1;
-  mix-blend-mode: overlay;
+  transform-style: preserve-3d;
+  cursor: pointer;
 }
 
-.visual-grid {
-  position: absolute;
+.icon-3d {
   width: 100%;
   height: 100%;
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  grid-template-rows: repeat(3, 1fr);
-  gap: 1px;
-  padding: 2rem;
+  filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.2));
 }
 
-.grid-item {
-  background: currentColor;
-  border-radius: 10px;
+/* Specific icon styles */
+.web-icon .icon-3d {
+  transform: rotateX(5deg) rotateY(-5deg);
+}
+
+.app-icon .icon-3d {
+  transform: rotateX(-3deg) rotateY(8deg);
+}
+
+.custom-icon .icon-3d {
+  transform: rotateX(2deg) rotateY(-3deg);
+}
+
+/* Hover effects for icons */
+.web-icon:hover .icon-3d {
+  filter: drop-shadow(0 15px 40px rgba(0, 0, 0, 0.3));
+}
+
+.app-icon:hover .icon-3d {
+  filter: drop-shadow(0 15px 40px rgba(29, 29, 31, 0.3));
+}
+
+.custom-icon:hover .icon-3d {
+  filter: drop-shadow(0 15px 40px rgba(45, 45, 47, 0.3));
+}
+
+/* Animation for gears in custom icon */
+.custom-icon svg circle:first-of-type {
+  animation: rotateGear 10s linear infinite;
+  transform-origin: 100px 100px;
+}
+
+.custom-icon svg circle:nth-of-type(4) {
+  animation: rotateGear 8s linear infinite reverse;
+  transform-origin: 140px 70px;
+}
+
+.custom-icon svg circle:nth-of-type(7) {
+  animation: rotateGear 12s linear infinite;
+  transform-origin: 60px 130px;
+}
+
+@keyframes rotateGear {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* CTA Section */
@@ -427,8 +463,13 @@
     order: -1;
   }
   
-  .visual-container {
-    height: 400px;
+  .visual-container-3d {
+    height: 350px;
+  }
+  
+  .icon-wrapper {
+    width: 250px;
+    height: 250px;
   }
 }
 
@@ -478,8 +519,13 @@
     display: none;
   }
   
-  .visual-container {
-    height: 300px;
+  .visual-container-3d {
+    height: 280px;
+  }
+  
+  .icon-wrapper {
+    width: 200px;
+    height: 200px;
   }
 
   .scroll-indicator {

@@ -16,6 +16,11 @@
   height: 100%;
   object-fit: cover;
   z-index: 1;
+  /* Enhanced mobile video support */
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
 .hero-video-overlay {
@@ -170,11 +175,13 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 0.5rem;
   color: var(--gray-medium);
   cursor: pointer;
   z-index: 10;
   transition: all 0.3s ease;
+  text-align: center;
 }
 
 .scroll-indicator:hover {
@@ -185,6 +192,8 @@
   font-size: 0.9rem;
   font-weight: 500;
   letter-spacing: 0.1em;
+  display: block;
+  text-align: center;
 }
 
 @keyframes bounce {
@@ -238,5 +247,33 @@
   
   .hero-login-text p {
     font-size: 0.85rem;
+  }
+
+  .scroll-indicator {
+    position: absolute;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    width: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    margin: 0;
+  }
+
+  .scroll-indicator span {
+    width: auto;
+    text-align: center;
+    display: block;
+    margin: 0 auto;
+  }
+
+  /* Enhanced mobile video support */
+  .hero-video-background {
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+    will-change: transform;
   }
 }

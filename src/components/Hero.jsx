@@ -24,38 +24,73 @@ function Hero() {
 
     window.addEventListener('appointmentSubmitted', handleAppointmentSubmitted);
     
-    // Enhanced video play for mobile
-    const playVideo = () => {
+    // Enhanced video play for mobile with aggressive strategies
+    const playVideo = async () => {
       if (videoRef.current) {
         const video = videoRef.current;
         
-        // Set video properties for better mobile compatibility
+        // Set video properties for maximum mobile compatibility
         video.muted = true;
         video.playsInline = true;
         video.autoplay = true;
+        video.defaultMuted = true;
+        video.volume = 0;
+        video.setAttribute('playsinline', 'true');
+        video.setAttribute('webkit-playsinline', 'true');
+        video.setAttribute('muted', 'true');
         
-        const playPromise = video.play();
+        // Force load the video
+        video.load();
         
-        if (playPromise !== undefined) {
-          playPromise
-            .then(() => {
-              console.log('Video playing successfully');
-            })
-            .catch(error => {
-              console.log('Video autoplay prevented, trying fallback...', error);
-              
-              // Mobile fallback: try to play on any user interaction
-              const playOnInteraction = () => {
-                video.play().catch(e => console.log('Mobile play failed:', e));
-                document.removeEventListener('touchstart', playOnInteraction);
-                document.removeEventListener('click', playOnInteraction);
-                document.removeEventListener('scroll', playOnInteraction);
-              };
-              
-              document.addEventListener('touchstart', playOnInteraction, { once: true });
-              document.addEventListener('click', playOnInteraction, { once: true });
-              document.addEventListener('scroll', playOnInteraction, { once: true });
-            });
+        try {
+          // Force play immediately
+          const playPromise = video.play();
+          if (playPromise !== undefined) {
+            await playPromise;
+            console.log('Video playing successfully');
+          }
+        } catch (error) {
+          console.log('Video autoplay prevented, setting up mobile fallbacks...', error);
+          
+          // Immediate retry without waiting for interaction
+          setTimeout(async () => {
+            try {
+              await video.play();
+              console.log('Video started on retry');
+            } catch (e) {
+              console.log('Retry failed, setting up interaction listeners');
+            }
+          }, 100);
+          
+          // Multiple mobile fallback strategies
+          const playOnInteraction = async (event) => {
+            try {
+              event.preventDefault();
+              await video.play();
+              console.log('Video started on user interaction');
+              // Remove all listeners once successful
+              document.removeEventListener('touchstart', playOnInteraction);
+              document.removeEventListener('touchend', playOnInteraction);
+              document.removeEventListener('touchmove', playOnInteraction);
+              document.removeEventListener('click', playOnInteraction);
+              document.removeEventListener('scroll', playOnInteraction);
+              document.removeEventListener('keydown', playOnInteraction);
+              window.removeEventListener('focus', playOnInteraction);
+              window.removeEventListener('load', playOnInteraction);
+            } catch (e) {
+              console.log('Mobile play attempt failed:', e);
+            }
+          };
+          
+          // Add multiple event listeners for maximum coverage
+          document.addEventListener('touchstart', playOnInteraction, { passive: false });
+          document.addEventListener('touchend', playOnInteraction, { passive: false });
+          document.addEventListener('touchmove', playOnInteraction, { passive: false });
+          document.addEventListener('click', playOnInteraction, { passive: false });
+          document.addEventListener('scroll', playOnInteraction, { passive: false });
+          document.addEventListener('keydown', playOnInteraction, { passive: false });
+          window.addEventListener('focus', playOnInteraction, { passive: false });
+          window.addEventListener('load', playOnInteraction, { passive: false });
         }
       }
     };
@@ -63,8 +98,11 @@ function Hero() {
     // Try to play immediately
     playVideo();
     
-    // Also try after a short delay
-    const playTimeout = setTimeout(playVideo, 500);
+    // Try multiple times with different delays for mobile browsers
+    const timeouts = [100, 500, 1000, 2000];
+    const timeoutIds = timeouts.map(delay => 
+      setTimeout(playVideo, delay)
+    );
     
     // Try on page visibility change (mobile browsers often pause videos)
     const handleVisibilityChange = () => {
@@ -73,12 +111,28 @@ function Hero() {
       }
     };
     
+    // Try on window focus (mobile browsers)
+    const handleWindowFocus = () => {
+      if (videoRef.current) {
+        playVideo();
+      }
+    };
+    
+    // Try on orientation change (mobile)
+    const handleOrientationChange = () => {
+      setTimeout(playVideo, 500);
+    };
+    
     document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('focus', handleWindowFocus);
+    window.addEventListener('orientationchange', handleOrientationChange);
 
     return () => {
       window.removeEventListener('appointmentSubmitted', handleAppointmentSubmitted);
       document.removeEventListener('visibilitychange', handleVisibilityChange);
-      clearTimeout(playTimeout);
+      window.removeEventListener('focus', handleWindowFocus);
+      window.removeEventListener('orientationchange', handleOrientationChange);
+      timeoutIds.forEach(clearTimeout);
     };
   }, []);
 
@@ -121,6 +175,15 @@ function Hero() {
         playsInline
         preload="auto"
         controls={false}
+        webkit-playsinline="true"
+        x5-playsinline="true"
+        x5-video-player-type="h5"
+        x5-video-player-fullscreen="true"
+        x-webkit-airplay="allow"
+        disablePictureInPicture
+        controlsList="nodownload nofullscreen noremoteplayback"
+        data-setup="{}"
+        poster=""
       >
         <source src="/backgroundstudio.mp4" type="video/mp4" />
       </video>

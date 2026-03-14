@@ -40,9 +40,12 @@ function Hero() {
       const attemptPlay = async () => {
         try {
           video.currentTime = 0;
-          await video.play();
-          console.log('✅ Video playing successfully');
-          return true;
+          const playPromise = video.play();
+          if (playPromise !== undefined) {
+            await playPromise;
+            console.log('✅ Video playing successfully');
+            return true;
+          }
         } catch (error) {
           console.log('❌ Video play failed:', error.message);
           return false;
@@ -53,13 +56,15 @@ function Hero() {
       attemptPlay();
       
       // Set up single interaction listener that removes itself
-      const playOnInteraction = async () => {
+      const playOnInteraction = async (event) => {
+        console.log('🎬 Attempting video play on:', event.type);
         const success = await attemptPlay();
         if (success) {
           // Remove listener after successful play
           document.removeEventListener('touchstart', playOnInteraction);
           document.removeEventListener('click', playOnInteraction);
           document.removeEventListener('scroll', playOnInteraction);
+          document.removeEventListener('keydown', playOnInteraction);
         }
       };
       
@@ -67,6 +72,7 @@ function Hero() {
       document.addEventListener('touchstart', playOnInteraction, { once: true, passive: true });
       document.addEventListener('click', playOnInteraction, { once: true, passive: true });
       document.addEventListener('scroll', playOnInteraction, { once: true, passive: true });
+      document.addEventListener('keydown', playOnInteraction, { once: true, passive: true });
     };
 
     // Try to play when video loads

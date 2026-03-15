@@ -114,17 +114,20 @@ router.post('/', requireAuth, async (req, res) => {
             additionalNotes
         } = req.body;
 
+        // Generate unique ID for request
+        const uniqueId = 'S' + Math.random().toString(36).substring(2, 8).toUpperCase();
+
         const result = await db.query(
             `INSERT INTO requests (
                 user_id, title, description, project_type, budget_range, 
                 timeline, budget, attachments, preferred_start_date,
-                technical_requirements, target_audience, additional_notes
-            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) 
+                technical_requirements, target_audience, additional_notes, unique_id
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) 
             RETURNING *`,
             [
                 userId, title, description, projectType, budgetRange,
                 timeline, budget, attachments || [], preferredStartDate,
-                technicalRequirements, targetAudience, additionalNotes
+                technicalRequirements, targetAudience, additionalNotes, uniqueId
             ]
         );
 

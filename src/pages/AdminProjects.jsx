@@ -486,7 +486,15 @@ function AdminProjects() {
               style={{ cursor: 'grab' }}
             >
               <div className="project-header">
-                <h3>{project.title}</h3>
+                <div className="project-title-section">
+                  <h3>{project.title}</h3>
+                  {project.unique_id && (
+                    <div className="project-id">
+                      <span className="id-label">ID:</span>
+                      <span className="id-value">{project.unique_id}</span>
+                    </div>
+                  )}
+                </div>
                 <div className="project-badges">
                   <span className={`status-badge status-${project.status}`}>
                     {project.status}

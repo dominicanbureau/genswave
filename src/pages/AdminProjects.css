@@ -99,13 +99,41 @@
 .project-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   margin-bottom: 1rem;
+}
+
+.project-title-section {
+  flex: 1;
 }
 
 .project-header h3 {
   font-size: 1.3rem;
   font-weight: 600;
+  margin: 0 0 0.25rem 0;
+}
+
+.project-id {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.project-id .id-label {
+  font-size: 0.75rem;
+  color: var(--gray-medium);
+  font-weight: 500;
+}
+
+.project-id .id-value {
+  font-size: 0.75rem;
+  color: var(--primary-color);
+  font-weight: 600;
+  background: rgba(99, 102, 241, 0.1);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'Courier New', monospace;
 }
 
 .project-client {

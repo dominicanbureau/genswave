@@ -1664,7 +1664,6 @@ function InstagramSection() {
   const [newMessage, setNewMessage] = useState('');
   const [isConnected, setIsConnected] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState('checking');
-  const [authUrl, setAuthUrl] = useState('');
   const [testMessage, setTestMessage] = useState('');
   const [testRecipient, setTestRecipient] = useState('');
   const [activeTab, setActiveTab] = useState('conversations');
@@ -1672,7 +1671,6 @@ function InstagramSection() {
   useEffect(() => {
     checkInstagramConnection();
     loadConversations();
-    getAuthUrl();
     
     // Refresh conversations every 30 seconds
     const interval = setInterval(loadConversations, 30000);
@@ -1681,28 +1679,21 @@ function InstagramSection() {
 
   const checkInstagramConnection = async () => {
     try {
-      // Check if Instagram is configured by trying to get auth URL
-      const response = await fetch('/api/instagram/auth/url');
+      // Check if Instagram environment variables are configured
+      const response = await fetch('/api/instagram/status');
       if (response.ok) {
-        setConnectionStatus('disconnected');
+        const data = await response.json();
+        if (data.configured) {
+          setConnectionStatus('connected');
+        } else {
+          setConnectionStatus('not_configured');
+        }
       } else {
         setConnectionStatus('not_configured');
       }
     } catch (error) {
       console.error('Error checking Instagram connection:', error);
       setConnectionStatus('error');
-    }
-  };
-
-  const getAuthUrl = async () => {
-    try {
-      const response = await fetch('/api/instagram/auth/url');
-      if (response.ok) {
-        const data = await response.json();
-        setAuthUrl(data.authUrl);
-      }
-    } catch (error) {
-      console.error('Error getting auth URL:', error);
     }
   };
 
@@ -1824,11 +1815,6 @@ function InstagramSection() {
               <h3>Instagram Desconectado</h3>
               <p>Necesitas autorizar la aplicación</p>
             </div>
-            {authUrl && (
-              <a href={authUrl} target="_blank" rel="noopener noreferrer" className="connect-btn">
-                Conectar Instagram
-              </a>
-            )}
           </div>
         );
       

@@ -756,7 +756,15 @@ function Appointments({ appointments, requests, fetchData, setActiveTab }) {
                 whileHover={{ scale: 1.01, y: -4 }}
               >
                 <div className="appointment-header">
-                  <h3>{appointment.service}</h3>
+                  <div className="appointment-title-section">
+                    <h3>{appointment.service}</h3>
+                    {appointment.unique_id && (
+                      <div className="appointment-id">
+                        <span className="id-label">ID:</span>
+                        <span className="id-value">{appointment.unique_id}</span>
+                      </div>
+                    )}
+                  </div>
                   <span 
                     className="status-badge"
                     style={{ backgroundColor: getStatusColor(appointment.status) }}
@@ -816,7 +824,15 @@ function Appointments({ appointments, requests, fetchData, setActiveTab }) {
                 whileHover={{ y: -4 }}
               >
                 <div className="request-header">
-                  <h3>{request.title}</h3>
+                  <div className="request-title-section">
+                    <h3>{request.title}</h3>
+                    {request.unique_id && (
+                      <div className="request-id">
+                        <span className="id-label">ID:</span>
+                        <span className="id-value">{request.unique_id}</span>
+                      </div>
+                    )}
+                  </div>
                   <span 
                     className="status-badge"
                     style={{ backgroundColor: getStatusColor(request.status) }}
@@ -1780,6 +1796,12 @@ function ProjectCard({ project, detailed = false }) {
         <div className="project-title-section">
           <h3>{project.title}</h3>
           <p className="project-type">{project.project_type || 'Desarrollo Web'}</p>
+          {project.unique_id && (
+            <div className="project-id">
+              <span className="id-label">ID:</span>
+              <span className="id-value">{project.unique_id}</span>
+            </div>
+          )}
         </div>
         <div className="project-status-section">
           <span 

@@ -96,10 +96,13 @@ router.post('/', requireAdmin, async (req, res) => {
     try {
         const { user_id, title, description, budget, start_date, end_date, cover_image, tags } = req.body;
 
+        // Generate unique ID for project
+        const uniqueId = 'P' + Math.random().toString(36).substring(2, 8).toUpperCase();
+
         const result = await db.query(
-            `INSERT INTO projects (user_id, title, description, budget, start_date, end_date, cover_image, tags) 
-             VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
-            [user_id, title, description, budget, start_date, end_date, cover_image, tags || []]
+            `INSERT INTO projects (user_id, title, description, budget, start_date, end_date, cover_image, tags, unique_id) 
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *`,
+            [user_id, title, description, budget, start_date, end_date, cover_image, tags || [], uniqueId]
         );
 
         res.json(result.rows[0]);

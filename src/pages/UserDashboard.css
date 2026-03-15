@@ -415,9 +415,33 @@
 .project-type {
   font-size: 0.8rem;
   color: var(--gray-medium);
-  margin: 0;
+  margin: 0 0 0.5rem 0;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+}
+
+.project-id {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.id-label {
+  font-size: 0.75rem;
+  color: var(--gray-medium);
+  font-weight: 500;
+}
+
+.id-value {
+  font-size: 0.75rem;
+  color: var(--primary-color);
+  font-weight: 600;
+  background: rgba(99, 102, 241, 0.1);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'Courier New', monospace;
+}
   font-weight: 500;
 }
 
@@ -549,13 +573,45 @@
 .appointment-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   margin-bottom: 1rem;
+}
+
+.appointment-title-section,
+.request-title-section {
+  flex: 1;
 }
 
 .appointment-header h3 {
   font-size: 1.2rem;
   font-weight: 600;
+  margin: 0 0 0.25rem 0;
+}
+
+.appointment-id,
+.request-id {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.appointment-id .id-label,
+.request-id .id-label {
+  font-size: 0.75rem;
+  color: var(--gray-medium);
+  font-weight: 500;
+}
+
+.appointment-id .id-value,
+.request-id .id-value {
+  font-size: 0.75rem;
+  color: var(--primary-color);
+  font-weight: 600;
+  background: rgba(99, 102, 241, 0.1);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'Courier New', monospace;
 }
 
 .status-badge {

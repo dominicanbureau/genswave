@@ -16,10 +16,13 @@ router.post('/', async (req, res) => {
     try {
         const { name, email, phone, businessName, service, message, preferredDate } = req.body;
 
+        // Generate unique ID for appointment
+        const uniqueId = 'S' + Math.random().toString(36).substring(2, 8).toUpperCase();
+
         const result = await db.query(
-            `INSERT INTO appointments (name, email, phone, business_name, service, message, preferred_date) 
-             VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
-            [name, email, phone, businessName || null, service, message, preferredDate]
+            `INSERT INTO appointments (name, email, phone, business_name, service, message, preferred_date, unique_id) 
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
+            [name, email, phone, businessName || null, service, message, preferredDate, uniqueId]
         );
 
         res.json({ success: true, appointment: result.rows[0] });

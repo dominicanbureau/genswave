@@ -165,9 +165,9 @@ async function handleTextMessage(senderId, text, senderInfo) {
             `☁️ Soluciones en la nube\n` +
             `🛡️ Ciberseguridad\n\n` +
             `*¿CÓMO PODEMOS AYUDARTE?*\n` +
-            `🎫 Escriba "código" para generar acceso rápido\n` +
-            `📋 Escriba "consulta" para verificar estado de proyectos\n` +
-            `🆘 Escriba "ayuda" para ver más opciones\n\n` +
+            `Puedes realizar acciones rapidas.\n\n` +
+            `🎫 Escriba "acceso" para crear una cuenta rapida\n` +
+            `📋 Escriba "consulta" para verificar estado de servicios\n` +
             `¡Estamos aquí para impulsar tu negocio! 🚀`
           );
         } else if (lowerText.includes('código') || lowerText.includes('codigo') || lowerText.includes('acceso')) {

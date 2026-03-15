@@ -13,6 +13,8 @@ import CookiesPage from './pages/CookiesPage';
 import FAQPage from './pages/FAQPage';
 import SupportPage from './pages/SupportPage';
 import CasesPage from './pages/CasesPage';
+import DataDeletionPage from './pages/DataDeletionPage';
+import ContactInfoPage from './pages/ContactInfoPage';
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
@@ -26,6 +28,8 @@ function App() {
       <Route path="/terminos" element={<TermsPage />} />
       <Route path="/privacidad" element={<PrivacyPage />} />
       <Route path="/cookies" element={<CookiesPage />} />
+      <Route path="/data-deletion" element={<DataDeletionPage />} />
+      <Route path="/contact-info" element={<ContactInfoPage />} />
       <Route path="/faq" element={<FAQPage />} />
       <Route path="/soporte" element={<SupportPage />} />
       <Route path="/casos" element={<CasesPage />} />

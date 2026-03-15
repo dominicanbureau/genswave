@@ -30,8 +30,9 @@ function PrivacyPage() {
           <div className="legal-section">
             <h2>1. Introducción</h2>
             <p>
-              En Studio, nos comprometemos a proteger su privacidad. Esta Política de Privacidad explica cómo 
-              recopilamos, usamos, divulgamos y protegemos su información personal cuando utiliza nuestros servicios.
+              En Genswave, nos comprometemos a proteger su privacidad. Esta Política de Privacidad explica cómo 
+              recopilamos, usamos, divulgamos y protegemos su información personal cuando utiliza nuestros servicios,
+              incluyendo nuestra integración con Instagram para mensajería directa.
             </p>
           </div>
 
@@ -39,6 +40,7 @@ function PrivacyPage() {
             <h2>2. Información que Recopilamos</h2>
             <p>Recopilamos varios tipos de información, incluyendo:</p>
             <ul>
+              <li><strong>Información de redes sociales:</strong> mensajes de Instagram DM, ID de usuario, nombre de perfil</li>
               <li><strong>Información de contacto:</strong> nombre, dirección de email, número de teléfono</li>
               <li><strong>Información de la empresa:</strong> nombre de la empresa, cargo, ubicación</li>
               <li><strong>Información del proyecto:</strong> detalles sobre sus necesidades y requisitos</li>
@@ -51,6 +53,7 @@ function PrivacyPage() {
             <h2>3. Cómo Usamos su Información</h2>
             <p>Utilizamos la información recopilada para:</p>
             <ul>
+              <li>Responder a mensajes de Instagram DM y proporcionar soporte al cliente</li>
               <li>Proporcionar y mejorar nuestros servicios</li>
               <li>Comunicarnos con usted sobre proyectos y servicios</li>
               <li>Procesar pagos y transacciones</li>
@@ -127,7 +130,26 @@ function PrivacyPage() {
           </div>
 
           <div className="legal-section">
-            <h2>9. Cookies y Tecnologías Similares</h2>
+            <h2>9. Integración con Instagram</h2>
+            <p>
+              Nuestro servicio incluye integración con Instagram para mensajería directa. Al interactuar con 
+              nosotros a través de Instagram DM:
+            </p>
+            <ul>
+              <li>Recopilamos mensajes que nos envía a través de Instagram DM</li>
+              <li>Almacenamos su ID de usuario de Instagram y nombre de perfil para identificación</li>
+              <li>Utilizamos esta información para responder a sus consultas y proporcionar soporte</li>
+              <li>Los mensajes se almacenan de forma segura en nuestros servidores</li>
+              <li>Puede solicitar la eliminación de sus datos de Instagram en cualquier momento</li>
+            </ul>
+            <p>
+              Esta integración cumple con las políticas de Instagram y Meta. Sus datos de Instagram se procesan 
+              bajo las mismas protecciones que el resto de su información personal.
+            </p>
+          </div>
+
+          <div className="legal-section">
+            <h2>10. Cookies y Tecnologías Similares</h2>
             <p>
               Utilizamos cookies y tecnologías similares para mejorar su experiencia en nuestro sitio web. 
               Para más información, consulte nuestra Política de Cookies.
@@ -135,7 +157,7 @@ function PrivacyPage() {
           </div>
 
           <div className="legal-section">
-            <h2>10. Transferencias Internacionales</h2>
+            <h2>11. Transferencias Internacionales</h2>
             <p>
               Su información puede ser transferida y procesada en países fuera de su país de residencia. 
               Nos aseguramos de que dichas transferencias cumplan con las leyes de protección de datos aplicables 
@@ -144,7 +166,7 @@ function PrivacyPage() {
           </div>
 
           <div className="legal-section">
-            <h2>11. Menores de Edad</h2>
+            <h2>12. Menores de Edad</h2>
             <p>
               Nuestros servicios no están dirigidos a menores de 18 años. No recopilamos intencionalmente 
               información personal de menores. Si descubrimos que hemos recopilado información de un menor, 
@@ -153,7 +175,7 @@ function PrivacyPage() {
           </div>
 
           <div className="legal-section">
-            <h2>12. Cambios a esta Política</h2>
+            <h2>13. Cambios a esta Política</h2>
             <p>
               Podemos actualizar esta Política de Privacidad periódicamente. Le notificaremos sobre cambios 
               significativos publicando la nueva política en nuestro sitio web y actualizando la fecha de 
@@ -162,14 +184,14 @@ function PrivacyPage() {
           </div>
 
           <div className="legal-section">
-            <h2>13. Contacto</h2>
+            <h2>14. Contacto</h2>
             <p>
               Si tiene preguntas sobre esta Política de Privacidad o desea ejercer sus derechos, contáctenos:
             </p>
             <ul>
-              <li>Email: privacy@studio.com</li>
-              <li>Teléfono: +1 (234) 567-890</li>
-              <li>Dirección: San Francisco, CA</li>
+              <li>Email: privacy@genswave.com</li>
+              <li>Teléfono: +1 (809) 555-0123</li>
+              <li>Dirección: República Dominicana</li>
             </ul>
           </div>
         </motion.div>

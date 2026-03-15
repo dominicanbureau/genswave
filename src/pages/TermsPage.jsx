@@ -30,7 +30,7 @@ function TermsPage() {
           <div className="legal-section">
             <h2>1. Aceptación de los Términos</h2>
             <p>
-              Al acceder y utilizar los servicios de Studio, usted acepta estar sujeto a estos Términos y Condiciones. 
+              Al acceder y utilizar los servicios de Genswave, usted acepta estar sujeto a estos Términos y Condiciones. 
               Si no está de acuerdo con alguna parte de estos términos, no debe utilizar nuestros servicios.
             </p>
           </div>
@@ -38,7 +38,7 @@ function TermsPage() {
           <div className="legal-section">
             <h2>2. Descripción de Servicios</h2>
             <p>
-              Studio proporciona servicios de desarrollo web, aplicaciones móviles y soluciones digitales personalizadas. 
+              Genswave proporciona servicios de desarrollo web, aplicaciones móviles y soluciones digitales personalizadas. 
               Nos reservamos el derecho de modificar, suspender o discontinuar cualquier aspecto de nuestros servicios 
               en cualquier momento sin previo aviso.
             </p>
@@ -59,8 +59,8 @@ function TermsPage() {
           <div className="legal-section">
             <h2>4. Propiedad Intelectual</h2>
             <p>
-              Todo el contenido, diseños, código y materiales desarrollados por Studio permanecen como propiedad 
-              intelectual de Studio hasta que se complete el pago total del proyecto. Una vez completado el pago, 
+              Todo el contenido, diseños, código y materiales desarrollados por Genswave permanecen como propiedad 
+              intelectual de Genswave hasta que se complete el pago total del proyecto. Una vez completado el pago, 
               los derechos de uso se transfieren al cliente según lo acordado en el contrato específico del proyecto.
             </p>
           </div>
@@ -89,7 +89,7 @@ function TermsPage() {
           <div className="legal-section">
             <h2>7. Limitación de Responsabilidad</h2>
             <p>
-              Studio no será responsable de daños indirectos, incidentales, especiales o consecuentes que resulten 
+              Genswave no será responsable de daños indirectos, incidentales, especiales o consecuentes que resulten 
               del uso o la imposibilidad de usar nuestros servicios. Nuestra responsabilidad total no excederá el 
               monto pagado por los servicios en cuestión.
             </p>
@@ -135,8 +135,8 @@ function TermsPage() {
               Si tiene preguntas sobre estos Términos y Condiciones, puede contactarnos en:
             </p>
             <ul>
-              <li>Email: info@studio.com</li>
-              <li>Teléfono: +1 (234) 567-890</li>
+              <li>Email: info@genswave.com</li>
+              <li>Teléfono: +1 (809) 555-0123</li>
             </ul>
           </div>
         </motion.div>

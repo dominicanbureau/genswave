@@ -281,6 +281,17 @@ async function runProductionMigrations() {
             console.log('📋 Instagram integration will be available after configuration');
         }
         
+        // 11. Setup data deletion system
+        console.log('🗑️ Setting up data deletion system...');
+        try {
+            const { default: migrateDataDeletion } = await import('./migrate-data-deletion.js');
+            await migrateDataDeletion();
+            console.log('✅ Data deletion system setup completed');
+        } catch (error) {
+            console.log('⚠️ Data deletion migration warning:', error.message);
+            console.log('📋 Data deletion system will be available after database setup');
+        }
+        
     } catch (error) {
         console.error('❌ Database migration failed:', error);
         throw error;

@@ -15,6 +15,7 @@ import requestRoutes from './routes/requests.js';
 import quickCodeRoutes from './routes/quickCodes.js';
 import uploadRoutes from './routes/upload.js';
 import instagramRoutes from './routes/instagram.js';
+import dataDeletionRoutes from './routes/dataDeletion.js';
 
 dotenv.config();
 
@@ -91,6 +92,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/requests', requestRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/instagram', instagramRoutes);
+app.use('/api/data-deletion', dataDeletionRoutes);
 app.use('/api', quickCodeRoutes);
 
 // Serve uploaded files

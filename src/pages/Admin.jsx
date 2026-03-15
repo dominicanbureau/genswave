@@ -667,8 +667,8 @@ function ChatsSection() {
   const [newMessage, setNewMessage] = useState('');
   const [attachments, setAttachments] = useState([]);
   const [chatType, setChatType] = useState('web'); // 'web' or 'instagram'
-  const [instagramConversations, setInstagramConversations] = useState([]);
-  const [filteredInstagramConversations, setFilteredInstagramConversations] = useState([]);
+  const [instagramBotUsers, setInstagramBotUsers] = useState([]);
+  const [filteredInstagramBotUsers, setFilteredInstagramBotUsers] = useState([]);
   const [instagramMessages, setInstagramMessages] = useState([]);
   const [selectedInstagramConversation, setSelectedInstagramConversation] = useState(null);
   const messagesEndRef = useRef(null);
@@ -681,8 +681,8 @@ function ChatsSection() {
   }, []);
 
   useEffect(() => {
-    loadInstagramConversations();
-    const interval = setInterval(loadInstagramConversations, 5000);
+    loadInstagramBotUsers();
+    const interval = setInterval(loadInstagramBotUsers, 10000);
     return () => clearInterval(interval);
   }, []);
 
@@ -721,17 +721,17 @@ function ChatsSection() {
       }
     } else {
       if (!searchQuery.trim()) {
-        setFilteredInstagramConversations(instagramConversations);
+        setFilteredInstagramBotUsers(instagramBotUsers);
       } else {
-        const filtered = instagramConversations.filter(conv => 
-          conv.sender_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          (conv.instagram_username && conv.instagram_username.toLowerCase().includes(searchQuery.toLowerCase())) ||
-          conv.last_message.toLowerCase().includes(searchQuery.toLowerCase())
+        const filtered = instagramBotUsers.filter(user => 
+          user.sender_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          (user.instagram_username && user.instagram_username.toLowerCase().includes(searchQuery.toLowerCase())) ||
+          (user.last_message && user.last_message.toLowerCase().includes(searchQuery.toLowerCase()))
         );
-        setFilteredInstagramConversations(filtered);
+        setFilteredInstagramBotUsers(filtered);
       }
     }
-  }, [conversations, instagramConversations, searchQuery, chatType]);
+  }, [conversations, instagramBotUsers, searchQuery, chatType]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -1657,23 +1657,22 @@ function QuicksSection() {
 
 // Instagram Section Component
 function InstagramSection() {
-  const [instagramMessages, setInstagramMessages] = useState([]);
-  const [conversations, setConversations] = useState([]);
-  const [selectedConversation, setSelectedConversation] = useState(null);
+  const [botUsers, setBotUsers] = useState([]);
+  const [selectedUser, setSelectedUser] = useState(null);
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [isConnected, setIsConnected] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState('checking');
   const [testMessage, setTestMessage] = useState('');
   const [testRecipient, setTestRecipient] = useState('');
-  const [activeTab, setActiveTab] = useState('conversations');
+  const [activeTab, setActiveTab] = useState('users');
 
   useEffect(() => {
     checkInstagramConnection();
-    loadConversations();
+    loadInstagramBotUsers();
     
-    // Refresh conversations every 30 seconds
-    const interval = setInterval(loadConversations, 30000);
+    // Refresh bot users every 30 seconds
+    const interval = setInterval(loadInstagramBotUsers, 30000);
     return () => clearInterval(interval);
   }, []);
 
@@ -1697,15 +1696,15 @@ function InstagramSection() {
     }
   };
 
-  const loadConversations = async () => {
+  const loadInstagramBotUsers = async () => {
     try {
-      const response = await fetch('/api/instagram/conversations');
+      const response = await fetch('/api/instagram/bot-users');
       if (response.ok) {
         const data = await response.json();
-        setConversations(data.conversations);
+        setBotUsers(data.users);
       }
     } catch (error) {
-      console.error('Error loading conversations:', error);
+      console.error('Error loading bot users:', error);
     }
   };
 
@@ -1721,20 +1720,40 @@ function InstagramSection() {
     }
   };
 
-  const selectConversation = (conversation) => {
-    setSelectedConversation(conversation);
-    loadMessages(conversation.instagram_user_id);
+  const selectUser = (user) => {
+    setSelectedUser(user);
+    loadMessages(user.instagram_user_id);
+  };
+
+  const toggleBotForUser = async (userId, currentStatus) => {
+    try {
+      const response = await fetch(`/api/instagram/bot-users/${userId}/toggle`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ enabled: !currentStatus })
+      });
+
+      if (response.ok) {
+        // Reload bot users to reflect the change
+        loadInstagramBotUsers();
+      } else {
+        alert('Error al cambiar estado del bot');
+      }
+    } catch (error) {
+      console.error('Error toggling bot status:', error);
+      alert('Error al cambiar estado del bot');
+    }
   };
 
   const sendMessage = async () => {
-    if (!newMessage.trim() || !selectedConversation) return;
+    if (!newMessage.trim() || !selectedUser) return;
 
     try {
       const response = await fetch('/api/instagram/admin-reply', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          recipientId: selectedConversation.instagram_user_id,
+          recipientId: selectedUser.instagram_user_id,
           message: newMessage.trim()
         })
       });
@@ -1742,9 +1761,9 @@ function InstagramSection() {
       if (response.ok) {
         setNewMessage('');
         // Reload messages to show the sent message
-        loadMessages(selectedConversation.instagram_user_id);
-        // Refresh conversations to update last message time
-        loadConversations();
+        loadMessages(selectedUser.instagram_user_id);
+        // Refresh bot users to update last message time
+        loadInstagramBotUsers();
       } else {
         alert('Error al enviar mensaje');
       }
@@ -1931,16 +1950,16 @@ function InstagramSection() {
             <p>Mensaje de bienvenida con opciones</p>
           </div>
           <div className="command-item">
-            <strong>"Cotización" / "Precio"</strong>
-            <p>Solicitud de cotización</p>
+            <strong>"Código" / "Acceso"</strong>
+            <p>Generar código de acceso rápido</p>
           </div>
           <div className="command-item">
-            <strong>"Cita" / "Reunión"</strong>
-            <p>Agendar una cita</p>
+            <strong>"Consulta"</strong>
+            <p>Verificar estado de proyectos/solicitudes</p>
           </div>
           <div className="command-item">
-            <strong>"Servicios"</strong>
-            <p>Lista de servicios disponibles</p>
+            <strong>"Salir"</strong>
+            <p>Cancelar proceso actual</p>
           </div>
           <div className="command-item">
             <strong>"Ayuda" / "Help"</strong>
@@ -1953,28 +1972,104 @@ function InstagramSection() {
         </div>
       </div>
 
-      {/* Recent Messages */}
-      <div className="instagram-messages-card">
-        <h3>📨 Mensajes Recientes</h3>
-        {instagramMessages.length === 0 ? (
-          <div className="no-messages">
-            <p>No hay mensajes de Instagram aún.</p>
-            <p>Los mensajes aparecerán aquí cuando los usuarios escriban a tu Instagram.</p>
+      {/* Bot Users Management */}
+      <div className="instagram-users-card">
+        <h3>👥 Usuarios del Bot</h3>
+        {botUsers.length === 0 ? (
+          <div className="no-users">
+            <p>No hay usuarios que hayan interactuado con el bot aún.</p>
+            <p>Los usuarios aparecerán aquí cuando escriban a tu Instagram.</p>
           </div>
         ) : (
-          <div className="messages-list">
-            {instagramMessages.map((message, index) => (
-              <div key={index} className="message-item">
-                <div className="message-header">
-                  <strong>{message.sender_name}</strong>
-                  <span className="message-time">{message.created_at}</span>
+          <div className="users-list">
+            {botUsers.map((user, index) => (
+              <div key={index} className="user-item">
+                <div className="user-info">
+                  <div className="user-avatar">
+                    {user.profile_pic ? (
+                      <img src={user.profile_pic} alt={user.username} />
+                    ) : (
+                      <div className="avatar-placeholder">
+                        {user.username?.charAt(0)?.toUpperCase() || '?'}
+                      </div>
+                    )}
+                  </div>
+                  <div className="user-details">
+                    <strong>@{user.username || 'Usuario desconocido'}</strong>
+                    <p className="user-id">ID: {user.instagram_user_id}</p>
+                    <p className="last-message">
+                      Último mensaje: {user.last_message_at ? 
+                        new Date(user.last_message_at).toLocaleString() : 
+                        'Nunca'
+                      }
+                    </p>
+                  </div>
                 </div>
-                <div className="message-content">{message.message_text}</div>
+                <div className="user-actions">
+                  <button
+                    className={`bot-toggle-btn ${user.bot_enabled ? 'enabled' : 'disabled'}`}
+                    onClick={() => toggleBotForUser(user.instagram_user_id, user.bot_enabled)}
+                  >
+                    {user.bot_enabled ? '🤖 Habilitado' : '🔇 Deshabilitado'}
+                  </button>
+                  <button
+                    className="view-messages-btn"
+                    onClick={() => selectUser(user)}
+                  >
+                    Ver Mensajes
+                  </button>
+                </div>
               </div>
             ))}
           </div>
         )}
       </div>
+
+      {/* Message History Modal */}
+      {selectedUser && (
+        <div className="message-modal-overlay" onClick={() => setSelectedUser(null)}>
+          <div className="message-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>Mensajes con @{selectedUser.username}</h3>
+              <button 
+                className="close-modal-btn"
+                onClick={() => setSelectedUser(null)}
+              >
+                ✕
+              </button>
+            </div>
+            <div className="messages-container">
+              {messages.length === 0 ? (
+                <p>No hay mensajes aún</p>
+              ) : (
+                messages.map((msg, index) => (
+                  <div 
+                    key={index} 
+                    className={`message ${msg.is_from_bot ? 'bot-message' : 'user-message'}`}
+                  >
+                    <div className="message-content">{msg.message_text}</div>
+                    <div className="message-time">
+                      {new Date(msg.created_at).toLocaleString()}
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+            <div className="message-input-container">
+              <textarea
+                value={newMessage}
+                onChange={(e) => setNewMessage(e.target.value)}
+                placeholder="Escribe tu respuesta..."
+                className="message-input"
+                rows="3"
+              />
+              <button onClick={sendMessage} className="send-message-btn">
+                Enviar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </motion.div>
   );
 }

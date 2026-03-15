@@ -584,17 +584,46 @@ async function processConsultationInput(senderId, text, state) {
         'cancelled': '🔴',
         'on_hold': '🟠'
       };
+
+      const statusText = {
+        'pending': 'PENDIENTE',
+        'in_progress': 'EN PROGRESO',
+        'completed': 'COMPLETADO',
+        'cancelled': 'CANCELADO',
+        'on_hold': 'EN PAUSA'
+      };
       
       if (type === 'project') {
-        const startDate = result.start_date ? new Date(result.start_date).toLocaleDateString() : 'No definida';
-        const endDate = result.end_date ? new Date(result.end_date).toLocaleDateString() : 'No definida';
-        const createdDate = new Date(result.created_at).toLocaleDateString();
+        const startDate = result.start_date ? new Date(result.start_date).toLocaleDateString('es-ES') : 'Por definir';
+        const endDate = result.end_date ? new Date(result.end_date).toLocaleDateString('es-ES') : 'Por definir';
+        const createdDate = new Date(result.created_at).toLocaleDateString('es-ES');
+        const budget = result.budget ? `$${parseFloat(result.budget).toLocaleString()}` : 'Por cotizar';
+        
+        // Calculate progress percentage if project is in progress
+        let progressInfo = '';
+        if (result.status === 'in_progress' && result.start_date && result.end_date) {
+          const now = new Date();
+          const start = new Date(result.start_date);
+          const end = new Date(result.end_date);
+          const totalDuration = end - start;
+          const elapsed = now - start;
+          const progress = Math.max(0, Math.min(100, Math.round((elapsed / totalDuration) * 100)));
+          
+          const progressBar = '▓'.repeat(Math.floor(progress / 10)) + '░'.repeat(10 - Math.floor(progress / 10));
+          progressInfo = `\n📊 PROGRESO: ${progress}%\n${progressBar}\n`;
+        }
         
         await sendInstagramMessage(senderId,
           `✅ PROYECTO ENCONTRADO\n\n` +
-          `🆔 *ID:* ${result.unique_id}\n` +
-          `📋 *Título:* ${result.title}\n` +
-          `${statusEmoji[result.status] || '⚪'} *Estado:* ${result.status.toUpperCase()}\n\n` +
+          `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+          `🆔 ID: ${result.unique_id}\n` +
+          `📋 TÍTULO: ${result.title}\n` +
+          `${statusEmoji[result.status] || '⚪'} ESTADO: ${statusText[result.status] || result.status.toUpperCase()}\n` +
+          `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n` +
+          `💰 PRESUPUESTO: ${budget}\n` +
+          `📅 INICIO: ${startDate}\n` +
+          `📅 ENTREGA: ${endDate}\n` +
+          `📆 CREADO: ${createdDate}${progressInfo}\n` +
           `💰 *Presupuesto:* $${result.budget || 'No definido'}\n` +
           `📅 *Fecha inicio:* ${startDate}\n` +
           `📅 *Fecha fin:* ${endDate}\n` +

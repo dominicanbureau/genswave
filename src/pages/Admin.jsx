@@ -1396,6 +1396,288 @@ function QuicksSection() {
   );
 }
 
+// Instagram Section Component
+function InstagramSection() {
+  const [instagramMessages, setInstagramMessages] = useState([]);
+  const [isConnected, setIsConnected] = useState(false);
+  const [connectionStatus, setConnectionStatus] = useState('checking');
+  const [authUrl, setAuthUrl] = useState('');
+  const [testMessage, setTestMessage] = useState('');
+  const [testRecipient, setTestRecipient] = useState('');
+
+  useEffect(() => {
+    checkInstagramConnection();
+    loadInstagramMessages();
+    getAuthUrl();
+  }, []);
+
+  const checkInstagramConnection = async () => {
+    try {
+      // Check if Instagram is configured by trying to get auth URL
+      const response = await fetch('/api/instagram/auth/url');
+      if (response.ok) {
+        setConnectionStatus('disconnected');
+      } else {
+        setConnectionStatus('not_configured');
+      }
+    } catch (error) {
+      console.error('Error checking Instagram connection:', error);
+      setConnectionStatus('error');
+    }
+  };
+
+  const getAuthUrl = async () => {
+    try {
+      const response = await fetch('/api/instagram/auth/url');
+      if (response.ok) {
+        const data = await response.json();
+        setAuthUrl(data.authUrl);
+      }
+    } catch (error) {
+      console.error('Error getting auth URL:', error);
+    }
+  };
+
+  const loadInstagramMessages = async () => {
+    try {
+      // This would load messages from your database
+      // For now, we'll show a placeholder
+      setInstagramMessages([]);
+    } catch (error) {
+      console.error('Error loading Instagram messages:', error);
+    }
+  };
+
+  const sendTestMessage = async () => {
+    if (!testRecipient || !testMessage) {
+      alert('Por favor completa todos los campos');
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/instagram/send-message', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          recipientId: testRecipient,
+          message: testMessage
+        })
+      });
+
+      if (response.ok) {
+        alert('Mensaje enviado exitosamente');
+        setTestMessage('');
+        setTestRecipient('');
+      } else {
+        alert('Error al enviar mensaje');
+      }
+    } catch (error) {
+      console.error('Error sending test message:', error);
+      alert('Error al enviar mensaje');
+    }
+  };
+
+  const renderConnectionStatus = () => {
+    switch (connectionStatus) {
+      case 'checking':
+        return (
+          <div className="instagram-status checking">
+            <div className="status-icon">⏳</div>
+            <div className="status-text">
+              <h3>Verificando conexión...</h3>
+              <p>Comprobando el estado de Instagram</p>
+            </div>
+          </div>
+        );
+      
+      case 'connected':
+        return (
+          <div className="instagram-status connected">
+            <div className="status-icon">✅</div>
+            <div className="status-text">
+              <h3>Instagram Conectado</h3>
+              <p>El bot está funcionando correctamente</p>
+            </div>
+          </div>
+        );
+      
+      case 'disconnected':
+        return (
+          <div className="instagram-status disconnected">
+            <div className="status-icon">⚠️</div>
+            <div className="status-text">
+              <h3>Instagram Desconectado</h3>
+              <p>Necesitas autorizar la aplicación</p>
+            </div>
+            {authUrl && (
+              <a href={authUrl} target="_blank" rel="noopener noreferrer" className="connect-btn">
+                Conectar Instagram
+              </a>
+            )}
+          </div>
+        );
+      
+      case 'not_configured':
+        return (
+          <div className="instagram-status not-configured">
+            <div className="status-icon">❌</div>
+            <div className="status-text">
+              <h3>Instagram No Configurado</h3>
+              <p>Faltan las variables de entorno</p>
+            </div>
+          </div>
+        );
+      
+      default:
+        return (
+          <div className="instagram-status error">
+            <div className="status-icon">❌</div>
+            <div className="status-text">
+              <h3>Error de Conexión</h3>
+              <p>No se pudo verificar el estado</p>
+            </div>
+          </div>
+        );
+    }
+  };
+
+  return (
+    <motion.div
+      className="admin-section"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+    >
+      <div className="section-header">
+        <h2>Instagram DM Bot</h2>
+        <p>Gestiona la integración con Instagram Direct Messages</p>
+      </div>
+
+      {/* Connection Status */}
+      <div className="instagram-connection-card">
+        {renderConnectionStatus()}
+      </div>
+
+      {/* Configuration Guide */}
+      <div className="instagram-config-card">
+        <h3>📋 Configuración</h3>
+        <div className="config-info">
+          <h4>URLs para Meta for Developers:</h4>
+          <div className="url-list">
+            <div className="url-item">
+              <strong>Webhook URL:</strong>
+              <code>https://genswave.onrender.com/api/instagram/webhook</code>
+            </div>
+            <div className="url-item">
+              <strong>OAuth Redirect URI:</strong>
+              <code>https://genswave.onrender.com/api/instagram/auth/callback</code>
+            </div>
+          </div>
+          
+          <h4>Variables de Entorno Requeridas:</h4>
+          <ul className="env-vars">
+            <li><code>INSTAGRAM_APP_ID</code> - ID de tu app de Meta</li>
+            <li><code>INSTAGRAM_APP_SECRET</code> - Secret de tu app</li>
+            <li><code>INSTAGRAM_ACCESS_TOKEN</code> - Token de acceso</li>
+            <li><code>INSTAGRAM_WEBHOOK_VERIFY_TOKEN</code> - Token de verificación</li>
+          </ul>
+          
+          <p>
+            <strong>📖 Guía completa:</strong> Revisa el archivo <code>INSTAGRAM_SETUP.md</code> 
+            para instrucciones detalladas de configuración.
+          </p>
+        </div>
+      </div>
+
+      {/* Test Message */}
+      {connectionStatus === 'connected' && (
+        <div className="instagram-test-card">
+          <h3>🧪 Enviar Mensaje de Prueba</h3>
+          <div className="test-form">
+            <div className="form-group">
+              <label>ID del Destinatario:</label>
+              <input
+                type="text"
+                value={testRecipient}
+                onChange={(e) => setTestRecipient(e.target.value)}
+                placeholder="Instagram User ID"
+                className="form-input"
+              />
+            </div>
+            <div className="form-group">
+              <label>Mensaje:</label>
+              <textarea
+                value={testMessage}
+                onChange={(e) => setTestMessage(e.target.value)}
+                placeholder="Escribe tu mensaje de prueba..."
+                className="form-textarea"
+                rows="3"
+              />
+            </div>
+            <button onClick={sendTestMessage} className="test-send-btn">
+              Enviar Mensaje
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Bot Commands */}
+      <div className="instagram-commands-card">
+        <h3>🤖 Comandos del Bot</h3>
+        <div className="commands-grid">
+          <div className="command-item">
+            <strong>"Hola" / "Hello" / "Hi"</strong>
+            <p>Mensaje de bienvenida con opciones</p>
+          </div>
+          <div className="command-item">
+            <strong>"Cotización" / "Precio"</strong>
+            <p>Solicitud de cotización</p>
+          </div>
+          <div className="command-item">
+            <strong>"Cita" / "Reunión"</strong>
+            <p>Agendar una cita</p>
+          </div>
+          <div className="command-item">
+            <strong>"Servicios"</strong>
+            <p>Lista de servicios disponibles</p>
+          </div>
+          <div className="command-item">
+            <strong>"Ayuda" / "Help"</strong>
+            <p>Menú de comandos disponibles</p>
+          </div>
+          <div className="command-item">
+            <strong>Otros mensajes</strong>
+            <p>Respuesta automática + guardado para revisión</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Recent Messages */}
+      <div className="instagram-messages-card">
+        <h3>📨 Mensajes Recientes</h3>
+        {instagramMessages.length === 0 ? (
+          <div className="no-messages">
+            <p>No hay mensajes de Instagram aún.</p>
+            <p>Los mensajes aparecerán aquí cuando los usuarios escriban a tu Instagram.</p>
+          </div>
+        ) : (
+          <div className="messages-list">
+            {instagramMessages.map((message, index) => (
+              <div key={index} className="message-item">
+                <div className="message-header">
+                  <strong>{message.sender_name}</strong>
+                  <span className="message-time">{message.created_at}</span>
+                </div>
+                <div className="message-content">{message.message_text}</div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </motion.div>
+  );
+}
+
 // Account Settings Section Component
 function AccountSettingsSection() {
   const [adminData, setAdminData] = useState({
@@ -1918,6 +2200,8 @@ function Admin() {
         return <StatsSection />;
       case 'quicks':
         return <QuicksSection />;
+      case 'instagram':
+        return <InstagramSection />;
       case 'account':
         return <AccountSettingsSection />;
       default:
@@ -2031,6 +2315,22 @@ function Admin() {
               </svg>
             </div>
             <span className="nav-label">Códigos Quick</span>
+          </motion.button>
+
+          <motion.button
+            className={`nav-item ${activeTab === 'instagram' ? 'active' : ''}`}
+            onClick={() => setActiveTab('instagram')}
+            whileHover={{ x: 5 }}
+            whileTap={{ scale: 0.98 }}
+          >
+            <div className="nav-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+                <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+              </svg>
+            </div>
+            <span className="nav-label">Instagram DM</span>
           </motion.button>
 
           <motion.button

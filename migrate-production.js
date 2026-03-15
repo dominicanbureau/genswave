@@ -270,6 +270,17 @@ async function runProductionMigrations() {
 
         console.log('✅ Database migrations completed successfully!');
         
+        // 10. Setup Instagram integration
+        console.log('📱 Setting up Instagram integration...');
+        try {
+            const { default: migrateInstagram } = await import('./migrate-instagram.js');
+            await migrateInstagram();
+            console.log('✅ Instagram integration setup completed');
+        } catch (error) {
+            console.log('⚠️ Instagram migration warning:', error.message);
+            console.log('📋 Instagram integration will be available after configuration');
+        }
+        
     } catch (error) {
         console.error('❌ Database migration failed:', error);
         throw error;

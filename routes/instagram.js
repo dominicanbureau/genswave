@@ -537,6 +537,16 @@ async function processConsultationInput(senderId, text, state) {
       if (appointmentResult.rows.length > 0) {
         result = appointmentResult.rows[0];
         type = 'appointment';
+      } else {
+        // If not found in appointments, check requests table
+        const requestResult = await db.query(
+          'SELECT * FROM requests WHERE unique_id = $1',
+          [consultationId]
+        );
+        if (requestResult.rows.length > 0) {
+          result = requestResult.rows[0];
+          type = 'request';
+        }
       }
     }
     // Try both tables if no prefix
@@ -591,6 +601,30 @@ async function processConsultationInput(senderId, text, state) {
         `📅 Fecha inicio: ${startDate}\n` +
         `📅 Fecha fin: ${endDate}\n` +
         `💰 Presupuesto: ${budget}\n\n` +
+        `📝 Descripción:\n${result.description || 'Sin descripción'}\n\n` +
+        `Para más detalles, visite su dashboard en:\nhttps://genswave.onrender.com`
+      );
+    } else if (type === 'request') {
+      // Format request status
+      const statusEmoji = {
+        'pending': '⏳',
+        'approved': '✅',
+        'rejected': '❌',
+        'completed': '🎉',
+        'confirmed': '✅'
+      };
+      
+      const createdDate = new Date(result.created_at).toLocaleDateString('es-ES');
+      const budget = result.budget ? `${parseFloat(result.budget).toLocaleString()}` : 'No definido';
+      
+      await sendInstagramMessage(senderId,
+        `📋 *ESTADO DE SOLICITUD DETALLADA*\n\n` +
+        `🆔 ID: ${result.unique_id}\n` +
+        `📋 Título: ${result.title}\n` +
+        `${statusEmoji[result.status] || '⚪'} Estado: ${result.status.toUpperCase()}\n\n` +
+        `🛠️ Tipo: ${result.project_type || 'No especificado'}\n` +
+        `💰 Presupuesto: ${budget}\n` +
+        `📅 Solicitud creada: ${createdDate}\n\n` +
         `📝 Descripción:\n${result.description || 'Sin descripción'}\n\n` +
         `Para más detalles, visite su dashboard en:\nhttps://genswave.onrender.com`
       );

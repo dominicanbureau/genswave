@@ -97,7 +97,7 @@ router.post('/', requireAdmin, async (req, res) => {
         const { user_id, title, description, budget, start_date, end_date, cover_image, tags } = req.body;
 
         // Generate unique ID for project
-        const uniqueId = 'P' + Math.random().toString(36).substring(2, 8).toUpperCase();
+        const uniqueId = 'P' + Math.floor(Math.random() * 900000 + 100000).toString();
 
         const result = await db.query(
             `INSERT INTO projects (user_id, title, description, budget, start_date, end_date, cover_image, tags, unique_id) 

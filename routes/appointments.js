@@ -17,7 +17,7 @@ router.post('/', async (req, res) => {
         const { name, email, phone, businessName, service, message, preferredDate } = req.body;
 
         // Generate unique ID for appointment
-        const uniqueId = 'S' + Math.random().toString(36).substring(2, 8).toUpperCase();
+        const uniqueId = 'S' + Math.floor(Math.random() * 900000 + 100000).toString();
 
         const result = await db.query(
             `INSERT INTO appointments (name, email, phone, business_name, service, message, preferred_date, unique_id) 

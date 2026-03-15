@@ -15,7 +15,7 @@ async function addUniqueIdToRequests() {
         console.log(`📊 Found ${requests.rows.length} requests without unique_id`);
         
         for (const request of requests.rows) {
-            const uniqueId = 'S' + Math.random().toString(36).substring(2, 8).toUpperCase();
+            const uniqueId = 'S' + Math.floor(Math.random() * 900000 + 100000).toString();
             await db.query(
                 'UPDATE requests SET unique_id = $1 WHERE id = $2',
                 [uniqueId, request.id]

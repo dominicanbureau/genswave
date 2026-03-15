@@ -21,7 +21,7 @@ async function addUniqueIdToAppointmentsAndProjects() {
         console.log(`📊 Found ${appointments.rows.length} appointments without unique_id`);
         
         for (const appointment of appointments.rows) {
-            const uniqueId = 'S' + Math.random().toString(36).substring(2, 8).toUpperCase();
+            const uniqueId = 'S' + Math.floor(Math.random() * 900000 + 100000).toString();
             await db.query(
                 'UPDATE appointments SET unique_id = $1 WHERE id = $2',
                 [uniqueId, appointment.id]
@@ -33,7 +33,7 @@ async function addUniqueIdToAppointmentsAndProjects() {
         console.log(`📊 Found ${projects.rows.length} projects without unique_id`);
         
         for (const project of projects.rows) {
-            const uniqueId = 'P' + Math.random().toString(36).substring(2, 8).toUpperCase();
+            const uniqueId = 'P' + Math.floor(Math.random() * 900000 + 100000).toString();
             await db.query(
                 'UPDATE projects SET unique_id = $1 WHERE id = $2',
                 [uniqueId, project.id]

@@ -115,7 +115,7 @@ router.post('/', requireAuth, async (req, res) => {
         } = req.body;
 
         // Generate unique ID for request
-        const uniqueId = 'S' + Math.random().toString(36).substring(2, 8).toUpperCase();
+        const uniqueId = 'S' + Math.floor(Math.random() * 900000 + 100000).toString();
 
         const result = await db.query(
             `INSERT INTO requests (

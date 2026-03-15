@@ -54,15 +54,15 @@ router.post('/webhook', (req, res) => {
 
 // OAuth callback handler
 router.get('/auth/callback', async (req, res) => {
-  const { code } = req.query;
+  const { code, state } = req.query;
   
   if (!code) {
     return res.status(400).json({ error: 'Authorization code not provided' });
   }
 
   try {
-    // Exchange code for access token
-    const tokenResponse = await fetch('https://api.instagram.com/oauth/access_token', {
+    // Exchange code for access token using Facebook Graph API
+    const tokenResponse = await fetch('https://graph.facebook.com/v18.0/oauth/access_token', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
@@ -70,14 +70,21 @@ router.get('/auth/callback', async (req, res) => {
       body: new URLSearchParams({
         client_id: INSTAGRAM_APP_ID,
         client_secret: INSTAGRAM_APP_SECRET,
-        grant_type: 'authorization_code',
         redirect_uri: `https://genswave.onrender.com/api/instagram/auth/callback`,
         code: code,
       }),
     });
 
     const tokenData = await tokenResponse.json();
-    console.log('🔑 Instagram access token received:', tokenData);
+    console.log('🔑 Facebook/Instagram access token received:', tokenData);
+
+    if (tokenData.error) {
+      console.error('❌ OAuth error:', tokenData.error);
+      return res.status(400).json({ 
+        error: 'Authorization failed', 
+        details: tokenData.error.message 
+      });
+    }
 
     // Store the access token securely (you might want to save this to database)
     // For now, we'll just log it - you should save it to your environment variables
@@ -85,7 +92,11 @@ router.get('/auth/callback', async (req, res) => {
     res.json({
       success: true,
       message: 'Instagram connected successfully!',
-      data: tokenData
+      data: {
+        access_token: tokenData.access_token,
+        token_type: tokenData.token_type,
+        expires_in: tokenData.expires_in
+      }
     });
   } catch (error) {
     console.error('❌ Instagram OAuth error:', error);
@@ -336,11 +347,13 @@ function verifySignature(payload, signature) {
 
 // Get Instagram authorization URL
 router.get('/auth/url', (req, res) => {
-  const authUrl = `https://api.instagram.com/oauth/authorize?` +
+  // For Instagram Business, we need to use Facebook's OAuth with Instagram permissions
+  const authUrl = `https://www.facebook.com/v18.0/dialog/oauth?` +
     `client_id=${INSTAGRAM_APP_ID}&` +
     `redirect_uri=https://genswave.onrender.com/api/instagram/auth/callback&` +
-    `scope=instagram_basic,instagram_manage_messages&` +
-    `response_type=code`;
+    `scope=instagram_basic,instagram_manage_messages,pages_messaging,business_management&` +
+    `response_type=code&` +
+    `state=instagram_auth`;
   
   res.json({ authUrl });
 });

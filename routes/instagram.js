@@ -134,30 +134,39 @@ async function handleInstagramMessage(messagingEvent) {
 async function handleTextMessage(senderId, text, senderInfo) {
   const lowerText = text.toLowerCase().trim();
   
+  console.log(`📨 Received message from ${senderId}: "${text}"`);
+  
   // IMPORTANTE: Guardar TODOS los mensajes del usuario primero
   await saveInstagramMessageToDatabase(senderId, text, senderInfo);
   
   // Get or create conversation state
   const conversationState = await getConversationState(senderId);
+  console.log(`📊 Current conversation state:`, conversationState);
   
   // Handle conversation flow based on current state
   switch (conversationState.current_state) {
     case 'idle':
+      console.log(`🔄 Handling idle state`);
       await handleIdleState(senderId, text, senderInfo, lowerText);
       break;
     case 'awaiting_name':
+      console.log(`🔄 Handling name input`);
       await handleNameInput(senderId, text, senderInfo);
       break;
     case 'awaiting_email':
+      console.log(`🔄 Handling email input`);
       await handleEmailInput(senderId, text, senderInfo);
       break;
     case 'awaiting_phone':
+      console.log(`🔄 Handling phone input`);
       await handlePhoneInput(senderId, text, senderInfo);
       break;
     case 'awaiting_company':
+      console.log(`🔄 Handling company input`);
       await handleCompanyInput(senderId, text, senderInfo);
       break;
     default:
+      console.log(`🔄 Unknown state, handling as idle`);
       await handleIdleState(senderId, text, senderInfo, lowerText);
   }
 }
@@ -165,6 +174,8 @@ async function handleTextMessage(senderId, text, senderInfo) {
 // Get or create conversation state
 async function getConversationState(userId) {
   try {
+    console.log(`🔍 Getting conversation state for user: ${userId}`);
+    
     // Try to get existing state
     const result = await db.query(
       'SELECT * FROM conversation_states WHERE instagram_user_id = $1',
@@ -172,8 +183,11 @@ async function getConversationState(userId) {
     );
     
     if (result.rows.length > 0) {
+      console.log(`✅ Found existing state:`, result.rows[0]);
       return result.rows[0];
     }
+    
+    console.log(`📝 Creating new conversation state for user: ${userId}`);
     
     // Create new state if doesn't exist
     const newState = await db.query(
@@ -182,9 +196,10 @@ async function getConversationState(userId) {
       [userId, 'idle', '{}']
     );
     
+    console.log(`✅ Created new state:`, newState.rows[0]);
     return newState.rows[0];
   } catch (error) {
-    console.error('Error managing conversation state:', error);
+    console.error('❌ Error managing conversation state:', error);
     return { current_state: 'idle', collected_data: {} };
   }
 }
@@ -192,15 +207,19 @@ async function getConversationState(userId) {
 // Update conversation state
 async function updateConversationState(userId, newState, collectedData = null) {
   try {
+    console.log(`🔄 Updating state for ${userId}: ${newState}`, collectedData);
+    
     const updateData = collectedData ? JSON.stringify(collectedData) : null;
     const query = updateData 
       ? 'UPDATE conversation_states SET current_state = $1, collected_data = $2, updated_at = CURRENT_TIMESTAMP WHERE instagram_user_id = $3'
       : 'UPDATE conversation_states SET current_state = $1, updated_at = CURRENT_TIMESTAMP WHERE instagram_user_id = $2';
     
     const params = updateData ? [newState, updateData, userId] : [newState, userId];
-    await db.query(query, params);
+    const result = await db.query(query, params);
+    
+    console.log(`✅ State updated successfully. Rows affected: ${result.rowCount}`);
   } catch (error) {
-    console.error('Error updating conversation state:', error);
+    console.error('❌ Error updating conversation state:', error);
   }
 }
 
@@ -354,7 +373,10 @@ async function handleEmailInput(senderId, text, senderInfo) {
   const email = text.trim().toLowerCase();
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   
+  console.log(`📧 Processing email input: "${email}" for user ${senderId}`);
+  
   if (!emailRegex.test(email)) {
+    console.log(`❌ Invalid email format: ${email}`);
     await sendInstagramMessage(senderId,
       `Por favor, proporcione una dirección de correo electrónico válida.\n\n` +
       `**Formato esperado:** usuario@dominio.com\n\n` +
@@ -364,18 +386,36 @@ async function handleEmailInput(senderId, text, senderInfo) {
     return;
   }
   
-  // Save email and move to next step
-  const currentState = await getConversationState(senderId);
-  const collectedData = { ...currentState.collected_data, email: email };
+  console.log(`✅ Valid email format: ${email}`);
   
-  await updateConversationState(senderId, 'awaiting_phone', collectedData);
-  
-  await sendInstagramMessage(senderId,
-    `Excelente. Email registrado: **${email}**\n\n` +
-    `**Tercera pregunta:**\n` +
-    `Indique su **número de teléfono** con código de país 📱\n\n` +
-    `*Ejemplo: +1 234 567 8900*`
-  );
+  try {
+    // Save email and move to next step
+    const currentState = await getConversationState(senderId);
+    console.log(`📊 Current state before update:`, currentState);
+    
+    const collectedData = { ...currentState.collected_data, email: email };
+    console.log(`📊 New collected data:`, collectedData);
+    
+    await updateConversationState(senderId, 'awaiting_phone', collectedData);
+    console.log(`✅ State updated to awaiting_phone`);
+    
+    await sendInstagramMessage(senderId,
+      `Excelente. Email registrado: **${email}**\n\n` +
+      `**Tercera pregunta:**\n` +
+      `Indique su **número de teléfono** con código de país 📱\n\n` +
+      `*Ejemplo: +1 234 567 8900*`
+    );
+    
+    console.log(`✅ Email response sent successfully`);
+    
+  } catch (error) {
+    console.error('❌ Error in handleEmailInput:', error);
+    await sendInstagramMessage(senderId,
+      `❌ **ERROR TÉCNICO**\n\n` +
+      `Disculpe, ocurrió un error al procesar su email.\n\n` +
+      `Por favor, escriba "código" para reiniciar el proceso.`
+    );
+  }
 }
 
 // Handle phone input

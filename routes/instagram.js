@@ -52,20 +52,33 @@ router.post('/webhook', async (req, res) => {
 async function handleInstagramMessage(messagingEvent) {
   try {
     const senderId = messagingEvent.sender.id;
+    const recipientId = messagingEvent.recipient?.id;
     const message = messagingEvent.message;
 
-    if (message) {
-      console.log(`📨 Message from ${senderId}:`, message);
+    // CRITICAL: Ignore echo messages (our own messages) with multiple checks
+    if (message && (message.is_echo === true || message.is_echo === 'true')) {
+      console.log('🔄 Ignoring echo message from bot');
+      return;
+    }
+
+    // Additional safety: ignore messages from our own page ID
+    const OUR_PAGE_ID = process.env.INSTAGRAM_PAGE_ID || '1418733329331765';
+    if (senderId === OUR_PAGE_ID) {
+      console.log('🔄 Ignoring message from our own page');
+      return;
+    }
+
+    if (message && message.text) {
+      console.log(`📨 Message from ${senderId}:`, { text: message.text, is_echo: message.is_echo });
 
       // Get sender info
       const senderInfo = await getInstagramUserInfo(senderId);
       console.log('👤 Sender info:', senderInfo);
 
-      if (message.text) {
-        await handleTextMessage(senderId, message.text, senderInfo);
-      } else if (message.attachments) {
-        await handleAttachments(senderId, message.attachments, senderInfo);
-      }
+      await handleTextMessage(senderId, message.text, senderInfo);
+    } else if (message && message.attachments) {
+      const senderInfo = await getInstagramUserInfo(senderId);
+      await handleAttachments(senderId, message.attachments, senderInfo);
     }
   } catch (error) {
     console.error('❌ Error handling Instagram message:', error);
@@ -77,12 +90,18 @@ async function handleTextMessage(senderId, text, senderInfo) {
   try {
     console.log(`📨 Processing text: "${text}" from ${senderId}`);
     
+    // Additional safety check - ignore very long messages that might be bot responses
+    if (text.length > 500) {
+      console.log('⚠️ Ignoring very long message (likely bot response)');
+      return;
+    }
+    
     // Save user message first
     await saveInstagramMessageToDatabase(senderId, text, senderInfo);
     
     // Get conversation state
     const state = await getConversationState(senderId);
-    console.log(`📊 Current state: ${state.current_state}`, state.collected_data);
+    console.log(`📊 Current state: ${state.current_state}`);
     
     // Route to appropriate handler
     switch (state.current_state) {
@@ -124,7 +143,7 @@ async function processIdleInput(senderId, text, senderInfo) {
     );
     await updateConversationState(senderId, 'awaiting_name', {});
   }
-  else if (lowerText.includes('hola') || lowerText.includes('hello') || lowerText.includes('hi')) {
+  else if (lowerText.includes('hola') || lowerText.includes('hello') || lowerText.includes('hi') || lowerText.includes('buenos') || lowerText.includes('buenas')) {
     await sendInstagramMessage(senderId,
       `¡Hola ${senderInfo.name || 'estimado/a cliente'}! 👋\n\n` +
       `Bienvenido/a a **Genswave**, su socio estratégico en transformación digital.\n\n` +
@@ -133,15 +152,16 @@ async function processIdleInput(senderId, text, senderInfo) {
       `📱 Aplicaciones Móviles\n` +
       `💼 Consultoría Digital\n` +
       `🎫 Código de Acceso Rápido\n\n` +
+      `Para obtener acceso inmediato, escriba **"código"**\n\n` +
       `¿En qué podemos asistirle hoy?`
     );
   }
   else {
     await sendInstagramMessage(senderId,
       `Gracias por contactar a **Genswave** 📨\n\n` +
-      `Hemos recibido su mensaje: "${text}"\n\n` +
-      `Un especialista le responderá pronto. Mientras tanto:\n\n` +
-      `🎫 Escriba "código" para acceso rápido\n` +
+      `Un especialista revisará su consulta y le responderá pronto.\n\n` +
+      `**Opciones disponibles:**\n` +
+      `🎫 Escriba **"código"** para acceso rápido\n` +
       `🌐 Visite: https://genswave.onrender.com\n\n` +
       `¡Valoramos su confianza!`
     );
@@ -154,7 +174,8 @@ async function processNameInput(senderId, text, state) {
   
   if (name.length < 2) {
     await sendInstagramMessage(senderId,
-      `Por favor, proporcione un nombre válido con al menos 2 caracteres.\n\n` +
+      `⚠️ **Nombre muy corto**\n\n` +
+      `Por favor, proporcione su nombre completo.\n\n` +
       `**Pregunta actual:**\n` +
       `Su **nombre completo** 👤`
     );
@@ -165,10 +186,10 @@ async function processNameInput(senderId, text, state) {
   await updateConversationState(senderId, 'awaiting_email', newData);
   
   await sendInstagramMessage(senderId,
-    `Perfecto, **${name}**. Gracias por la información.\n\n` +
+    `✅ **Nombre registrado correctamente**\n\n` +
     `**Segunda pregunta:**\n` +
-    `Por favor, proporcione su **dirección de correo electrónico** 📧\n\n` +
-    `*Este será su usuario para acceder al portal*`
+    `Indique su **dirección de correo electrónico** 📧\n\n` +
+    `*Ejemplo: usuario@empresa.com*`
   );
 }
 
@@ -182,6 +203,7 @@ async function processEmailInput(senderId, text, state) {
   if (!emailRegex.test(email)) {
     console.log(`❌ Invalid email format`);
     await sendInstagramMessage(senderId,
+      `⚠️ **Formato de email incorrecto**\n\n` +
       `Por favor, proporcione una dirección de correo electrónico válida.\n\n` +
       `**Formato esperado:** usuario@dominio.com\n\n` +
       `**Pregunta actual:**\n` +
@@ -196,7 +218,7 @@ async function processEmailInput(senderId, text, state) {
   await updateConversationState(senderId, 'awaiting_phone', newData);
   
   await sendInstagramMessage(senderId,
-    `Excelente. Email registrado: **${email}**\n\n` +
+    `✅ **Email registrado correctamente**\n\n` +
     `**Tercera pregunta:**\n` +
     `Indique su **número de teléfono** con código de país 📱\n\n` +
     `*Ejemplo: +1 234 567 8900*`
@@ -209,6 +231,7 @@ async function processPhoneInput(senderId, text, state) {
   
   if (phone.length < 8) {
     await sendInstagramMessage(senderId,
+      `⚠️ **Número de teléfono muy corto**\n\n` +
       `Por favor, proporcione un número de teléfono válido.\n\n` +
       `**Incluya el código de país si es posible**\n` +
       `*Ejemplo: +1 234 567 8900*\n\n` +
@@ -222,7 +245,7 @@ async function processPhoneInput(senderId, text, state) {
   await updateConversationState(senderId, 'awaiting_company', newData);
   
   await sendInstagramMessage(senderId,
-    `Perfecto. Teléfono registrado: **${phone}**\n\n` +
+    `✅ **Teléfono registrado correctamente**\n\n` +
     `**Última pregunta:**\n` +
     `¿Cuál es el nombre de su **empresa u organización**? 🏢\n\n` +
     `*Si es persona natural, puede indicar "Independiente"*`
@@ -235,6 +258,7 @@ async function processCompanyInput(senderId, text, state) {
   
   if (company.length < 2) {
     await sendInstagramMessage(senderId,
+      `⚠️ **Nombre de empresa muy corto**\n\n` +
       `Por favor, indique el nombre de su empresa o "Independiente".\n\n` +
       `**Pregunta actual:**\n` +
       `Nombre de su **empresa u organización** 🏢`

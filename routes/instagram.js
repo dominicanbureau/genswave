@@ -479,6 +479,139 @@ async function saveBotResponseToDatabase(recipientId, messageText) {
   }
 }
 
+// Process consultation ID input
+async function processConsultationInput(senderId, text, state) {
+  const consultationId = text.trim().toUpperCase();
+  
+  if (consultationId.length < 3) {
+    await sendInstagramMessage(senderId,
+      `⚠️ ID muy corto\n\n` +
+      `Por favor, proporcione un ID válido.\n\n` +
+      `Formato esperado: P123ABC (proyectos) o S123ABC (solicitudes)\n\n` +
+      `Pregunta actual:\n` +
+      `Su ID de consulta:`
+    );
+    return;
+  }
+  
+  try {
+    let result = null;
+    let type = '';
+    
+    // Check if it's a project (starts with P)
+    if (consultationId.startsWith('P')) {
+      const projectResult = await db.query(
+        'SELECT * FROM projects WHERE unique_id = $1',
+        [consultationId]
+      );
+      if (projectResult.rows.length > 0) {
+        result = projectResult.rows[0];
+        type = 'project';
+      }
+    }
+    // Check if it's an appointment/solicitud (starts with S)
+    else if (consultationId.startsWith('S')) {
+      const appointmentResult = await db.query(
+        'SELECT * FROM appointments WHERE unique_id = $1',
+        [consultationId]
+      );
+      if (appointmentResult.rows.length > 0) {
+        result = appointmentResult.rows[0];
+        type = 'appointment';
+      }
+    }
+    // Try both tables if no prefix
+    else {
+      const projectResult = await db.query(
+        'SELECT * FROM projects WHERE unique_id = $1',
+        [consultationId]
+      );
+      if (projectResult.rows.length > 0) {
+        result = projectResult.rows[0];
+        type = 'project';
+      } else {
+        const appointmentResult = await db.query(
+          'SELECT * FROM appointments WHERE unique_id = $1',
+          [consultationId]
+        );
+        if (appointmentResult.rows.length > 0) {
+          result = appointmentResult.rows[0];
+          type = 'appointment';
+        }
+      }
+    }
+    
+    if (!result) {
+      await sendInstagramMessage(senderId,
+        `❌ *ID NO ENCONTRADO*\n\n` +
+        `No se encontró ningún proyecto o solicitud con el ID: ${consultationId}\n\n` +
+        `Verifique que:\n` +
+        `• El ID esté escrito correctamente\n` +
+        `• Sea un ID válido de Genswave\n\n` +
+        `Para nueva consulta, escriba "consulta"`
+      );
+    } else if (type === 'project') {
+      // Format project status
+      const statusEmoji = {
+        'active': '🟢',
+        'completed': '✅',
+        'paused': '⏸️',
+        'cancelled': '❌'
+      };
+      
+      const startDate = result.start_date ? new Date(result.start_date).toLocaleDateString('es-ES') : 'No definida';
+      const endDate = result.end_date ? new Date(result.end_date).toLocaleDateString('es-ES') : 'No definida';
+      const budget = result.budget ? `$${parseFloat(result.budget).toLocaleString()}` : 'No definido';
+      
+      await sendInstagramMessage(senderId,
+        `📊 *ESTADO DEL PROYECTO*\n\n` +
+        `🆔 ID: ${result.unique_id}\n` +
+        `📋 Título: ${result.title}\n` +
+        `${statusEmoji[result.status] || '⚪'} Estado: ${result.status.toUpperCase()}\n` +
+        `📈 Progreso: ${result.progress}%\n\n` +
+        `📅 Fecha inicio: ${startDate}\n` +
+        `📅 Fecha fin: ${endDate}\n` +
+        `💰 Presupuesto: ${budget}\n\n` +
+        `📝 Descripción:\n${result.description || 'Sin descripción'}\n\n` +
+        `Para más detalles, visite su dashboard en:\nhttps://genswave.onrender.com`
+      );
+    } else if (type === 'appointment') {
+      // Format appointment status
+      const statusEmoji = {
+        'pending': '⏳',
+        'approved': '✅',
+        'rejected': '❌',
+        'completed': '🎉'
+      };
+      
+      const preferredDate = new Date(result.preferred_date).toLocaleDateString('es-ES');
+      const createdDate = new Date(result.created_at).toLocaleDateString('es-ES');
+      
+      await sendInstagramMessage(senderId,
+        `📋 *ESTADO DE SOLICITUD*\n\n` +
+        `🆔 ID: ${result.unique_id}\n` +
+        `👤 Cliente: ${result.name}\n` +
+        `${statusEmoji[result.status] || '⚪'} Estado: ${result.status.toUpperCase()}\n\n` +
+        `🛠️ Servicio: ${result.service}\n` +
+        `🏢 Empresa: ${result.business_name || 'No especificada'}\n` +
+        `📅 Fecha preferida: ${preferredDate}\n` +
+        `📅 Solicitud creada: ${createdDate}\n\n` +
+        `📝 Mensaje:\n${result.message || 'Sin mensaje'}\n\n` +
+        `${result.admin_notes ? `📋 Notas del equipo:\n${result.admin_notes}\n\n` : ''}` +
+        `Para más detalles, visite su dashboard en:\nhttps://genswave.onrender.com`
+      );
+    }
+    
+    // Reset state
+    await updateConversationState(senderId, 'idle', {});
+    
+  } catch (error) {
+    console.error('❌ Error processing consultation:', error);
+    await sendErrorMessage(senderId);
+    await updateConversationState(senderId, 'idle', {});
+  }
+}
+
 // Handle attachments
 async function handleAttachments(senderId, attachments, senderInfo) {
   await saveInstagramMessageToDatabase(senderId, '[Archivo adjunto]', senderInfo);

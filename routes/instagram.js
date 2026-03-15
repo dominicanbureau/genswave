@@ -110,6 +110,9 @@ async function handleTextMessage(senderId, text, senderInfo) {
       case 'awaiting_company':
         await processCompanyInput(senderId, text, state);
         break;
+      case 'awaiting_consultation_id':
+        await processConsultationInput(senderId, text, state);
+        break;
       default:
         await processIdleInput(senderId, text, senderInfo);
     }
@@ -125,27 +128,43 @@ async function processIdleInput(senderId, text, senderInfo) {
   
   if (lowerText.includes('código') || lowerText.includes('codigo') || lowerText.includes('acceso')) {
     await sendInstagramMessage(senderId,
-      `🎫 **GENERACIÓN DE CÓDIGO DE ACCESO**\n\n` +
+      `🎫 *GENERACIÓN DE CÓDIGO DE ACCESO*\n\n` +
       `Estimado/a cliente, procederemos a generar su código de acceso personalizado.\n\n` +
-      `**Beneficios:**\n` +
+      `*BENEFICIOS:*\n` +
       `✅ Acceso exclusivo a su dashboard\n` +
       `✅ Seguimiento de proyectos en tiempo real\n` +
       `✅ Comunicación directa con nuestro equipo\n\n` +
-      `**Primera pregunta:**\n` +
-      `Por favor, indíquenos su **nombre completo** 👤`
+      `*PRIMERA PREGUNTA:*\n` +
+      `Por favor, indíquenos su *nombre completo* 👤`
     );
     await updateConversationState(senderId, 'awaiting_name', {});
+  }
+  else if (lowerText.includes('consulta') || lowerText.includes('estado') || lowerText.includes('seguimiento')) {
+    await sendInstagramMessage(senderId,
+      `🔍 *CONSULTA DE ESTADO*\n\n` +
+      `Para consultar el estado de su proyecto o solicitud, necesito el ID único.\n\n` +
+      `📋 Puede encontrar su ID en:\n` +
+      `• Panel de usuario (dashboard)\n` +
+      `• Email de confirmación\n\n` +
+      `Por favor, envíe su ID de consulta:`
+    );
+    await updateConversationState(senderId, 'awaiting_consultation_id', {});
   }
   else if (lowerText.includes('hola') || lowerText.includes('hello') || lowerText.includes('hi') || lowerText.includes('buenos') || lowerText.includes('buenas')) {
     await sendInstagramMessage(senderId,
       `¡Hola ${senderInfo.name || 'estimado/a cliente'}! 👋\n\n` +
-      `Bienvenido/a a **Genswave**, su socio estratégico en transformación digital.\n\n` +
-      `**Servicios disponibles:**\n` +
+      `Bienvenido/a a *Genswave*, su socio estratégico en transformación digital.\n\n` +
+      `🚀 *NUESTROS SERVICIOS:*\n` +
       `🌐 Desarrollo Web Profesional\n` +
-      `📱 Aplicaciones Móviles\n` +
-      `💼 Consultoría Digital\n` +
-      `🎫 Código de Acceso Rápido\n\n` +
-      `Para obtener acceso inmediato, escriba **"código"**\n\n` +
+      `📱 Aplicaciones Móviles iOS/Android\n` +
+      `💼 Consultoría Digital Empresarial\n` +
+      `🎨 Diseño UI/UX Avanzado\n` +
+      `⚙️ Automatización de Procesos\n\n` +
+      `📋 *COMANDOS DISPONIBLES:*\n` +
+      `• "código" - Generar acceso rápido al portal\n` +
+      `• "consulta" - Verificar estado de proyectos/solicitudes\n` +
+      `• "servicios" - Ver catálogo completo\n\n` +
+      `💬 También puede escribir cualquier consulta y nuestro equipo le responderá personalmente.\n\n` +
       `¿En qué podemos asistirle hoy?`
     );
   }

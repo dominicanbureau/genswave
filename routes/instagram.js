@@ -55,16 +55,9 @@ async function handleInstagramMessage(messagingEvent) {
     const recipientId = messagingEvent.recipient?.id;
     const message = messagingEvent.message;
 
-    // CRITICAL: Ignore echo messages (our own messages) with multiple checks
+    // CRITICAL: Ignore echo messages (our own messages) - this is the primary filter
     if (message && (message.is_echo === true || message.is_echo === 'true')) {
       console.log('🔄 Ignoring echo message from bot');
-      return;
-    }
-
-    // Additional safety: ignore messages from our own page ID
-    const OUR_PAGE_ID = process.env.INSTAGRAM_PAGE_ID || '1418733329331765';
-    if (senderId === OUR_PAGE_ID) {
-      console.log('🔄 Ignoring message from our own page');
       return;
     }
 

@@ -624,13 +624,11 @@ async function processConsultationInput(senderId, text, state) {
           `📅 INICIO: ${startDate}\n` +
           `📅 ENTREGA: ${endDate}\n` +
           `📆 CREADO: ${createdDate}${progressInfo}\n` +
-          `💰 *Presupuesto:* $${result.budget || 'No definido'}\n` +
-          `📅 *Fecha inicio:* ${startDate}\n` +
-          `📅 *Fecha fin:* ${endDate}\n` +
-          `📅 *Proyecto creado:* ${createdDate}\n\n` +
-          `📝 *Descripción:*\n${result.description || 'Sin descripción'}\n\n` +
-          `${result.admin_notes ? `📋 *Notas del equipo:*\n${result.admin_notes}\n\n` : ''}` +
-          `Para más detalles, visite su dashboard en:\nhttps://genswave.onrender.com`
+          `📝 DESCRIPCIÓN:\n${result.description || 'Sin descripción disponible'}\n\n` +
+          `${result.admin_notes ? `📋 NOTAS DEL EQUIPO:\n${result.admin_notes}\n\n` : ''}` +
+          `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+          `🌐 Dashboard completo:\nhttps://genswave.onrender.com\n` +
+          `📞 Soporte: info@genswave.com`
         );
       } else if (type === 'appointment') {
         const preferredDate = result.preferred_date ? new Date(result.preferred_date).toLocaleDateString() : 'No especificada';

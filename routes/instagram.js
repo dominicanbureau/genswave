@@ -134,6 +134,9 @@ async function handleInstagramMessage(messagingEvent) {
 async function handleTextMessage(senderId, text, senderInfo) {
   const lowerText = text.toLowerCase().trim();
   
+  // IMPORTANTE: Guardar TODOS los mensajes del usuario primero
+  await saveInstagramMessageToDatabase(senderId, text, senderInfo);
+  
   // Command handlers
   if (lowerText.includes('hola') || lowerText.includes('hello') || lowerText.includes('hi')) {
     await sendInstagramMessage(senderId, 
@@ -298,9 +301,6 @@ async function handleTextMessage(senderId, text, senderInfo) {
       `🎫 Escribir "código" para generar acceso rápido\n\n` +
       `¡Gracias por contactarnos!`
     );
-    
-    // Save message to database for admin review
-    await saveInstagramMessageToDatabase(senderId, text, senderInfo);
   }
 }
 
@@ -530,12 +530,18 @@ router.get('/conversations', async (req, res) => {
     const query = `
       SELECT 
         instagram_user_id,
-        instagram_username,
-        sender_name,
-        message_text as last_message,
+        COALESCE(instagram_username, 'Sin username') as instagram_username,
+        COALESCE(sender_name, 'Usuario de Instagram') as sender_name,
+        (
+          SELECT message_text 
+          FROM instagram_messages im2 
+          WHERE im2.instagram_user_id = im.instagram_user_id 
+          ORDER BY created_at DESC 
+          LIMIT 1
+        ) as last_message,
         MAX(created_at) as last_message_time,
         SUM(CASE WHEN is_from_user = true AND is_read = false THEN 1 ELSE 0 END) as unread_count
-      FROM instagram_messages 
+      FROM instagram_messages im
       GROUP BY instagram_user_id, instagram_username, sender_name
       ORDER BY last_message_time DESC
     `;

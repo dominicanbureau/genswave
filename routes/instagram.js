@@ -1,6 +1,7 @@
 import express from 'express';
 import crypto from 'crypto';
 import fetch from 'node-fetch';
+import db from '../database.js';
 
 const router = express.Router();
 
@@ -141,10 +142,96 @@ async function handleTextMessage(senderId, text, senderInfo) {
       `🌐 Solicitar cotización para página web\n` +
       `📱 Información sobre apps móviles\n` +
       `💼 Consultas sobre proyectos\n` +
-      `📞 Agendar una cita\n\n` +
+      `📞 Agendar una cita\n` +
+      `🎫 Generar código de acceso\n\n` +
       `¿En qué puedo ayudarte hoy?`
     );
   } 
+  else if (lowerText.includes('código') || lowerText.includes('codigo') || lowerText.includes('acceso') || lowerText.includes('login')) {
+    await sendInstagramMessage(senderId,
+      `🎫 ¡Perfecto! Te ayudo a generar un código de acceso.\n\n` +
+      `Este código te permitirá:\n` +
+      `✅ Acceder a nuestro sitio web\n` +
+      `✅ Ver el estado de tus proyectos\n` +
+      `✅ Comunicarte directamente con nosotros\n\n` +
+      `Para generar tu código, necesito algunos datos:\n\n` +
+      `📝 Responde con tu información en este formato:\n` +
+      `DATOS: [Tu nombre] | [Tu email] | [Tu teléfono] | [Tu empresa]\n\n` +
+      `Ejemplo:\n` +
+      `DATOS: Juan Pérez | juan@email.com | +1234567890 | Mi Empresa\n\n` +
+      `¿Listo para generar tu código?`
+    );
+  }
+  else if (lowerText.startsWith('datos:')) {
+    // Parse user data for quick code generation
+    const dataString = text.substring(6).trim(); // Remove "DATOS:" prefix
+    const dataParts = dataString.split('|').map(part => part.trim());
+    
+    if (dataParts.length >= 3) {
+      const [name, email, phone, company] = dataParts;
+      
+      try {
+        // Generate quick code
+        const code = Math.random().toString(36).substring(2, 8).toUpperCase();
+        const expiresAt = new Date();
+        expiresAt.setDate(expiresAt.getDate() + 7); // Expires in 7 days
+
+        // Save quick code to database
+        const insertQuery = `
+          INSERT INTO quick_codes (name, email, phone, company, code, expires_at, created_at)
+          VALUES ($1, $2, $3, $4, $5, $6, $7)
+          RETURNING id
+        `;
+
+        const values = [
+          name || senderInfo.name || 'Usuario de Instagram',
+          email || `instagram_${senderId}@temp.com`,
+          phone || 'No proporcionado',
+          company || 'No especificada',
+          code,
+          expiresAt,
+          new Date()
+        ];
+
+        const result = await db.query(insertQuery, values);
+
+        // Send success message with code
+        await sendInstagramMessage(senderId,
+          `🎉 ¡Código generado exitosamente!\n\n` +
+          `👤 Nombre: ${name}\n` +
+          `📧 Email: ${email}\n` +
+          `📱 Teléfono: ${phone}\n` +
+          `🏢 Empresa: ${company || 'No especificada'}\n\n` +
+          `🎫 Tu código de acceso: ${code}\n\n` +
+          `👉 Visita: https://genswave.onrender.com\n` +
+          `📝 Ingresa tu código en "Código Rápido"\n\n` +
+          `⏰ Válido por 7 días\n` +
+          `📞 ¿Necesitas ayuda? ¡Escríbeme!\n\n` +
+          `¡Gracias por confiar en Genswave!`
+        );
+
+        console.log(`✅ Quick code generated via Instagram: ${code} for ${name}`);
+        
+      } catch (error) {
+        console.error('Error generating quick code from Instagram:', error);
+        await sendInstagramMessage(senderId,
+          `❌ Hubo un error al generar tu código.\n\n` +
+          `Por favor, inténtalo de nuevo o contacta a nuestro equipo.\n\n` +
+          `📞 También puedes visitarnos en:\n` +
+          `👉 https://genswave.onrender.com`
+        );
+      }
+    } else {
+      await sendInstagramMessage(senderId,
+        `❌ Formato incorrecto.\n\n` +
+        `Por favor, usa este formato:\n` +
+        `DATOS: [Nombre] | [Email] | [Teléfono] | [Empresa]\n\n` +
+        `Ejemplo:\n` +
+        `DATOS: Juan Pérez | juan@email.com | +1234567890 | Mi Empresa\n\n` +
+        `¡Inténtalo de nuevo!`
+      );
+    }
+  }
   else if (lowerText.includes('cotización') || lowerText.includes('precio') || lowerText.includes('costo')) {
     await sendInstagramMessage(senderId,
       `💰 ¡Perfecto! Te ayudo con una cotización.\n\n` +
@@ -194,6 +281,7 @@ async function handleTextMessage(senderId, text, senderInfo) {
       `• "Cotización" - Para solicitar precios\n` +
       `• "Cita" - Para agendar reunión\n` +
       `• "Servicios" - Ver qué ofrecemos\n` +
+      `• "Código" - Generar código de acceso\n` +
       `• "Ayuda" - Ver este menú\n\n` +
       `También puedes escribirme cualquier pregunta y te responderé lo antes posible.\n\n` +
       `🌐 Visita: https://genswave.onrender.com`
@@ -206,7 +294,8 @@ async function handleTextMessage(senderId, text, senderInfo) {
       `He recibido: "${text}"\n\n` +
       `Un miembro de nuestro equipo te responderá pronto. Mientras tanto, puedes:\n\n` +
       `🌐 Visitar nuestra web: https://genswave.onrender.com\n` +
-      `💬 Escribir "ayuda" para ver comandos disponibles\n\n` +
+      `💬 Escribir "ayuda" para ver comandos disponibles\n` +
+      `🎫 Escribir "código" para generar acceso rápido\n\n` +
       `¡Gracias por contactarnos!`
     );
     
@@ -253,6 +342,10 @@ async function sendInstagramMessage(recipientId, messageText) {
     
     if (response.ok) {
       console.log('✅ Instagram message sent successfully:', result);
+      
+      // Save bot response to database
+      await saveBotResponseToDatabase(recipientId, messageText);
+      
     } else {
       console.error('❌ Failed to send Instagram message:', result);
     }
@@ -260,6 +353,41 @@ async function sendInstagramMessage(recipientId, messageText) {
     return result;
   } catch (error) {
     console.error('❌ Error sending Instagram message:', error);
+  }
+}
+
+// Save bot response to database
+async function saveBotResponseToDatabase(recipientId, messageText) {
+  try {
+    const query = `
+      INSERT INTO instagram_messages (
+        instagram_user_id,
+        instagram_username,
+        sender_name,
+        message_text,
+        message_type,
+        is_from_user,
+        is_read,
+        created_at
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+    `;
+
+    const values = [
+      recipientId,
+      null,
+      'Genswave Bot',
+      messageText,
+      'text',
+      false, // is_from_user (this is from bot)
+      true, // is_read (bot messages are automatically read)
+      new Date()
+    ];
+
+    await db.query(query, values);
+    console.log('💾 Bot response saved to database');
+    
+  } catch (error) {
+    console.error('❌ Error saving bot response to database:', error);
   }
 }
 
@@ -291,19 +419,34 @@ async function getInstagramUserInfo(userId) {
 // Save Instagram message to database for admin review
 async function saveInstagramMessageToDatabase(senderId, messageText, senderInfo) {
   try {
-    // This would integrate with your existing messages system
-    // For now, we'll log it - you can integrate with your database later
-    console.log('💾 Saving Instagram message to database:', {
+    // Save to instagram_messages table
+    const query = `
+      INSERT INTO instagram_messages (
+        instagram_user_id,
+        instagram_username,
+        sender_name,
+        message_text,
+        message_type,
+        is_from_user,
+        is_read,
+        created_at
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+      RETURNING id
+    `;
+
+    const values = [
       senderId,
+      senderInfo.username || null,
+      senderInfo.name || 'Usuario de Instagram',
       messageText,
-      senderInfo,
-      platform: 'instagram',
-      timestamp: new Date()
-    });
-    
-    // TODO: Integrate with your existing messages table
-    // You might want to create a new table for Instagram messages
-    // or add a platform field to your existing messages table
+      'text',
+      true, // is_from_user
+      false, // is_read
+      new Date()
+    ];
+
+    const result = await db.query(query, values);
+    console.log('💾 Instagram message saved to database:', result.rows[0].id);
     
   } catch (error) {
     console.error('❌ Error saving Instagram message to database:', error);
@@ -363,14 +506,169 @@ router.post('/send-message', async (req, res) => {
   const { recipientId, message } = req.body;
   
   if (!recipientId || !message) {
-    return res.status(400).json({ error: 'recipientId and message are required' });
+    return res.status(400).json({ error: 'recipientId y message son requeridos' });
   }
 
   try {
     const result = await sendInstagramMessage(recipientId, message);
-    res.json({ success: true, result });
+    if (result) {
+      // Save admin message to database
+      await saveBotResponseToDatabase(recipientId, message);
+      res.json({ success: true, message: 'Mensaje enviado correctamente' });
+    } else {
+      res.status(500).json({ error: 'Error al enviar mensaje por Instagram' });
+    }
   } catch (error) {
+    console.error('Error sending Instagram message:', error);
     res.status(500).json({ error: error.message });
+  }
+});
+
+// Get Instagram conversations for admin
+router.get('/conversations', async (req, res) => {
+  try {
+    const query = `
+      SELECT 
+        instagram_user_id,
+        instagram_username,
+        sender_name,
+        message_text as last_message,
+        MAX(created_at) as last_message_time,
+        SUM(CASE WHEN is_from_user = true AND is_read = false THEN 1 ELSE 0 END) as unread_count
+      FROM instagram_messages 
+      GROUP BY instagram_user_id, instagram_username, sender_name
+      ORDER BY last_message_time DESC
+    `;
+
+    const result = await db.query(query);
+    res.json(result.rows);
+  } catch (error) {
+    console.error('❌ Error fetching Instagram conversations:', error);
+    res.status(500).json({ error: 'Error al cargar conversaciones de Instagram' });
+  }
+});
+
+// Get messages for a specific Instagram user
+router.get('/messages/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    
+    const query = `
+      SELECT 
+        id,
+        instagram_user_id,
+        instagram_username,
+        sender_name,
+        message_text,
+        message_type,
+        attachments,
+        is_from_user,
+        is_read,
+        created_at
+      FROM instagram_messages 
+      WHERE instagram_user_id = $1
+      ORDER BY created_at ASC
+    `;
+
+    const result = await db.query(query, [userId]);
+    
+    // Mark user messages as read
+    await db.query(
+      'UPDATE instagram_messages SET is_read = true WHERE instagram_user_id = $1 AND is_from_user = true',
+      [userId]
+    );
+
+    res.json(result.rows);
+  } catch (error) {
+    console.error('❌ Error fetching Instagram messages:', error);
+    res.status(500).json({ error: 'Error al cargar mensajes de Instagram' });
+  }
+});
+
+// Send message from admin to Instagram user
+router.post('/admin-reply', async (req, res) => {
+  try {
+    const { recipientId, message } = req.body;
+    
+    if (!recipientId || !message) {
+      return res.status(400).json({ error: 'recipientId and message are required' });
+    }
+
+    // Send message via Instagram API
+    const result = await sendInstagramMessage(recipientId, message);
+    
+    if (result) {
+      res.json({ success: true, message: 'Message sent successfully' });
+    } else {
+      res.status(500).json({ error: 'Failed to send message' });
+    }
+  } catch (error) {
+    console.error('❌ Error sending admin reply:', error);
+    res.status(500).json({ error: 'Failed to send message' });
+  }
+});
+
+// Generate quick code for Instagram user
+router.post('/generate-quick-code', async (req, res) => {
+  try {
+    const { instagramUserId } = req.body;
+
+    if (!instagramUserId) {
+      return res.status(400).json({ error: 'instagramUserId es requerido' });
+    }
+
+    // Get Instagram user info
+    const userInfo = await getInstagramUserInfo(instagramUserId);
+    
+    if (!userInfo) {
+      return res.status(404).json({ error: 'Usuario de Instagram no encontrado' });
+    }
+
+    // Generate quick code
+    const code = Math.random().toString(36).substring(2, 8).toUpperCase();
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + 7); // Expires in 7 days
+
+    // Save quick code to database
+    const insertQuery = `
+      INSERT INTO quick_codes (name, email, phone, company, code, expires_at, created_at)
+      VALUES ($1, $2, $3, $4, $5, $6, $7)
+      RETURNING id
+    `;
+
+    const values = [
+      userInfo.name || 'Usuario de Instagram',
+      `instagram_${instagramUserId}@temp.com`, // Temporary email
+      userInfo.phone || 'No proporcionado',
+      'Instagram User',
+      code,
+      expiresAt,
+      new Date()
+    ];
+
+    const result = await db.query(insertQuery, values);
+
+    // Send code to user via Instagram
+    const message = `🎉 ¡Tu código de acceso ha sido generado!\n\n` +
+                   `Código: ${code}\n\n` +
+                   `Este código te permite acceder a nuestro sitio web y ver el estado de tus proyectos.\n\n` +
+                   `👉 Visita: https://genswave.onrender.com\n` +
+                   `📝 Ingresa tu código en la sección "Código Rápido"\n\n` +
+                   `⏰ Válido por 7 días\n\n` +
+                   `¡Gracias por contactarnos!`;
+
+    await sendInstagramMessage(instagramUserId, message);
+    await saveBotResponseToDatabase(instagramUserId, message);
+
+    res.json({ 
+      success: true, 
+      code: code,
+      message: 'Código generado y enviado correctamente' 
+    });
+
+  } catch (error) {
+    console.error('Error generating quick code:', error);
+    res.status(500).json({ error: 'Error al generar código rápido' });
   }
 });
 

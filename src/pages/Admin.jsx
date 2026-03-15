@@ -666,6 +666,11 @@ function ChatsSection() {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [attachments, setAttachments] = useState([]);
+  const [chatType, setChatType] = useState('web'); // 'web' or 'instagram'
+  const [instagramConversations, setInstagramConversations] = useState([]);
+  const [filteredInstagramConversations, setFilteredInstagramConversations] = useState([]);
+  const [instagramMessages, setInstagramMessages] = useState([]);
+  const [selectedInstagramConversation, setSelectedInstagramConversation] = useState(null);
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
 
@@ -676,30 +681,57 @@ function ChatsSection() {
   }, []);
 
   useEffect(() => {
-    if (selectedConversation) {
+    loadInstagramConversations();
+    const interval = setInterval(loadInstagramConversations, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    if (selectedConversation && chatType === 'web') {
       loadMessages(selectedConversation.id);
       const interval = setInterval(() => loadMessages(selectedConversation.id), 3000);
       return () => clearInterval(interval);
     }
-  }, [selectedConversation]);
+  }, [selectedConversation, chatType]);
+
+  useEffect(() => {
+    if (selectedInstagramConversation && chatType === 'instagram') {
+      loadInstagramMessages(selectedInstagramConversation.instagram_user_id);
+      const interval = setInterval(() => loadInstagramMessages(selectedInstagramConversation.instagram_user_id), 3000);
+      return () => clearInterval(interval);
+    }
+  }, [selectedInstagramConversation, chatType]);
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages]);
+  }, [messages, instagramMessages]);
 
   // Filter conversations based on search query
   useEffect(() => {
-    if (!searchQuery.trim()) {
-      setFilteredConversations(conversations);
+    if (chatType === 'web') {
+      if (!searchQuery.trim()) {
+        setFilteredConversations(conversations);
+      } else {
+        const filtered = conversations.filter(conv => 
+          conv.user_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          conv.user_email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          conv.last_message.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+        setFilteredConversations(filtered);
+      }
     } else {
-      const filtered = conversations.filter(conv => 
-        conv.user_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        conv.user_email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        conv.last_message.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-      setFilteredConversations(filtered);
+      if (!searchQuery.trim()) {
+        setFilteredInstagramConversations(instagramConversations);
+      } else {
+        const filtered = instagramConversations.filter(conv => 
+          conv.sender_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          (conv.instagram_username && conv.instagram_username.toLowerCase().includes(searchQuery.toLowerCase())) ||
+          conv.last_message.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+        setFilteredInstagramConversations(filtered);
+      }
     }
-  }, [conversations, searchQuery]);
+  }, [conversations, instagramConversations, searchQuery, chatType]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -712,6 +744,26 @@ function ChatsSection() {
       setConversations(data);
     } catch (error) {
       console.error('Error al cargar conversaciones:', error);
+    }
+  };
+
+  const loadInstagramConversations = async () => {
+    try {
+      const response = await fetch('/api/instagram/conversations');
+      const data = await response.json();
+      setInstagramConversations(data);
+    } catch (error) {
+      console.error('Error al cargar conversaciones de Instagram:', error);
+    }
+  };
+
+  const loadInstagramMessages = async (userId) => {
+    try {
+      const response = await fetch(`/api/instagram/messages/${userId}`);
+      const data = await response.json();
+      setInstagramMessages(data);
+    } catch (error) {
+      console.error('Error al cargar mensajes de Instagram:', error);
     }
   };
 
@@ -752,51 +804,73 @@ function ChatsSection() {
   const sendMessage = async (e) => {
     e.preventDefault();
     if (!newMessage.trim() && attachments.length === 0) return;
-    if (!selectedConversation) return;
+    
+    if (chatType === 'web' && !selectedConversation) return;
+    if (chatType === 'instagram' && !selectedInstagramConversation) return;
 
     try {
-      let attachmentData = [];
-      
-      // Upload attachments if any
-      if (attachments.length > 0) {
-        const formData = new FormData();
-        attachments.forEach(attachment => {
-          formData.append('attachments', attachment.file);
-        });
+      if (chatType === 'web') {
+        let attachmentData = [];
         
-        const uploadResponse = await fetch('/api/upload/chat-attachments', {
-          method: 'POST',
-          body: formData
-        });
-        
-        if (uploadResponse.ok) {
-          const uploadResult = await uploadResponse.json();
-          attachmentData = uploadResult.files;
-        } else {
-          console.error('Error uploading attachments');
-          return;
+        // Upload attachments if any
+        if (attachments.length > 0) {
+          const formData = new FormData();
+          attachments.forEach(attachment => {
+            formData.append('attachments', attachment.file);
+          });
+          
+          const uploadResponse = await fetch('/api/upload/chat-attachments', {
+            method: 'POST',
+            body: formData
+          });
+          
+          if (uploadResponse.ok) {
+            const uploadResult = await uploadResponse.json();
+            attachmentData = uploadResult.files;
+          } else {
+            console.error('Error uploading attachments');
+            return;
+          }
         }
-      }
 
-      // Send message with attachments
-      const response = await fetch('/api/messages', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          message: newMessage,
-          user_id: selectedConversation.id,
-          attachments: attachmentData
-        })
-      });
-
-      if (response.ok) {
-        setNewMessage('');
-        // Clear attachments
-        attachments.forEach(att => {
-          if (att.preview) URL.revokeObjectURL(att.preview);
+        // Send message with attachments
+        const response = await fetch('/api/messages', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            message: newMessage,
+            user_id: selectedConversation.id,
+            attachments: attachmentData
+          })
         });
-        setAttachments([]);
-        loadMessages(selectedConversation.id);
+
+        if (response.ok) {
+          setNewMessage('');
+          // Clear attachments
+          attachments.forEach(att => {
+            if (att.preview) URL.revokeObjectURL(att.preview);
+          });
+          setAttachments([]);
+          loadMessages(selectedConversation.id);
+        }
+      } else {
+        // Send Instagram message
+        const response = await fetch('/api/instagram/send-message', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            recipientId: selectedInstagramConversation.instagram_user_id,
+            message: newMessage
+          })
+        });
+
+        if (response.ok) {
+          setNewMessage('');
+          loadInstagramMessages(selectedInstagramConversation.instagram_user_id);
+        } else {
+          const error = await response.json();
+          alert('Error al enviar mensaje: ' + error.message);
+        }
       }
     } catch (error) {
       console.error('Error al enviar mensaje:', error);
@@ -853,6 +927,33 @@ function ChatsSection() {
       alert('Error al eliminar la conversación');
     }
   };
+
+  const generateQuickCodeForInstagram = async (instagramUserId) => {
+    if (!confirm('¿Generar un código rápido para este usuario de Instagram?')) return;
+    
+    try {
+      const response = await fetch('/api/instagram/generate-quick-code', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          instagramUserId: instagramUserId
+        })
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        alert(`Código generado: ${result.code}\nSe ha enviado al usuario por Instagram.`);
+        loadInstagramMessages(instagramUserId);
+      } else {
+        const error = await response.json();
+        alert('Error al generar código: ' + error.message);
+      }
+    } catch (error) {
+      console.error('Error al generar código rápido:', error);
+      alert('Error al generar código rápido');
+    }
+  };
+
   return (
     <motion.div
       className="admin-content chat-section"
@@ -862,10 +963,37 @@ function ChatsSection() {
     >
       <h1>CHATS DE SOPORTE</h1>
       
+      <div className="chat-type-toggle">
+        <button 
+          className={`toggle-btn ${chatType === 'web' ? 'active' : ''}`}
+          onClick={() => {
+            setChatType('web');
+            setSelectedConversation(null);
+            setSelectedInstagramConversation(null);
+            setMessages([]);
+            setInstagramMessages([]);
+          }}
+        >
+          💬 Chat Web
+        </button>
+        <button 
+          className={`toggle-btn ${chatType === 'instagram' ? 'active' : ''}`}
+          onClick={() => {
+            setChatType('instagram');
+            setSelectedConversation(null);
+            setSelectedInstagramConversation(null);
+            setMessages([]);
+            setInstagramMessages([]);
+          }}
+        >
+          📱 Instagram
+        </button>
+      </div>
+      
       <div className="chat-layout">
         <div className="conversations-list">
           <div className="conversations-header">
-            <h3>Conversaciones</h3>
+            <h3>{chatType === 'web' ? 'Conversaciones Web' : 'Conversaciones Instagram'}</h3>
             <div className="search-container">
               <div className="search-input-wrapper">
                 <svg className="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -894,46 +1022,108 @@ function ChatsSection() {
               </div>
             </div>
           </div>
-          {filteredConversations.length === 0 ? (
-            <p className="empty-state">
-              {searchQuery ? 'No se encontraron conversaciones' : 'No hay conversaciones'}
-            </p>
+          {chatType === 'web' ? (
+            filteredConversations.length === 0 ? (
+              <p className="empty-state">
+                {searchQuery ? 'No se encontraron conversaciones' : 'No hay conversaciones'}
+              </p>
+            ) : (
+              filteredConversations.map((conv) => (
+                <motion.div
+                  key={conv.id}
+                  className={`conversation-item ${selectedConversation?.id === conv.id ? 'active' : ''}`}
+                  onClick={() => setSelectedConversation(conv)}
+                  whileHover={{ x: 5 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <div className="conversation-avatar">
+                    {conv.user_name.charAt(0).toUpperCase()}
+                  </div>
+                  <div className="conversation-info">
+                    <h4>{conv.user_name}</h4>
+                    <p className="last-message">{conv.last_message}</p>
+                    <span className="conversation-time">
+                      {new Date(conv.last_message_at).toLocaleDateString('es-ES')}
+                    </span>
+                  </div>
+                  {conv.unread_count > 0 && (
+                    <span className="unread-badge">{conv.unread_count}</span>
+                  )}
+                </motion.div>
+              ))
+            )
           ) : (
-            filteredConversations.map((conv) => (
-              <motion.div
-                key={conv.id}
-                className={`conversation-item ${selectedConversation?.id === conv.id ? 'active' : ''}`}
-                onClick={() => setSelectedConversation(conv)}
-                whileHover={{ x: 5 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                <div className="conversation-avatar">
-                  {conv.user_name.charAt(0).toUpperCase()}
-                </div>
-                <div className="conversation-info">
-                  <h4>{conv.user_name}</h4>
-                  <p className="last-message">{conv.last_message}</p>
-                  <span className="conversation-time">
-                    {new Date(conv.last_message_at).toLocaleDateString('es-ES')}
-                  </span>
-                </div>
-                {conv.unread_count > 0 && (
-                  <span className="unread-badge">{conv.unread_count}</span>
-                )}
-              </motion.div>
-            ))
+            filteredInstagramConversations.length === 0 ? (
+              <p className="empty-state">
+                {searchQuery ? 'No se encontraron conversaciones de Instagram' : 'No hay conversaciones de Instagram'}
+              </p>
+            ) : (
+              filteredInstagramConversations.map((conv) => (
+                <motion.div
+                  key={conv.instagram_user_id}
+                  className={`conversation-item ${selectedInstagramConversation?.instagram_user_id === conv.instagram_user_id ? 'active' : ''}`}
+                  onClick={() => setSelectedInstagramConversation(conv)}
+                  whileHover={{ x: 5 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <div className="conversation-avatar instagram">
+                    📱
+                  </div>
+                  <div className="conversation-info">
+                    <h4>{conv.sender_name}</h4>
+                    {conv.instagram_username && (
+                      <p className="instagram-username">@{conv.instagram_username}</p>
+                    )}
+                    <p className="last-message">{conv.last_message}</p>
+                    <span className="conversation-time">
+                      {new Date(conv.last_message_time).toLocaleDateString('es-ES')}
+                    </span>
+                  </div>
+                  {conv.unread_count > 0 && (
+                    <span className="unread-badge">{conv.unread_count}</span>
+                  )}
+                </motion.div>
+              ))
+            )
           )}
         </div>
 
         <div className="chat-area">
-          {selectedConversation ? (
+          {(chatType === 'web' && selectedConversation) || (chatType === 'instagram' && selectedInstagramConversation) ? (
             <>
               <div className="chat-header">
                 <div className="chat-header-content">
-                  <h3>Chat con {selectedConversation.user_name}</h3>
-                  <p>{selectedConversation.user_email}</p>
+                  {chatType === 'web' ? (
+                    <>
+                      <h3>Chat con {selectedConversation.user_name}</h3>
+                      <p>{selectedConversation.user_email}</p>
+                    </>
+                  ) : (
+                    <>
+                      <h3>Instagram: {selectedInstagramConversation.sender_name}</h3>
+                      <p>@{selectedInstagramConversation.instagram_username || 'Sin username'}</p>
+                    </>
+                  )}
                 </div>
                 <div className="chat-actions">
+                  {chatType === 'instagram' && (
+                    <motion.button
+                      className="btn-generate-code"
+                      onClick={() => generateQuickCodeForInstagram(selectedInstagramConversation.instagram_user_id)}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      title="Generar código rápido"
+                    >
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M9 12l2 2 4-4"/>
+                        <path d="M21 12c-1 0-3-1-3-3s2-3 3-3 3 1 3 3-2 3-3 3"/>
+                        <path d="M3 12c1 0 3-1 3-3s-2-3-3-3-3 1-3 3 2 3 3 3"/>
+                        <path d="M12 3c0 1-1 3-3 3s-3-2-3-3 1-3 3-3 3 2 3 3"/>
+                        <path d="M12 21c0-1-1-3-3-3s-3 2-3 3 1 3 3 3 3-2 3-3"/>
+                      </svg>
+                      Generar Código
+                    </motion.button>
+                  )}
                   <motion.button
                     className="btn-delete-all"
                     onClick={() => deleteAllMessages()}
@@ -952,56 +1142,80 @@ function ChatsSection() {
               </div>
               
               <div className="messages-container">
-                {messages.map((message) => (
-                  <div
-                    key={message.id}
-                    className={`message ${message.sender_role === 'admin' ? 'admin' : 'user'}`}
-                  >
-                    <div className="message-content">
-                      <div className="message-header">
-                        <p>{message.message}</p>
-                        <motion.button
-                          className="btn-delete-message"
-                          onClick={() => deleteMessage(message.id)}
-                          whileHover={{ scale: 1.1 }}
-                          whileTap={{ scale: 0.9 }}
-                          title="Eliminar mensaje"
-                        >
-                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <path d="M3 6h18"/>
-                            <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
-                            <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
-                          </svg>
-                        </motion.button>
-                      </div>
-                      {message.attachments && message.attachments.length > 0 && (
-                        <div className="message-attachments">
-                          {message.attachments.map((attachment, idx) => (
-                            <div key={idx} className="attachment-preview">
-                              {attachment.type?.startsWith('image/') ? (
-                                <img src={attachment.url} alt={attachment.name} className="attachment-image" />
-                              ) : (
-                                <div className="attachment-file">
-                                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                                    <polyline points="14 2 14 8 20 8"/>
-                                  </svg>
-                                  <span>{attachment.name}</span>
-                                </div>
-                              )}
-                            </div>
-                          ))}
+                {chatType === 'web' ? (
+                  messages.map((message) => (
+                    <div
+                      key={message.id}
+                      className={`message ${message.sender_role === 'admin' ? 'admin' : 'user'}`}
+                    >
+                      <div className="message-content">
+                        <div className="message-header">
+                          <p>{message.message}</p>
+                          <motion.button
+                            className="btn-delete-message"
+                            onClick={() => deleteMessage(message.id)}
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.9 }}
+                            title="Eliminar mensaje"
+                          >
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                              <path d="M3 6h18"/>
+                              <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
+                              <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
+                            </svg>
+                          </motion.button>
                         </div>
-                      )}
-                      <span className="message-time">
-                        {new Date(message.created_at).toLocaleTimeString('es-ES', {
-                          hour: '2-digit',
-                          minute: '2-digit'
-                        })}
-                      </span>
+                        {message.attachments && message.attachments.length > 0 && (
+                          <div className="message-attachments">
+                            {message.attachments.map((attachment, idx) => (
+                              <div key={idx} className="attachment-preview">
+                                {attachment.type?.startsWith('image/') ? (
+                                  <img src={attachment.url} alt={attachment.name} className="attachment-image" />
+                                ) : (
+                                  <div className="attachment-file">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                      <polyline points="14 2 14 8 20 8"/>
+                                    </svg>
+                                    <span>{attachment.name}</span>
+                                  </div>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                        <span className="message-time">
+                          {new Date(message.created_at).toLocaleTimeString('es-ES', {
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          })}
+                        </span>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))
+                ) : (
+                  instagramMessages.map((message) => (
+                    <div
+                      key={message.id}
+                      className={`message ${message.is_from_user ? 'user' : 'admin'} instagram`}
+                    >
+                      <div className="message-content">
+                        <div className="message-header">
+                          <p>{message.message_text}</p>
+                          <div className="message-type-indicator">
+                            {message.is_from_user ? '📱' : '🤖'}
+                          </div>
+                        </div>
+                        <span className="message-time">
+                          {new Date(message.created_at).toLocaleTimeString('es-ES', {
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          })}
+                        </span>
+                      </div>
+                    </div>
+                  ))
+                )}
                 <div ref={messagesEndRef} />
               </div>
 
@@ -1045,32 +1259,34 @@ function ChatsSection() {
                     type="text"
                     value={newMessage}
                     onChange={(e) => setNewMessage(e.target.value)}
-                    placeholder="Escribe tu respuesta..."
+                    placeholder={chatType === 'web' ? "Escribe tu respuesta..." : "Responder por Instagram..."}
                   />
                   
-                  <div className="attachment-controls">
-                    <input
-                      ref={fileInputRef}
-                      type="file"
-                      multiple
-                      onChange={handleFileSelect}
-                      style={{ display: 'none' }}
-                      accept="image/*,.pdf,.doc,.docx,.txt,.zip"
-                    />
-                    
-                    <motion.button
-                      type="button"
-                      className="attachment-btn"
-                      onClick={() => fileInputRef.current?.click()}
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      title="Adjuntar archivo"
-                    >
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/>
-                      </svg>
-                    </motion.button>
-                  </div>
+                  {chatType === 'web' && (
+                    <div className="attachment-controls">
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        multiple
+                        onChange={handleFileSelect}
+                        style={{ display: 'none' }}
+                        accept="image/*,.pdf,.doc,.docx,.txt,.zip"
+                      />
+                      
+                      <motion.button
+                        type="button"
+                        className="attachment-btn"
+                        onClick={() => fileInputRef.current?.click()}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        title="Adjuntar archivo"
+                      >
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/>
+                        </svg>
+                      </motion.button>
+                    </div>
+                  )}
                 </div>
                 
                 <motion.button
@@ -1399,16 +1615,25 @@ function QuicksSection() {
 // Instagram Section Component
 function InstagramSection() {
   const [instagramMessages, setInstagramMessages] = useState([]);
+  const [conversations, setConversations] = useState([]);
+  const [selectedConversation, setSelectedConversation] = useState(null);
+  const [messages, setMessages] = useState([]);
+  const [newMessage, setNewMessage] = useState('');
   const [isConnected, setIsConnected] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState('checking');
   const [authUrl, setAuthUrl] = useState('');
   const [testMessage, setTestMessage] = useState('');
   const [testRecipient, setTestRecipient] = useState('');
+  const [activeTab, setActiveTab] = useState('conversations');
 
   useEffect(() => {
     checkInstagramConnection();
-    loadInstagramMessages();
+    loadConversations();
     getAuthUrl();
+    
+    // Refresh conversations every 30 seconds
+    const interval = setInterval(loadConversations, 30000);
+    return () => clearInterval(interval);
   }, []);
 
   const checkInstagramConnection = async () => {
@@ -1438,13 +1663,60 @@ function InstagramSection() {
     }
   };
 
-  const loadInstagramMessages = async () => {
+  const loadConversations = async () => {
     try {
-      // This would load messages from your database
-      // For now, we'll show a placeholder
-      setInstagramMessages([]);
+      const response = await fetch('/api/instagram/conversations');
+      if (response.ok) {
+        const data = await response.json();
+        setConversations(data.conversations);
+      }
     } catch (error) {
-      console.error('Error loading Instagram messages:', error);
+      console.error('Error loading conversations:', error);
+    }
+  };
+
+  const loadMessages = async (userId) => {
+    try {
+      const response = await fetch(`/api/instagram/messages/${userId}`);
+      if (response.ok) {
+        const data = await response.json();
+        setMessages(data.messages);
+      }
+    } catch (error) {
+      console.error('Error loading messages:', error);
+    }
+  };
+
+  const selectConversation = (conversation) => {
+    setSelectedConversation(conversation);
+    loadMessages(conversation.instagram_user_id);
+  };
+
+  const sendMessage = async () => {
+    if (!newMessage.trim() || !selectedConversation) return;
+
+    try {
+      const response = await fetch('/api/instagram/admin-reply', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          recipientId: selectedConversation.instagram_user_id,
+          message: newMessage.trim()
+        })
+      });
+
+      if (response.ok) {
+        setNewMessage('');
+        // Reload messages to show the sent message
+        loadMessages(selectedConversation.instagram_user_id);
+        // Refresh conversations to update last message time
+        loadConversations();
+      } else {
+        alert('Error al enviar mensaje');
+      }
+    } catch (error) {
+      console.error('Error sending message:', error);
+      alert('Error al enviar mensaje');
     }
   };
 

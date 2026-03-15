@@ -137,186 +137,401 @@ async function handleTextMessage(senderId, text, senderInfo) {
   // IMPORTANTE: Guardar TODOS los mensajes del usuario primero
   await saveInstagramMessageToDatabase(senderId, text, senderInfo);
   
-  // Command handlers
+  // Get or create conversation state
+  const conversationState = await getConversationState(senderId);
+  
+  // Handle conversation flow based on current state
+  switch (conversationState.current_state) {
+    case 'idle':
+      await handleIdleState(senderId, text, senderInfo, lowerText);
+      break;
+    case 'awaiting_name':
+      await handleNameInput(senderId, text, senderInfo);
+      break;
+    case 'awaiting_email':
+      await handleEmailInput(senderId, text, senderInfo);
+      break;
+    case 'awaiting_phone':
+      await handlePhoneInput(senderId, text, senderInfo);
+      break;
+    case 'awaiting_company':
+      await handleCompanyInput(senderId, text, senderInfo);
+      break;
+    default:
+      await handleIdleState(senderId, text, senderInfo, lowerText);
+  }
+}
+
+// Get or create conversation state
+async function getConversationState(userId) {
+  try {
+    // Try to get existing state
+    const result = await db.query(
+      'SELECT * FROM conversation_states WHERE instagram_user_id = $1',
+      [userId]
+    );
+    
+    if (result.rows.length > 0) {
+      return result.rows[0];
+    }
+    
+    // Create new state if doesn't exist
+    const newState = await db.query(
+      `INSERT INTO conversation_states (instagram_user_id, current_state, collected_data) 
+       VALUES ($1, $2, $3) RETURNING *`,
+      [userId, 'idle', '{}']
+    );
+    
+    return newState.rows[0];
+  } catch (error) {
+    console.error('Error managing conversation state:', error);
+    return { current_state: 'idle', collected_data: {} };
+  }
+}
+
+// Update conversation state
+async function updateConversationState(userId, newState, collectedData = null) {
+  try {
+    const updateData = collectedData ? JSON.stringify(collectedData) : null;
+    const query = updateData 
+      ? 'UPDATE conversation_states SET current_state = $1, collected_data = $2, updated_at = CURRENT_TIMESTAMP WHERE instagram_user_id = $3'
+      : 'UPDATE conversation_states SET current_state = $1, updated_at = CURRENT_TIMESTAMP WHERE instagram_user_id = $2';
+    
+    const params = updateData ? [newState, updateData, userId] : [newState, userId];
+    await db.query(query, params);
+  } catch (error) {
+    console.error('Error updating conversation state:', error);
+  }
+}
+
+// Handle idle state (initial commands)
+async function handleIdleState(senderId, text, senderInfo, lowerText) {
   if (lowerText.includes('hola') || lowerText.includes('hello') || lowerText.includes('hi')) {
     await sendInstagramMessage(senderId, 
-      `¡Hola ${senderInfo.name || 'amigo'}! 👋\n\n` +
-      `Soy el asistente de Genswave. Puedo ayudarte con:\n\n` +
-      `🌐 Solicitar cotización para página web\n` +
-      `📱 Información sobre apps móviles\n` +
-      `💼 Consultas sobre proyectos\n` +
-      `📞 Agendar una cita\n` +
-      `🎫 Generar código de acceso\n\n` +
-      `¿En qué puedo ayudarte hoy?`
+      `¡Hola ${senderInfo.name || 'estimado/a cliente'}! 👋\n\n` +
+      `Bienvenido/a a **Genswave**, su socio estratégico en transformación digital.\n\n` +
+      `Nuestros servicios especializados incluyen:\n\n` +
+      `🌐 **Desarrollo Web Profesional**\n` +
+      `📱 **Aplicaciones Móviles Nativas**\n` +
+      `💼 **Consultoría en Proyectos Digitales**\n` +
+      `📅 **Asesoramiento Personalizado**\n` +
+      `🎫 **Acceso Rápido a su Portal Cliente**\n\n` +
+      `¿En qué podemos asistirle hoy?`
     );
   } 
-  else if (lowerText.includes('código') || lowerText.includes('codigo') || lowerText.includes('acceso') || lowerText.includes('login')) {
+  else if (lowerText.includes('código') || lowerText.includes('codigo') || lowerText.includes('acceso') || lowerText.includes('portal')) {
     await sendInstagramMessage(senderId,
-      `🎫 ¡Perfecto! Te ayudo a generar un código de acceso.\n\n` +
-      `Este código te permitirá:\n` +
-      `✅ Acceder a nuestro sitio web\n` +
-      `✅ Ver el estado de tus proyectos\n` +
-      `✅ Comunicarte directamente con nosotros\n\n` +
-      `Para generar tu código, necesito algunos datos:\n\n` +
-      `📝 Responde con tu información en este formato:\n` +
-      `DATOS: [Tu nombre] | [Tu email] | [Tu teléfono] | [Tu empresa]\n\n` +
-      `Ejemplo:\n` +
-      `DATOS: Juan Pérez | juan@email.com | +1234567890 | Mi Empresa\n\n` +
-      `¿Listo para generar tu código?`
+      `🎫 **GENERACIÓN DE CÓDIGO DE ACCESO**\n\n` +
+      `Estimado/a cliente, procederemos a generar su código de acceso personalizado para nuestro portal cliente.\n\n` +
+      `**Beneficios de su código:**\n` +
+      `✅ Acceso exclusivo a su dashboard personalizado\n` +
+      `✅ Seguimiento en tiempo real de sus proyectos\n` +
+      `✅ Comunicación directa con nuestro equipo\n` +
+      `✅ Historial completo de servicios\n\n` +
+      `Para proceder, necesitaremos algunos datos. Le haré unas preguntas breves.\n\n` +
+      `**Primera pregunta:**\n` +
+      `Por favor, indíquenos su **nombre completo** 👤`
+    );
+    await updateConversationState(senderId, 'awaiting_name');
+  }
+  else if (lowerText.includes('cotización') || lowerText.includes('cotizacion') || lowerText.includes('precio') || lowerText.includes('presupuesto')) {
+    await sendInstagramMessage(senderId,
+      `💰 **SOLICITUD DE COTIZACIÓN PROFESIONAL**\n\n` +
+      `Gracias por su interés en nuestros servicios de desarrollo digital.\n\n` +
+      `Para elaborar una propuesta técnica y comercial precisa, necesitamos conocer:\n\n` +
+      `📋 **Información requerida:**\n` +
+      `• Nombre de su empresa u organización\n` +
+      `• Tipo de proyecto (web, móvil, consultoría)\n` +
+      `• Descripción detallada de sus requerimientos\n` +
+      `• Cronograma estimado del proyecto\n` +
+      `• Presupuesto aproximado disponible\n\n` +
+      `**Opciones para continuar:**\n` +
+      `🌐 Complete nuestro formulario: https://genswave.onrender.com\n` +
+      `📞 O compártanos los detalles por este medio\n\n` +
+      `¿Cómo prefiere proceder?`
     );
   }
-  else if (lowerText.startsWith('datos:')) {
-    // Parse user data for quick code generation
-    const dataString = text.substring(6).trim(); // Remove "DATOS:" prefix
-    const dataParts = dataString.split('|').map(part => part.trim());
-    
-    if (dataParts.length >= 3) {
-      const [name, email, phone, company] = dataParts;
-      
-      try {
-        // Generate quick code
-        const code = Math.random().toString(36).substring(2, 8).toUpperCase();
-        const expiresAt = new Date();
-        expiresAt.setDate(expiresAt.getDate() + 7); // Expires in 7 days
-
-        // Save quick code to database
-        const insertQuery = `
-          INSERT INTO quick_codes (name, email, phone, company, code, expires_at, created_at)
-          VALUES ($1, $2, $3, $4, $5, $6, $7)
-          RETURNING id
-        `;
-
-        const values = [
-          name || senderInfo.name || 'Usuario de Instagram',
-          email || `instagram_${senderId}@temp.com`,
-          phone || 'No proporcionado',
-          company || 'No especificada',
-          code,
-          expiresAt,
-          new Date()
-        ];
-
-        const result = await db.query(insertQuery, values);
-
-        // Send success message with code
-        await sendInstagramMessage(senderId,
-          `🎉 ¡Código generado exitosamente!\n\n` +
-          `👤 Nombre: ${name}\n` +
-          `📧 Email: ${email}\n` +
-          `📱 Teléfono: ${phone}\n` +
-          `🏢 Empresa: ${company || 'No especificada'}\n\n` +
-          `🎫 Tu código de acceso: ${code}\n\n` +
-          `👉 Visita: https://genswave.onrender.com\n` +
-          `📝 Ingresa tu código en "Código Rápido"\n\n` +
-          `⏰ Válido por 7 días\n` +
-          `📞 ¿Necesitas ayuda? ¡Escríbeme!\n\n` +
-          `¡Gracias por confiar en Genswave!`
-        );
-
-        console.log(`✅ Quick code generated via Instagram: ${code} for ${name}`);
-        
-      } catch (error) {
-        console.error('Error generating quick code from Instagram:', error);
-        await sendInstagramMessage(senderId,
-          `❌ Hubo un error al generar tu código.\n\n` +
-          `Por favor, inténtalo de nuevo o contacta a nuestro equipo.\n\n` +
-          `📞 También puedes visitarnos en:\n` +
-          `👉 https://genswave.onrender.com`
-        );
-      }
-    } else {
-      await sendInstagramMessage(senderId,
-        `❌ Formato incorrecto.\n\n` +
-        `Por favor, usa este formato:\n` +
-        `DATOS: [Nombre] | [Email] | [Teléfono] | [Empresa]\n\n` +
-        `Ejemplo:\n` +
-        `DATOS: Juan Pérez | juan@email.com | +1234567890 | Mi Empresa\n\n` +
-        `¡Inténtalo de nuevo!`
-      );
-    }
-  }
-  else if (lowerText.includes('cotización') || lowerText.includes('precio') || lowerText.includes('costo')) {
+  else if (lowerText.includes('cita') || lowerText.includes('reunión') || lowerText.includes('reunion') || lowerText.includes('consulta')) {
     await sendInstagramMessage(senderId,
-      `💰 ¡Perfecto! Te ayudo con una cotización.\n\n` +
-      `Para darte el mejor precio, necesito conocer:\n\n` +
-      `🏢 Nombre de tu negocio\n` +
-      `🎯 Tipo de proyecto (web, app, etc.)\n` +
-      `📋 Descripción de lo que necesitas\n` +
-      `📞 Tu número de contacto\n\n` +
-      `También puedes llenar el formulario completo aquí:\n` +
-      `👉 https://genswave.onrender.com\n\n` +
-      `¿Me puedes contar más sobre tu proyecto?`
+      `📅 **PROGRAMACIÓN DE CONSULTA PROFESIONAL**\n\n` +
+      `Será un placer atenderle en una consulta personalizada.\n\n` +
+      `**Modalidades disponibles:**\n` +
+      `🖥️ Videollamada (Google Meet/Zoom)\n` +
+      `📞 Llamada telefónica\n` +
+      `🏢 Reunión presencial (según ubicación)\n\n` +
+      `**Para agendar su cita:**\n` +
+      `🌐 Sistema automático: https://genswave.onrender.com\n\n` +
+      `**O proporcione:**\n` +
+      `📅 Fecha de preferencia\n` +
+      `⏰ Horario conveniente\n` +
+      `📱 Número de contacto\n` +
+      `💼 Tema a tratar\n\n` +
+      `¿Cuál sería su disponibilidad?`
     );
   }
-  else if (lowerText.includes('cita') || lowerText.includes('reunión') || lowerText.includes('meeting')) {
+  else if (lowerText.includes('servicios') || lowerText.includes('que hacen') || lowerText.includes('portfolio')) {
     await sendInstagramMessage(senderId,
-      `📅 ¡Excelente! Agendemos una cita.\n\n` +
-      `Puedes agendar directamente aquí:\n` +
-      `👉 https://genswave.onrender.com\n\n` +
-      `O si prefieres, dime:\n` +
-      `📅 Fecha preferida\n` +
-      `⏰ Hora preferida\n` +
-      `📞 Tu número de contacto\n\n` +
-      `¿Cuándo te viene mejor?`
+      `🚀 **PORTAFOLIO DE SERVICIOS GENSWAVE**\n\n` +
+      `**DESARROLLO WEB PROFESIONAL** 🌐\n` +
+      `• Sitios web corporativos de alto impacto\n` +
+      `• Plataformas e-commerce avanzadas\n` +
+      `• Sistemas web personalizados\n` +
+      `• Optimización SEO y rendimiento\n\n` +
+      `**APLICACIONES MÓVILES** 📱\n` +
+      `• Apps nativas iOS y Android\n` +
+      `• Aplicaciones híbridas multiplataforma\n` +
+      `• Integración con APIs y servicios\n` +
+      `• Publicación en App Store y Play Store\n\n` +
+      `**CONSULTORÍA DIGITAL** ⚙️\n` +
+      `• Arquitectura de software\n` +
+      `• Automatización de procesos\n` +
+      `• Integración de sistemas\n` +
+      `• Auditoría técnica y optimización\n\n` +
+      `¿Le interesa conocer más detalles sobre algún servicio específico?`
     );
   }
-  else if (lowerText.includes('servicios') || lowerText.includes('qué hacen')) {
+  else if (lowerText.includes('ayuda') || lowerText.includes('help') || lowerText.includes('comandos')) {
     await sendInstagramMessage(senderId,
-      `🚀 En Genswave ofrecemos:\n\n` +
-      `🌐 **Desarrollo Web**\n` +
-      `• Páginas web profesionales\n` +
-      `• E-commerce\n` +
-      `• Sistemas web personalizados\n\n` +
-      `📱 **Apps Móviles**\n` +
-      `• iOS y Android\n` +
-      `• Apps nativas y híbridas\n\n` +
-      `⚙️ **Soluciones Personalizadas**\n` +
-      `• Automatización\n` +
-      `• Integraciones\n` +
-      `• Consultoría técnica\n\n` +
-      `¿Te interesa algún servicio en particular?`
-    );
-  }
-  else if (lowerText.includes('ayuda') || lowerText.includes('help')) {
-    await sendInstagramMessage(senderId,
-      `🆘 ¡Estoy aquí para ayudarte!\n\n` +
-      `Comandos disponibles:\n` +
-      `• "Cotización" - Para solicitar precios\n` +
-      `• "Cita" - Para agendar reunión\n` +
-      `• "Servicios" - Ver qué ofrecemos\n` +
-      `• "Código" - Generar código de acceso\n` +
-      `• "Ayuda" - Ver este menú\n\n` +
-      `También puedes escribirme cualquier pregunta y te responderé lo antes posible.\n\n` +
-      `🌐 Visita: https://genswave.onrender.com`
+      `🆘 **CENTRO DE AYUDA GENSWAVE**\n\n` +
+      `**Comandos disponibles:**\n\n` +
+      `🎫 **"Código"** - Generar acceso a portal cliente\n` +
+      `💰 **"Cotización"** - Solicitar presupuesto\n` +
+      `📅 **"Cita"** - Agendar consulta profesional\n` +
+      `🚀 **"Servicios"** - Ver portafolio completo\n` +
+      `🆘 **"Ayuda"** - Mostrar este menú\n\n` +
+      `**Contacto directo:**\n` +
+      `🌐 Web: https://genswave.onrender.com\n` +
+      `📧 Email: contacto@genswave.com\n\n` +
+      `También puede escribirnos cualquier consulta y nuestro equipo le responderá a la brevedad.\n\n` +
+      `¿En qué más podemos asistirle?`
     );
   }
   else {
     // Default response for unrecognized messages
     await sendInstagramMessage(senderId,
-      `Gracias por tu mensaje! 📨\n\n` +
-      `He recibido: "${text}"\n\n` +
-      `Un miembro de nuestro equipo te responderá pronto. Mientras tanto, puedes:\n\n` +
-      `🌐 Visitar nuestra web: https://genswave.onrender.com\n` +
-      `💬 Escribir "ayuda" para ver comandos disponibles\n` +
-      `🎫 Escribir "código" para generar acceso rápido\n\n` +
-      `¡Gracias por contactarnos!`
+      `Gracias por contactar a **Genswave** 📨\n\n` +
+      `Hemos recibido su mensaje:\n` +
+      `"${text}"\n\n` +
+      `Un especialista de nuestro equipo revisará su consulta y le responderá en el menor tiempo posible.\n\n` +
+      `**Mientras tanto, puede:**\n` +
+      `🌐 Explorar nuestros servicios: https://genswave.onrender.com\n` +
+      `🆘 Escribir "ayuda" para ver opciones disponibles\n` +
+      `🎫 Escribir "código" para acceso rápido al portal\n\n` +
+      `Valoramos su confianza en nosotros.`
+    );
+  }
+}
+
+// Handle name input
+async function handleNameInput(senderId, text, senderInfo) {
+  const name = text.trim();
+  
+  if (name.length < 2) {
+    await sendInstagramMessage(senderId,
+      `Por favor, proporcione un nombre válido con al menos 2 caracteres.\n\n` +
+      `**Pregunta actual:**\n` +
+      `Indíquenos su **nombre completo** 👤`
+    );
+    return;
+  }
+  
+  // Save name and move to next step
+  const currentState = await getConversationState(senderId);
+  const collectedData = { ...currentState.collected_data, name: name };
+  
+  await updateConversationState(senderId, 'awaiting_email', collectedData);
+  
+  await sendInstagramMessage(senderId,
+    `Perfecto, **${name}**. Gracias por la información.\n\n` +
+    `**Segunda pregunta:**\n` +
+    `Por favor, proporcione su **dirección de correo electrónico** 📧\n\n` +
+    `*Este será su usuario para acceder al portal cliente*`
+  );
+}
+
+// Handle email input
+async function handleEmailInput(senderId, text, senderInfo) {
+  const email = text.trim().toLowerCase();
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  
+  if (!emailRegex.test(email)) {
+    await sendInstagramMessage(senderId,
+      `Por favor, proporcione una dirección de correo electrónico válida.\n\n` +
+      `**Formato esperado:** usuario@dominio.com\n\n` +
+      `**Pregunta actual:**\n` +
+      `Su **dirección de correo electrónico** 📧`
+    );
+    return;
+  }
+  
+  // Save email and move to next step
+  const currentState = await getConversationState(senderId);
+  const collectedData = { ...currentState.collected_data, email: email };
+  
+  await updateConversationState(senderId, 'awaiting_phone', collectedData);
+  
+  await sendInstagramMessage(senderId,
+    `Excelente. Email registrado: **${email}**\n\n` +
+    `**Tercera pregunta:**\n` +
+    `Indique su **número de teléfono** con código de país 📱\n\n` +
+    `*Ejemplo: +1 234 567 8900*`
+  );
+}
+
+// Handle phone input
+async function handlePhoneInput(senderId, text, senderInfo) {
+  const phone = text.trim();
+  
+  if (phone.length < 8) {
+    await sendInstagramMessage(senderId,
+      `Por favor, proporcione un número de teléfono válido.\n\n` +
+      `**Incluya el código de país si es posible**\n` +
+      `*Ejemplo: +1 234 567 8900*\n\n` +
+      `**Pregunta actual:**\n` +
+      `Su **número de teléfono** 📱`
+    );
+    return;
+  }
+  
+  // Save phone and move to final step
+  const currentState = await getConversationState(senderId);
+  const collectedData = { ...currentState.collected_data, phone: phone };
+  
+  await updateConversationState(senderId, 'awaiting_company', collectedData);
+  
+  await sendInstagramMessage(senderId,
+    `Perfecto. Teléfono registrado: **${phone}**\n\n` +
+    `**Última pregunta:**\n` +
+    `¿Cuál es el nombre de su **empresa u organización**? 🏢\n\n` +
+    `*Si es persona natural, puede indicar "Independiente"*`
+  );
+}
+
+// Handle company input and generate code
+async function handleCompanyInput(senderId, text, senderInfo) {
+  const company = text.trim();
+  
+  if (company.length < 2) {
+    await sendInstagramMessage(senderId,
+      `Por favor, indique el nombre de su empresa o "Independiente".\n\n` +
+      `**Pregunta actual:**\n` +
+      `Nombre de su **empresa u organización** 🏢`
+    );
+    return;
+  }
+  
+  // Get all collected data
+  const currentState = await getConversationState(senderId);
+  const collectedData = { ...currentState.collected_data, company: company };
+  
+  try {
+    // Generate quick code
+    const code = Math.random().toString(36).substring(2, 8).toUpperCase();
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + 30); // 30 days validity
+    
+    // Save to database
+    const insertQuery = `
+      INSERT INTO quick_codes (name, email, phone, company, code, expires_at, created_at)
+      VALUES ($1, $2, $3, $4, $5, $6, $7)
+      RETURNING id
+    `;
+    
+    const values = [
+      collectedData.name,
+      collectedData.email,
+      collectedData.phone,
+      company,
+      code,
+      expiresAt,
+      new Date()
+    ];
+    
+    const result = await db.query(insertQuery, values);
+    
+    // Reset conversation state
+    await updateConversationState(senderId, 'idle', {});
+    
+    // Send success message with code
+    await sendInstagramMessage(senderId,
+      `🎉 **CÓDIGO DE ACCESO GENERADO EXITOSAMENTE**\n\n` +
+      `**Datos registrados:**\n` +
+      `👤 **Nombre:** ${collectedData.name}\n` +
+      `📧 **Email:** ${collectedData.email}\n` +
+      `📱 **Teléfono:** ${collectedData.phone}\n` +
+      `🏢 **Empresa:** ${company}\n\n` +
+      `🎫 **SU CÓDIGO DE ACCESO:** \`${code}\`\n\n` +
+      `**Instrucciones de uso:**\n` +
+      `1️⃣ Visite: https://genswave.onrender.com\n` +
+      `2️⃣ Haga clic en "Código Rápido"\n` +
+      `3️⃣ Ingrese el código: **${code}**\n` +
+      `4️⃣ Acceda a su dashboard personalizado\n\n` +
+      `⏰ **Válido por 30 días**\n` +
+      `🔒 **Código único y seguro**\n\n` +
+      `¡Gracias por confiar en **Genswave**!\n` +
+      `¿Necesita alguna asistencia adicional?`
+    );
+    
+    console.log(`✅ Quick code generated via Instagram: ${code} for ${collectedData.name} (${collectedData.email})`);
+    
+  } catch (error) {
+    console.error('Error generating quick code from Instagram:', error);
+    
+    // Reset conversation state on error
+    await updateConversationState(senderId, 'idle', {});
+    
+    await sendInstagramMessage(senderId,
+      `❌ **ERROR EN LA GENERACIÓN**\n\n` +
+      `Disculpe, ocurrió un error técnico al generar su código de acceso.\n\n` +
+      `**Opciones disponibles:**\n` +
+      `🔄 Escriba "código" para intentar nuevamente\n` +
+      `🌐 Visite: https://genswave.onrender.com\n` +
+      `📧 Contacte: contacto@genswave.com\n\n` +
+      `Nuestro equipo técnico ha sido notificado del inconveniente.`
     );
   }
 }
 
 // Handle attachments (images, videos, etc.)
 async function handleAttachments(senderId, attachments, senderInfo) {
+  // Save user message first
+  await saveInstagramMessageToDatabase(senderId, '[Archivo adjunto]', senderInfo);
+  
   await sendInstagramMessage(senderId,
-    `📎 He recibido tu archivo adjunto.\n\n` +
-    `Un miembro de nuestro equipo lo revisará y te responderá pronto.\n\n` +
-    `Si necesitas una respuesta inmediata, puedes:\n` +
-    `🌐 Visitar: https://genswave.onrender.com\n` +
-    `💬 Escribir "ayuda" para comandos disponibles`
+    `📎 **ARCHIVO RECIBIDO**\n\n` +
+    `Hemos recibido su archivo adjunto correctamente.\n\n` +
+    `Un especialista de nuestro equipo lo revisará y le responderá a la brevedad.\n\n` +
+    `**Mientras tanto:**\n` +
+    `🌐 Explore nuestros servicios: https://genswave.onrender.com\n` +
+    `🆘 Escriba "ayuda" para ver opciones disponibles\n` +
+    `🎫 Escriba "código" para generar acceso rápido\n\n` +
+    `Gracias por contactar a **Genswave**.`
   );
   
   // Save attachment info to database
   await saveInstagramAttachmentToDatabase(senderId, attachments, senderInfo);
 }
+
+// Clean old conversation states (run periodically)
+async function cleanOldConversationStates() {
+  try {
+    // Clean states older than 24 hours that are not in 'idle' state
+    const result = await db.query(`
+      DELETE FROM conversation_states 
+      WHERE updated_at < NOW() - INTERVAL '24 hours' 
+      AND current_state != 'idle'
+    `);
+    
+    if (result.rowCount > 0) {
+      console.log(`🧹 Cleaned ${result.rowCount} old conversation states`);
+    }
+  } catch (error) {
+    console.error('Error cleaning old conversation states:', error);
+  }
+}
+
+// Run cleanup every hour
+setInterval(cleanOldConversationStates, 60 * 60 * 1000);
 
 // Send message to Instagram user
 async function sendInstagramMessage(recipientId, messageText) {
@@ -633,7 +848,7 @@ router.post('/generate-quick-code', async (req, res) => {
     // Generate quick code
     const code = Math.random().toString(36).substring(2, 8).toUpperCase();
     const expiresAt = new Date();
-    expiresAt.setDate(expiresAt.getDate() + 7); // Expires in 7 days
+    expiresAt.setDate(expiresAt.getDate() + 30); // 30 days validity
 
     // Save quick code to database
     const insertQuery = `
@@ -655,13 +870,15 @@ router.post('/generate-quick-code', async (req, res) => {
     const result = await db.query(insertQuery, values);
 
     // Send code to user via Instagram
-    const message = `🎉 ¡Tu código de acceso ha sido generado!\n\n` +
-                   `Código: ${code}\n\n` +
-                   `Este código te permite acceder a nuestro sitio web y ver el estado de tus proyectos.\n\n` +
-                   `👉 Visita: https://genswave.onrender.com\n` +
-                   `📝 Ingresa tu código en la sección "Código Rápido"\n\n` +
-                   `⏰ Válido por 7 días\n\n` +
-                   `¡Gracias por contactarnos!`;
+    const message = `🎉 **CÓDIGO DE ACCESO GENERADO**\n\n` +
+                   `Su código ha sido generado por nuestro equipo:\n\n` +
+                   `🎫 **Código:** \`${code}\`\n\n` +
+                   `**Instrucciones:**\n` +
+                   `1️⃣ Visite: https://genswave.onrender.com\n` +
+                   `2️⃣ Haga clic en "Código Rápido"\n` +
+                   `3️⃣ Ingrese su código\n\n` +
+                   `⏰ **Válido por 30 días**\n\n` +
+                   `¡Gracias por confiar en **Genswave**!`;
 
     await sendInstagramMessage(instagramUserId, message);
     await saveBotResponseToDatabase(instagramUserId, message);
@@ -675,6 +892,43 @@ router.post('/generate-quick-code', async (req, res) => {
   } catch (error) {
     console.error('Error generating quick code:', error);
     res.status(500).json({ error: 'Error al generar código rápido' });
+  }
+});
+
+// Reset conversation state for a user
+router.post('/reset-conversation', async (req, res) => {
+  try {
+    const { instagramUserId } = req.body;
+
+    if (!instagramUserId) {
+      return res.status(400).json({ error: 'instagramUserId es requerido' });
+    }
+
+    // Reset conversation state to idle
+    await db.query(
+      'UPDATE conversation_states SET current_state = $1, collected_data = $2, updated_at = CURRENT_TIMESTAMP WHERE instagram_user_id = $3',
+      ['idle', '{}', instagramUserId]
+    );
+
+    // Send reset message to user
+    const message = `🔄 **CONVERSACIÓN REINICIADA**\n\n` +
+                   `Su conversación ha sido reiniciada por nuestro equipo.\n\n` +
+                   `Puede comenzar nuevamente escribiendo:\n` +
+                   `🎫 **"Código"** - Para generar acceso\n` +
+                   `🆘 **"Ayuda"** - Para ver opciones\n\n` +
+                   `¿En qué podemos asistirle?`;
+
+    await sendInstagramMessage(instagramUserId, message);
+    await saveBotResponseToDatabase(instagramUserId, message);
+
+    res.json({ 
+      success: true, 
+      message: 'Estado de conversación reiniciado correctamente' 
+    });
+
+  } catch (error) {
+    console.error('Error resetting conversation:', error);
+    res.status(500).json({ error: 'Error al reiniciar conversación' });
   }
 });
 

@@ -954,6 +954,32 @@ function ChatsSection() {
     }
   };
 
+  const resetInstagramConversation = async (instagramUserId) => {
+    if (!confirm('¿Reiniciar la conversación para este usuario? Esto limpiará cualquier proceso en curso.')) return;
+    
+    try {
+      const response = await fetch('/api/instagram/reset-conversation', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          instagramUserId: instagramUserId
+        })
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        alert('Conversación reiniciada correctamente.\nSe ha notificado al usuario.');
+        loadInstagramMessages(instagramUserId);
+      } else {
+        const error = await response.json();
+        alert('Error al reiniciar conversación: ' + error.message);
+      }
+    } catch (error) {
+      console.error('Error al reiniciar conversación:', error);
+      alert('Error al reiniciar conversación');
+    }
+  };
+
   return (
     <motion.div
       className="admin-content chat-section"
@@ -1107,22 +1133,39 @@ function ChatsSection() {
                 </div>
                 <div className="chat-actions">
                   {chatType === 'instagram' && (
-                    <motion.button
-                      className="btn-generate-code"
-                      onClick={() => generateQuickCodeForInstagram(selectedInstagramConversation.instagram_user_id)}
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      title="Generar código rápido"
-                    >
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M9 12l2 2 4-4"/>
-                        <path d="M21 12c-1 0-3-1-3-3s2-3 3-3 3 1 3 3-2 3-3 3"/>
-                        <path d="M3 12c1 0 3-1 3-3s-2-3-3-3-3 1-3 3 2 3 3 3"/>
-                        <path d="M12 3c0 1-1 3-3 3s-3-2-3-3 1-3 3-3 3 2 3 3"/>
-                        <path d="M12 21c0-1-1-3-3-3s-3 2-3 3 1 3 3 3 3-2 3-3"/>
-                      </svg>
-                      Generar Código
-                    </motion.button>
+                    <>
+                      <motion.button
+                        className="btn-reset-conversation"
+                        onClick={() => resetInstagramConversation(selectedInstagramConversation.instagram_user_id)}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        title="Reiniciar conversación"
+                      >
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
+                          <path d="M21 3v5h-5"/>
+                          <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
+                          <path d="M3 21v-5h5"/>
+                        </svg>
+                        Reiniciar
+                      </motion.button>
+                      <motion.button
+                        className="btn-generate-code"
+                        onClick={() => generateQuickCodeForInstagram(selectedInstagramConversation.instagram_user_id)}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        title="Generar código rápido"
+                      >
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path d="M9 12l2 2 4-4"/>
+                          <path d="M21 12c-1 0-3-1-3-3s2-3 3-3 3 1 3 3-2 3-3 3"/>
+                          <path d="M3 12c1 0 3-1 3-3s-2-3-3-3-3 1-3 3 2 3 3 3"/>
+                          <path d="M12 3c0 1-1 3-3 3s-3-2-3-3 1-3 3-3 3 2 3 3"/>
+                          <path d="M12 21c0-1-1-3-3-3s-3 2-3 3 1 3 3 3 3-2 3-3"/>
+                        </svg>
+                        Generar Código
+                      </motion.button>
+                    </>
                   )}
                   <motion.button
                     className="btn-delete-all"

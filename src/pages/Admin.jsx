@@ -1873,6 +1873,9 @@ function InstagramSection() {
         <p>Gestiona la integración con Instagram Direct Messages</p>
       </div>
 
+      {/* Migration Helper */}
+      <MigrationHelper />
+
       {/* Connection Status */}
       <div className="instagram-connection-card">
         {renderConnectionStatus()}
@@ -2787,3 +2790,109 @@ function Admin() {
 }
 
 export default Admin;
+// Migration helper component
+function MigrationHelper() {
+  const [migrationStatus, setMigrationStatus] = useState('checking');
+  const [migrationResult, setMigrationResult] = useState(null);
+
+  useEffect(() => {
+    checkMigrationStatus();
+  }, []);
+
+  const checkMigrationStatus = async () => {
+    try {
+      const response = await fetch('/api/migrate/check-profile-pic');
+      const data = await response.json();
+      
+      if (data.migrationNeeded) {
+        setMigrationStatus('needed');
+      } else {
+        setMigrationStatus('complete');
+      }
+    } catch (error) {
+      console.error('Error checking migration status:', error);
+      setMigrationStatus('error');
+    }
+  };
+
+  const runMigration = async () => {
+    setMigrationStatus('running');
+    try {
+      const response = await fetch('/api/migrate/add-profile-pic', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        setMigrationStatus('complete');
+        setMigrationResult('✅ Migración completada exitosamente');
+      } else {
+        setMigrationStatus('error');
+        setMigrationResult('❌ Error en la migración: ' + data.error);
+      }
+    } catch (error) {
+      console.error('Error running migration:', error);
+      setMigrationStatus('error');
+      setMigrationResult('❌ Error ejecutando migración');
+    }
+  };
+
+  if (migrationStatus === 'complete') {
+    return null; // Don't show if migration is complete
+  }
+
+  return (
+    <div className="migration-helper" style={{
+      background: migrationStatus === 'needed' ? '#fff3cd' : '#f8d7da',
+      border: `1px solid ${migrationStatus === 'needed' ? '#ffeaa7' : '#f5c6cb'}`,
+      borderRadius: '8px',
+      padding: '16px',
+      marginBottom: '20px'
+    }}>
+      <h4 style={{ margin: '0 0 12px 0', color: '#856404' }}>
+        🔧 Migración de Base de Datos Requerida
+      </h4>
+      
+      {migrationStatus === 'needed' && (
+        <>
+          <p style={{ margin: '0 0 12px 0', color: '#856404' }}>
+            Se necesita ejecutar una migración para agregar soporte de fotos de perfil en Instagram.
+          </p>
+          <button 
+            onClick={runMigration}
+            style={{
+              background: '#28a745',
+              color: 'white',
+              border: 'none',
+              padding: '8px 16px',
+              borderRadius: '4px',
+              cursor: 'pointer'
+            }}
+          >
+            Ejecutar Migración
+          </button>
+        </>
+      )}
+      
+      {migrationStatus === 'running' && (
+        <p style={{ margin: 0, color: '#856404' }}>
+          ⏳ Ejecutando migración...
+        </p>
+      )}
+      
+      {migrationStatus === 'error' && (
+        <p style={{ margin: 0, color: '#721c24' }}>
+          {migrationResult || '❌ Error verificando estado de migración'}
+        </p>
+      )}
+      
+      {migrationResult && migrationStatus === 'complete' && (
+        <p style={{ margin: 0, color: '#155724' }}>
+          {migrationResult}
+        </p>
+      )}
+    </div>
+  );
+}

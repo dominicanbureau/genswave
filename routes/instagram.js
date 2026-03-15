@@ -591,7 +591,7 @@ async function processConsultationInput(senderId, text, state) {
         const createdDate = new Date(result.created_at).toLocaleDateString();
         
         await sendInstagramMessage(senderId,
-          `✅ *PROYECTO ENCONTRADO*\n\n` +
+          `✅ PROYECTO ENCONTRADO\n\n` +
           `🆔 *ID:* ${result.unique_id}\n` +
           `📋 *Título:* ${result.title}\n` +
           `${statusEmoji[result.status] || '⚪'} *Estado:* ${result.status.toUpperCase()}\n\n` +
@@ -608,7 +608,7 @@ async function processConsultationInput(senderId, text, state) {
         const createdDate = new Date(result.created_at).toLocaleDateString();
         
         await sendInstagramMessage(senderId,
-          `✅ *CITA ENCONTRADA*\n\n` +
+          `✅ CITA ENCONTRADA\n\n` +
           `🆔 *ID:* ${result.unique_id}\n` +
           `${statusEmoji[result.status] || '⚪'} *Estado:* ${result.status.toUpperCase()}\n\n` +
           `🛠️ *Servicio:* ${result.service}\n` +
@@ -624,7 +624,7 @@ async function processConsultationInput(senderId, text, state) {
         const createdDate = new Date(result.created_at).toLocaleDateString();
         
         await sendInstagramMessage(senderId,
-          `✅ *SOLICITUD ENCONTRADA*\n\n` +
+          `✅ SOLICITUD ENCONTRADA\n\n` +
           `🆔 *ID:* ${result.unique_id}\n` +
           `${statusEmoji[result.status] || '⚪'} *Estado:* ${result.status.toUpperCase()}\n\n` +
           `🛠️ *Servicio:* ${result.service}\n` +
@@ -637,7 +637,7 @@ async function processConsultationInput(senderId, text, state) {
       }
     } else {
       await sendInstagramMessage(senderId,
-        `❌ *ID NO ENCONTRADO*\n\n` +
+        `❌ ID NO ENCONTRADO\n\n` +
         `No se encontró ningún proyecto o solicitud con el ID: ${consultationId}\n\n` +
         `Verifique que:\n` +
         `• El ID esté escrito correctamente\n` +

@@ -302,8 +302,7 @@ async function saveInstagramMessageToDatabase(senderId, messageText, senderInfo)
 // Save Instagram attachment to database
 async function saveInstagramAttachmentToDatabase(senderId, attachments, senderInfo) {
   try {
-    console.log('💾 Savin
-g Instagram attachment to database:', {
+    console.log('💾 Saving Instagram attachment to database:', {
       senderId,
       attachments,
       senderInfo,

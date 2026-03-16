@@ -526,7 +526,9 @@ function LoginForm({ data, onChange, onSubmit, onQuickAccess, onPasswordRecovery
         transition={{ delay: 0.6 }}
       >
         <button type="button" className="link-btn" onClick={onPasswordRecovery}>
-          Olvidé mi contraseña
+          <Link to="/reset-password" style={{ color: 'inherit', textDecoration: 'none' }}>
+            Olvidé mi contraseña
+          </Link>
         </button>
         <button type="button" className="link-btn" onClick={onQuickAccess}>
           Ingresar con código Quick

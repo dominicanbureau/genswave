@@ -135,8 +135,8 @@ function TermsPage() {
               Si tiene preguntas sobre estos Términos y Condiciones, puede contactarnos en:
             </p>
             <ul>
-              <li>Email: info@genswave.com</li>
-              <li>Teléfono: +1 (809) 555-0123</li>
+              <li>Email: legal@genswave.org</li>
+              <li>Ubicación: Distrito Nacional, Dominican Republic</li>
             </ul>
           </div>
         </motion.div>

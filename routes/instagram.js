@@ -154,6 +154,13 @@ async function handleTextMessage(senderId, text, senderInfo) {
         // Handle general commands
         const lowerText = text.toLowerCase().trim();
         
+        // Check for /reset command
+        if (lowerText.startsWith('/reset ')) {
+          const email = text.trim().substring(7).toLowerCase(); // Remove "/reset " prefix
+          await processPasswordResetCommand(senderId, email);
+          return;
+        }
+        
         if (lowerText.includes('hola') || lowerText.includes('hello') || lowerText.includes('hi')) {
           await sendInstagramMessage(senderId,
             `¡Hola! 👋 Bienvenido/a a *Genswave*\n\n` +
@@ -166,8 +173,10 @@ async function handleTextMessage(senderId, text, senderInfo) {
             `🛡️ Ciberseguridad\n\n` +
             `*¿CÓMO PODEMOS AYUDARTE?*\n` +
             `Puedes realizar acciones rapidas.\n\n` +
-            `🎫 Escriba "acceso" para crear una cuenta rapida\n` +
-            `📋 Escriba "consulta" para verificar estado de servicios\n` +
+            `🎫 Escriba "código" para crear acceso rápido\n` +
+            `📋 Escriba "consulta" para verificar estado\n` +
+            `🔐 Escriba "/reset email" para restablecer contraseña\n` +
+            `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
             `¡Estamos aquí para impulsar tu negocio! 🚀`
           );
         } else if (lowerText.includes('código') || lowerText.includes('codigo') || lowerText.includes('acceso')) {
@@ -198,6 +207,7 @@ async function handleTextMessage(senderId, text, senderInfo) {
             `*COMANDOS DISPONIBLES:*\n\n` +
             `🎫 *"código"* - Generar acceso rápido al portal\n` +
             `📋 *"consulta"* - Verificar estado de proyectos/solicitudes\n` +
+            `🔐 *"/reset email"* - Restablecer contraseña\n` +
             `👋 *"hola"* - Ver mensaje de bienvenida\n` +
             `❌ *"salir"* - Cancelar proceso actual\n\n` +
             `*SERVICIOS:*\n` +
@@ -206,7 +216,7 @@ async function handleTextMessage(senderId, text, senderInfo) {
             `☁️ Soluciones en la nube\n` +
             `🛡️ Ciberseguridad\n\n` +
             `*CONTACTO DIRECTO:*\n` +
-            `📧 info@genswave.com\n` +
+            `📧 support@genswave.org\n` +
             `🌐 https://genswave.onrender.com\n\n` +
             `¿En qué más podemos asistirle?`
           );
@@ -217,6 +227,7 @@ async function handleTextMessage(senderId, text, senderInfo) {
             `*MIENTRAS TANTO:*\n` +
             `🎫 Escriba "código" para generar acceso rápido\n` +
             `📋 Escriba "consulta" para verificar estado\n` +
+            `🔐 Escriba "/reset email" para restablecer contraseña\n` +
             `🆘 Escriba "ayuda" para ver opciones\n\n` +
             `¡Gracias por contactar a *Genswave*! 🚀`
           );
@@ -628,7 +639,7 @@ async function processConsultationInput(senderId, text, state) {
           `${result.admin_notes ? `📋 NOTAS DEL EQUIPO:\n${result.admin_notes}\n\n` : ''}` +
           `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
           `🌐 Dashboard completo:\nhttps://genswave.onrender.com\n` +
-          `📞 Soporte: info@genswave.com`
+          `📞 Soporte: support@genswave.org`
         );
       } else if (type === 'appointment') {
         const preferredDate = result.preferred_date ? new Date(result.preferred_date).toLocaleDateString() : 'No especificada';
@@ -904,5 +915,81 @@ router.post('/admin-reply', async (req, res) => {
     res.status(500).json({ error: 'Error al enviar mensaje' });
   }
 });
+
+// Process password reset command
+async function processPasswordResetCommand(senderId, email) {
+  try {
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    
+    if (!email || !emailRegex.test(email)) {
+      await sendInstagramMessage(senderId,
+        `⚠️ FORMATO DE EMAIL INVÁLIDO\n\n` +
+        `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+        `Por favor, use el formato correcto:\n\n` +
+        `📧 EJEMPLO:\n` +
+        `/reset tu@correo.com\n\n` +
+        `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+        `📞 Soporte: support@genswave.org`
+      );
+      return;
+    }
+
+    // Call the password reset API
+    const baseUrl = process.env.NODE_ENV === 'production' 
+      ? 'https://genswave.onrender.com' 
+      : 'http://localhost:3000';
+    
+    const response = await fetch(`${baseUrl}/api/password-reset/request`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email }),
+    });
+
+    const data = await response.json();
+
+    if (data.success) {
+      await sendInstagramMessage(senderId,
+        `✅ SOLICITUD DE RESTABLECIMIENTO ENVIADA\n\n` +
+        `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+        `📧 EMAIL: ${email}\n` +
+        `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n` +
+        `Si el correo existe en nuestro sistema, recibirás un enlace de restablecimiento.\n\n` +
+        `📋 INSTRUCCIONES:\n` +
+        `1️⃣ Revisa tu bandeja de entrada\n` +
+        `2️⃣ Haz clic en el enlace del correo\n` +
+        `3️⃣ Ingresa tu nueva contraseña\n\n` +
+        `⏰ El enlace expira en 1 hora\n\n` +
+        `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+        `🌐 Dashboard: https://genswave.onrender.com\n` +
+        `📞 Soporte: support@genswave.org`
+      );
+    } else {
+      await sendInstagramMessage(senderId,
+        `❌ ERROR AL PROCESAR SOLICITUD\n\n` +
+        `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+        `No se pudo procesar la solicitud de restablecimiento.\n\n` +
+        `📋 VERIFIQUE QUE:\n` +
+        `• El email esté escrito correctamente\n` +
+        `• Tenga una cuenta registrada\n\n` +
+        `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+        `🔄 Intente nuevamente con: /reset su@correo.com\n` +
+        `📞 Soporte: support@genswave.org`
+      );
+    }
+
+  } catch (error) {
+    console.error('❌ Error processing password reset command:', error);
+    await sendInstagramMessage(senderId,
+      `❌ ERROR TÉCNICO\n\n` +
+      `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+      `Ocurrió un error al procesar su solicitud.\n\n` +
+      `🔄 Intente nuevamente en unos minutos\n` +
+      `📞 Soporte: support@genswave.org`
+    );
+  }
+}
 
 export default router;

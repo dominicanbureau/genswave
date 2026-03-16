@@ -189,9 +189,8 @@ function PrivacyPage() {
               Si tiene preguntas sobre esta Política de Privacidad o desea ejercer sus derechos, contáctenos:
             </p>
             <ul>
-              <li>Email: privacy@genswave.com</li>
-              <li>Teléfono: +1 (809) 555-0123</li>
-              <li>Dirección: República Dominicana</li>
+              <li>Email: legal@genswave.org</li>
+              <li>Ubicación: Distrito Nacional, Dominican Republic</li>
             </ul>
           </div>
         </motion.div>

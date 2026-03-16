@@ -436,21 +436,21 @@ function InfoSection() {
         <div className="info-grid">
           <InfoCard
             title="Email"
-            content="contacto@genswave.com"
+            content="info@genswave.org"
             description="Respuesta en 24 horas"
             delay={0.2}
             isInView={isInView}
           />
           <InfoCard
-            title="Teléfono"
-            content="+1 (555) 123-4567"
-            description="Lun - Vie, 9am - 6pm"
+            title="Instagram"
+            content="@genswave"
+            description="Mensajes directos"
             delay={0.3}
             isInView={isInView}
           />
           <InfoCard
             title="Ubicación"
-            content="San Francisco, CA"
+            content="Distrito Nacional, Dominican Republic"
             description="Trabajamos remotamente"
             delay={0.4}
             isInView={isInView}

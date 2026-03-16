@@ -15,6 +15,7 @@ import SupportPage from './pages/SupportPage';
 import CasesPage from './pages/CasesPage';
 import DataDeletionPage from './pages/DataDeletionPage';
 import ContactInfoPage from './pages/ContactInfoPage';
+import ResetPassword from './pages/ResetPassword';
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
@@ -25,6 +26,7 @@ function App() {
       <Route path="/proceso" element={<ProcessPage />} />
       <Route path="/contacto" element={<ContactPage />} />
       <Route path="/login" element={<Login />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/terminos" element={<TermsPage />} />
       <Route path="/privacidad" element={<PrivacyPage />} />
       <Route path="/cookies" element={<CookiesPage />} />

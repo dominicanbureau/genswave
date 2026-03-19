@@ -10,6 +10,7 @@ function UserDashboard() {
   const [appointments, setAppointments] = useState([]);
   const [messages, setMessages] = useState([]);
   const [requests, setRequests] = useState([]);
+  const [requestLimit, setRequestLimit] = useState({ canCreate: true, hoursRemaining: 0 });
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(true);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
@@ -98,18 +99,20 @@ function UserDashboard() {
       console.log('📊 Fetching dashboard data...');
       setConnectionStatus('connecting');
       
-      const [projectsRes, appointmentsRes, messagesRes, requestsRes] = await Promise.all([
+      const [projectsRes, appointmentsRes, messagesRes, requestsRes, limitRes] = await Promise.all([
         fetch('/api/projects').catch(() => ({ ok: false, json: () => [] })),
         fetch('/api/appointments').catch(() => ({ ok: false, json: () => [] })),
         fetch('/api/messages').catch(() => ({ ok: false, json: () => [] })),
-        fetch('/api/requests').catch(() => ({ ok: false, json: () => [] }))
+        fetch('/api/requests').catch(() => ({ ok: false, json: () => [] })),
+        fetch('/api/requests/check-limit').catch(() => ({ ok: false, json: () => ({ canCreate: true, hoursRemaining: 0 }) }))
       ]);
 
       console.log('📈 API responses:', {
         projects: projectsRes.ok,
         appointments: appointmentsRes.ok,
         messages: messagesRes.ok,
-        requests: requestsRes.ok
+        requests: requestsRes.ok,
+        limit: limitRes.ok
       });
 
       // Check if at least one request was successful
@@ -122,11 +125,13 @@ function UserDashboard() {
         const appointmentsData = appointmentsRes.ok ? await appointmentsRes.json() : [];
         const messagesData = messagesRes.ok ? await messagesRes.json() : [];
         const requestsData = requestsRes.ok ? await requestsRes.json() : [];
+        const limitData = limitRes.ok ? await limitRes.json() : { canCreate: true, hoursRemaining: 0 };
 
         setProjects(projectsData);
         setAppointments(appointmentsData);
         setMessages(messagesData);
         setRequests(requestsData);
+        setRequestLimit(limitData);
 
         // Count unread messages (messages from admin that user hasn't seen)
         const unreadCount = messagesData.filter(msg => 

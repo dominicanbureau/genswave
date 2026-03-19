@@ -114,7 +114,7 @@ CREATE TABLE instagram_messages (
    - Recibir código inmediatamente
 
 3. **Usar Código**:
-   - Visitar https://genswave.onrender.com
+   - Visitar https://genswave.org
    - Ingresar código en sección "Código Rápido"
    - Acceder al dashboard personalizado
 
@@ -197,7 +197,7 @@ node check-instagram-connection.js
 node clean-expired-codes.js
 
 # Verificar webhooks
-curl -X GET https://genswave.onrender.com/api/instagram/webhook
+curl -X GET https://genswave.org/api/instagram/webhook
 ```
 
 ## Conclusión

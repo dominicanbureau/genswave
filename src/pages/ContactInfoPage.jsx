@@ -74,8 +74,8 @@ function ContactInfoPage() {
               <div className="contact-item">
                 <h3>🌐 Sitio Web</h3>
                 <p>
-                  <strong>Principal:</strong> https://genswave.onrender.com<br/>
-                  <strong>Dominio:</strong> genswave.onrender.com
+                  <strong>Principal:</strong> https://genswave.org<br/>
+                  <strong>Dominio:</strong> genswave.org
                 </p>
               </div>
             </div>

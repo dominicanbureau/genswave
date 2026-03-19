@@ -1,5 +1,6 @@
 import express from 'express';
 import db from '../database.js';
+import { sendProjectCreatedEmail } from '../utils/emailService.js';
 
 const router = express.Router();
 
@@ -105,7 +106,28 @@ router.post('/', requireAdmin, async (req, res) => {
             [user_id, title, description, budget, start_date, end_date, cover_image, tags || [], uniqueId]
         );
 
-        res.json(result.rows[0]);
+        const project = result.rows[0];
+
+        // Get user info for email
+        const userResult = await db.query(
+            'SELECT name, email FROM users WHERE id = $1',
+            [user_id]
+        );
+
+        if (userResult.rows.length > 0) {
+            const user = userResult.rows[0];
+            
+            // Send project creation email
+            try {
+                await sendProjectCreatedEmail(user.email, user.name, project);
+                console.log(`✅ Project creation email sent to ${user.email} for project ${project.unique_id}`);
+            } catch (emailError) {
+                console.error('❌ Failed to send project creation email:', emailError);
+                // Don't fail project creation if email fails
+            }
+        }
+
+        res.json(project);
     } catch (error) {
         console.error('Error al crear proyecto:', error);
         res.status(500).json({ error: 'Error en el servidor' });

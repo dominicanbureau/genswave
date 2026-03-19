@@ -23,9 +23,9 @@ Esta guía te ayudará a configurar la integración de Instagram DMs con tu proy
 
 #### URLs de Callback Requeridas:
 ```
-OAuth Redirect URI: https://genswave.onrender.com/api/instagram/auth/callback
-Deauthorize Callback URL: https://genswave.onrender.com/api/instagram/auth/deauthorize
-Data Deletion Request URL: https://genswave.onrender.com/api/instagram/auth/data-deletion
+OAuth Redirect URI: https://genswave.org/api/instagram/auth/callback
+Deauthorize Callback URL: https://genswave.org/api/instagram/auth/deauthorize
+Data Deletion Request URL: https://genswave.org/api/instagram/auth/data-deletion
 ```
 
 ### Paso 3: Configurar Instagram Messaging API
@@ -36,7 +36,7 @@ Data Deletion Request URL: https://genswave.onrender.com/api/instagram/auth/data
 
 #### Configuración de Webhook:
 ```
-Callback URL: https://genswave.onrender.com/api/instagram/webhook
+Callback URL: https://genswave.org/api/instagram/webhook
 Verify Token: tu-token-secreto-aqui (guárdalo para después)
 ```
 
@@ -158,7 +158,7 @@ Los mensajes se guardan en la tabla `instagram_messages`:
 ## 🔧 Troubleshooting
 
 ### Webhook no funciona
-1. Verifica que la URL sea exactamente: `https://genswave.onrender.com/api/instagram/webhook`
+1. Verifica que la URL sea exactamente: `https://genswave.org/api/instagram/webhook`
 2. Confirma que el `INSTAGRAM_WEBHOOK_VERIFY_TOKEN` coincida
 3. Revisa los logs de Render para errores
 

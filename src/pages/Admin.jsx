@@ -1889,11 +1889,11 @@ function InstagramSection() {
           <div className="url-list">
             <div className="url-item">
               <strong>Webhook URL:</strong>
-              <code>https://genswave.onrender.com/api/instagram/webhook</code>
+              <code>https://genswave.org/api/instagram/webhook</code>
             </div>
             <div className="url-item">
               <strong>OAuth Redirect URI:</strong>
-              <code>https://genswave.onrender.com/api/instagram/auth/callback</code>
+              <code>https://genswave.org/api/instagram/auth/callback</code>
             </div>
           </div>
           

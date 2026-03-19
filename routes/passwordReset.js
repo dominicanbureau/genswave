@@ -3,6 +3,7 @@ import bcrypt from 'bcrypt';
 import crypto from 'crypto';
 import { Resend } from 'resend';
 import db from '../database.js';
+import { sendPasswordResetConfirmation } from '../utils/emailService.js';
 
 const router = express.Router();
 
@@ -50,7 +51,7 @@ router.post('/request', async (req, res) => {
     );
 
     // Send reset email
-    const resetUrl = `https://genswave.onrender.com/reset-password?token=${token}`;
+    const resetUrl = `https://genswave.org/reset-password?token=${token}`;
     
     await resend.emails.send({
       from: 'support@genswave.org',
@@ -182,6 +183,12 @@ router.post('/reset', async (req, res) => {
 
     const resetToken = tokenResult.rows[0];
 
+    // Get user info for confirmation email
+    const userResult = await db.query(
+      'SELECT name FROM users WHERE email = $1',
+      [resetToken.email]
+    );
+
     // Hash new password
     const hashedPassword = await bcrypt.hash(newPassword, 10);
 
@@ -196,6 +203,17 @@ router.post('/reset', async (req, res) => {
       'UPDATE password_reset_tokens SET used = TRUE WHERE token = $1',
       [token]
     );
+
+    // Send confirmation email
+    try {
+      const userName = userResult.rows[0]?.name || 'Usuario';
+      const userIP = req.ip || req.connection.remoteAddress || 'No disponible';
+      await sendPasswordResetConfirmation(resetToken.email, userName, userIP);
+      console.log(`✅ Password reset confirmation email sent to ${resetToken.email}`);
+    } catch (emailError) {
+      console.error('❌ Failed to send password reset confirmation email:', emailError);
+      // Don't fail the reset if email fails
+    }
 
     console.log(`✅ Password reset successful for ${resetToken.email}`);
 

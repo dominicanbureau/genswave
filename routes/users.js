@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs';
 import multer from 'multer';
 import path from 'path';
 import db from '../database.js';
+import { sendWelcomeEmail, sendProfileUpdateConfirmation } from '../utils/emailService.js';
 
 const router = express.Router();
 

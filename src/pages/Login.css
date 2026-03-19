@@ -20,6 +20,17 @@
   will-change: auto;
 }
 
+/* Mobile responsive layout */
+@media (max-width: 1024px) {
+  .auth-container {
+    grid-template-columns: 1fr;
+  }
+  
+  .auth-left {
+    display: none;
+  }
+}
+
 /* Left Side - Branding */
 .auth-left {
   background: var(--black);
@@ -31,6 +42,13 @@
   position: relative;
   overflow: hidden;
   gap: 4rem;
+}
+
+@media (max-width: 1200px) {
+  .auth-left {
+    padding: 2rem 3rem;
+    gap: 3rem;
+  }
 }
 
 .back-home {
@@ -120,6 +138,29 @@
   position: relative;
 }
 
+@media (max-width: 1024px) {
+  .auth-right {
+    padding: 3rem 2rem;
+    min-height: 100vh;
+    justify-content: flex-start;
+    padding-top: 6rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .auth-right {
+    padding: 2rem 1.5rem;
+    padding-top: 4rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .auth-right {
+    padding: 1.5rem 1rem;
+    padding-top: 3rem;
+  }
+}
+
 /* Tabs */
 .auth-tabs {
   display: flex;
@@ -129,6 +170,12 @@
   background: var(--gray-light);
   padding: 0.5rem;
   border-radius: 12px;
+}
+
+@media (max-width: 480px) {
+  .auth-tabs {
+    margin-bottom: 2rem;
+  }
 }
 
 .tab {
@@ -144,6 +191,13 @@
   z-index: 2;
   font-family: inherit;
   color: var(--gray-medium);
+}
+
+@media (max-width: 480px) {
+  .tab {
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+  }
 }
 
 .tab.active {
@@ -551,4 +605,118 @@
   text-align: center;
   color: var(--gray-dark);
   margin-bottom: 2rem;
+}
+/* Additional Mobile Improvements */
+@media (max-width: 1024px) {
+  .auth-branding h1 {
+    font-size: clamp(2.5rem, 8vw, 4rem);
+  }
+  
+  .auth-branding p {
+    font-size: clamp(1rem, 3vw, 1.2rem);
+  }
+}
+
+/* Mobile Logo/Branding for when left side is hidden */
+@media (max-width: 1024px) {
+  .auth-right::before {
+    content: '';
+    position: absolute;
+    top: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 60px;
+    background: var(--black);
+    border-radius: 12px;
+    z-index: 1;
+  }
+  
+  .auth-right::after {
+    content: 'Genswave';
+    position: absolute;
+    top: 4.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--black);
+    z-index: 1;
+  }
+}
+
+/* Form Improvements */
+@media (max-width: 480px) {
+  .form-group {
+    margin-bottom: 1.5rem;
+  }
+  
+  .form-group input {
+    padding: 1rem;
+    font-size: 1rem;
+  }
+  
+  .form-group label {
+    font-size: 0.9rem;
+  }
+  
+  .submit-btn {
+    padding: 1rem;
+    font-size: 1rem;
+  }
+}
+
+/* Responsive Features Section */
+@media (max-width: 1200px) {
+  .auth-features {
+    margin-top: 2rem;
+  }
+  
+  .feature {
+    padding: 0.75rem;
+  }
+  
+  .feature-title {
+    font-size: 0.9rem;
+  }
+}
+
+/* Fix viewport issues on mobile */
+@media (max-width: 768px) {
+  .auth-page {
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+  }
+  
+  .auth-container {
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+  }
+}
+
+/* Landscape mobile adjustments */
+@media (max-width: 768px) and (orientation: landscape) {
+  .auth-right {
+    padding-top: 2rem;
+    justify-content: flex-start;
+  }
+  
+  .auth-tabs {
+    margin-bottom: 1.5rem;
+  }
+  
+  .form-group {
+    margin-bottom: 1rem;
+  }
+}
+
+/* Prevent horizontal scroll */
+@media (max-width: 768px) {
+  .auth-page {
+    overflow-x: hidden;
+  }
+  
+  * {
+    box-sizing: border-box;
+  }
 }

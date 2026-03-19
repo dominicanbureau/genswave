@@ -267,7 +267,7 @@ router.post('/instagram', async (req, res) => {
 
     // Return the required response format for Instagram
     res.json({
-      url: `https://genswave.onrender.com/data-deletion/status/${referenceNumber}`,
+      url: `https://genswave.org/data-deletion/status/${referenceNumber}`,
       confirmation_code: referenceNumber
     });
 

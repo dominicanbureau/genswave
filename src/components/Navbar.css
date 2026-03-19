@@ -2,9 +2,15 @@
   position: fixed;
   top: 0;
   width: 100%;
-  background: transparent;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-left: none;
+  border-right: none;
+  border-top: none;
   z-index: 1000;
-  border-bottom: none;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .nav-container {
@@ -44,12 +50,13 @@
 
 .nav-menu a {
   text-decoration: none;
-  color: var(--gray-dark);
+  color: rgba(255, 255, 255, 0.9);
   font-size: 0.95rem;
-  font-weight: 400;
+  font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
   position: relative;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .nav-menu a::after {
@@ -58,9 +65,10 @@
   bottom: -5px;
   left: 0;
   width: 0;
-  height: 1px;
-  background: var(--black);
+  height: 2px;
+  background: rgba(255, 255, 255, 0.8);
   transition: width 0.3s ease;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
 }
 
 .nav-menu a:hover::after,
@@ -69,21 +77,28 @@
 }
 
 .nav-menu a.active {
-  color: var(--black);
-  font-weight: 500;
+  color: rgba(255, 255, 255, 1);
+  font-weight: 600;
 }
 
 .login-btn {
-  padding: 0.5rem 1.5rem;
-  background: var(--black);
-  color: var(--white) !important;
+  padding: 0.6rem 1.8rem;
+  background: rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.95) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 50px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   transition: all 0.3s ease;
+  font-weight: 500;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .login-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  background: rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.5);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 }
 
 .login-btn::after {
@@ -118,10 +133,11 @@
 .hamburger-line {
   width: 24px;
   height: 2px;
-  background: var(--black);
+  background: rgba(255, 255, 255, 0.9);
   margin: 3px 0;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   transform-origin: center;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .hamburger.active .hamburger-line:nth-child(1) {
@@ -328,4 +344,51 @@
 /* Prevent body scroll when menu is open */
 body.mobile-menu-open {
   overflow: hidden;
+}
+/* Enhanced liquid glass effects */
+.navbar::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, 
+    rgba(255, 255, 255, 0.1) 0%, 
+    rgba(255, 255, 255, 0.05) 50%, 
+    rgba(255, 255, 255, 0.1) 100%);
+  z-index: -1;
+  animation: shimmer 3s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+/* Enhanced hover effects for nav items */
+.nav-menu a:hover {
+  color: rgba(255, 255, 255, 1);
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+}
+
+/* Logo enhancement */
+.logo-image {
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+.logo-image:hover {
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.15));
+}
+
+/* Mobile menu enhancements */
+.mobile-menu {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.mobile-nav-menu a:hover {
+  background: rgba(102, 126, 234, 0.1);
+  border-left-color: #667eea;
 }

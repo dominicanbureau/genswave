@@ -1,5 +1,6 @@
 import express from 'express';
 import db from '../database.js';
+import { sendRequestCreatedEmail, sendRequestStatusUpdateEmail } from '../utils/emailService.js';
 
 const router = express.Router();
 
@@ -42,6 +43,18 @@ router.patch('/admin/requests/:id/status', requireAdmin, async (req, res) => {
         const { id } = req.params;
         const { status } = req.body;
 
+        // Get current request data for comparison
+        const currentRequest = await db.query(
+            'SELECT r.*, u.name as user_name, u.email as user_email FROM requests r JOIN users u ON r.user_id = u.id WHERE r.id = $1',
+            [id]
+        );
+
+        if (currentRequest.rows.length === 0) {
+            return res.status(404).json({ error: 'Solicitud no encontrada' });
+        }
+
+        const previousStatus = currentRequest.rows[0].status;
+
         const result = await db.query(
             'UPDATE requests SET status = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2 RETURNING *',
             [status, id]
@@ -49,6 +62,19 @@ router.patch('/admin/requests/:id/status', requireAdmin, async (req, res) => {
 
         if (result.rows.length === 0) {
             return res.status(404).json({ error: 'Solicitud no encontrada' });
+        }
+
+        // Send status update email if status changed
+        if (previousStatus !== status) {
+            try {
+                const user = currentRequest.rows[0];
+                const updatedRequest = { ...result.rows[0], title: user.title };
+                await sendRequestStatusUpdateEmail(user.user_email, user.user_name, updatedRequest, previousStatus);
+                console.log(`✅ Request status update email sent to ${user.user_email} for request ${updatedRequest.unique_id}`);
+            } catch (emailError) {
+                console.error('❌ Failed to send request status update email:', emailError);
+                // Don't fail update if email fails
+            }
         }
 
         res.json({ success: true, request: result.rows[0] });
@@ -96,6 +122,36 @@ router.get('/', requireAuth, async (req, res) => {
     }
 });
 
+// Check request limit
+router.get('/check-limit', requireAuth, async (req, res) => {
+    try {
+        const userId = req.session.userId;
+        
+        const result = await db.query(
+            'SELECT last_request_at FROM users WHERE id = $1',
+            [userId]
+        );
+
+        if (result.rows.length === 0 || !result.rows[0].last_request_at) {
+            return res.json({ canCreate: true, hoursRemaining: 0 });
+        }
+
+        const lastRequestTime = new Date(result.rows[0].last_request_at);
+        const now = new Date();
+        const hoursDiff = (now - lastRequestTime) / (1000 * 60 * 60);
+
+        if (hoursDiff >= 48) {
+            return res.json({ canCreate: true, hoursRemaining: 0 });
+        }
+
+        const hoursRemaining = Math.ceil(48 - hoursDiff);
+        res.json({ canCreate: false, hoursRemaining });
+    } catch (error) {
+        console.error('Error al verificar límite:', error);
+        res.status(500).json({ error: 'Error en el servidor' });
+    }
+});
+
 // Create request
 router.post('/', requireAuth, async (req, res) => {
     try {
@@ -114,6 +170,26 @@ router.post('/', requireAuth, async (req, res) => {
             additionalNotes
         } = req.body;
 
+        // Check 48-hour limit
+        const lastRequestCheck = await db.query(
+            'SELECT last_request_at FROM users WHERE id = $1',
+            [userId]
+        );
+
+        if (lastRequestCheck.rows.length > 0 && lastRequestCheck.rows[0].last_request_at) {
+            const lastRequestTime = new Date(lastRequestCheck.rows[0].last_request_at);
+            const now = new Date();
+            const hoursDiff = (now - lastRequestTime) / (1000 * 60 * 60);
+
+            if (hoursDiff < 48) {
+                const hoursRemaining = Math.ceil(48 - hoursDiff);
+                return res.status(429).json({ 
+                    error: `Debes esperar ${hoursRemaining} horas antes de crear otra solicitud detallada`,
+                    hoursRemaining 
+                });
+            }
+        }
+
         // Generate unique ID for request
         const uniqueId = 'S' + Math.floor(Math.random() * 900000 + 100000).toString();
 
@@ -130,6 +206,31 @@ router.post('/', requireAuth, async (req, res) => {
                 technicalRequirements, targetAudience, additionalNotes, uniqueId
             ]
         );
+
+        // Update user's last_request_at
+        await db.query(
+            'UPDATE users SET last_request_at = CURRENT_TIMESTAMP WHERE id = $1',
+            [userId]
+        );
+
+        // Get user info for email
+        const userResult = await db.query(
+            'SELECT name, email FROM users WHERE id = $1',
+            [userId]
+        );
+
+        if (userResult.rows.length > 0) {
+            const user = userResult.rows[0];
+            
+            // Send request creation email
+            try {
+                await sendRequestCreatedEmail(user.email, user.name, result.rows[0]);
+                console.log(`✅ Request creation email sent to ${user.email} for request ${result.rows[0].unique_id}`);
+            } catch (emailError) {
+                console.error('❌ Failed to send request creation email:', emailError);
+                // Don't fail request creation if email fails
+            }
+        }
 
         res.json({ success: true, request: result.rows[0] });
     } catch (error) {

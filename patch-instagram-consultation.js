@@ -28,11 +28,11 @@ const newPattern = `      if (appointmentResult.rows.length > 0) {
 content = content.replace(oldPattern, newPattern);
 
 // Add the request response handling after appointment response
-const appointmentEndPattern = `        \`Para más detalles, visite su dashboard en:\\nhttps://genswave.onrender.com\`
+const appointmentEndPattern = `        \`Para más detalles, visite su dashboard en:\\nhttps://genswave.org\`
       );
     }`;
 
-const requestResponsePattern = `        \`Para más detalles, visite su dashboard en:\\nhttps://genswave.onrender.com\`
+const requestResponsePattern = `        \`Para más detalles, visite su dashboard en:\\nhttps://genswave.org\`
       );
     } else if (type === 'request') {
       // Format request status
@@ -56,7 +56,7 @@ const requestResponsePattern = `        \`Para más detalles, visite su dashboar
         \`💰 Presupuesto: \${budget}\\n\` +
         \`📅 Solicitud creada: \${createdDate}\\n\\n\` +
         \`📝 Descripción:\\n\${result.description || 'Sin descripción'}\\n\\n\` +
-        \`Para más detalles, visite su dashboard en:\\nhttps://genswave.onrender.com\`
+        \`Para más detalles, visite su dashboard en:\\nhttps://genswave.org\`
       );
     }`;
 

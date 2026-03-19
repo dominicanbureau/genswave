@@ -121,7 +121,7 @@ async function processConsultationInput(senderId, text, state) {
         `📅 Fecha fin: ${endDate}\n` +
         `💰 Presupuesto: ${budget}\n\n` +
         `📝 Descripción:\n${result.description || 'Sin descripción'}\n\n` +
-        `Para más detalles, visite su dashboard en:\nhttps://genswave.onrender.com`
+        `Para más detalles, visite su dashboard en:\nhttps://genswave.org`
       );
     } else if (type === 'appointment') {
       // Format appointment status
@@ -147,7 +147,7 @@ async function processConsultationInput(senderId, text, state) {
         `📅 Solicitud creada: ${createdDate}\n\n` +
         `📝 Mensaje:\n${result.message || 'Sin mensaje'}\n\n` +
         `${result.admin_notes ? `📋 Notas del equipo:\n${result.admin_notes}\n\n` : ''}` +
-        `Para más detalles, visite su dashboard en:\nhttps://genswave.onrender.com`
+        `Para más detalles, visite su dashboard en:\nhttps://genswave.org`
       );
     } else if (type === 'request') {
       // Format request status
@@ -172,7 +172,7 @@ async function processConsultationInput(senderId, text, state) {
         `📅 Solicitud creada: ${createdDate}\n\n` +
         `📝 Descripción:\n${result.description || 'Sin descripción'}\n\n` +
         `${result.admin_notes ? `📋 Notas del equipo:\n${result.admin_notes}\n\n` : ''}` +
-        `Para más detalles, visite su dashboard en:\nhttps://genswave.onrender.com`
+        `Para más detalles, visite su dashboard en:\nhttps://genswave.org`
       );
     }
     

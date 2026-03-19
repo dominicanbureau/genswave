@@ -108,7 +108,7 @@ async function diagnoseIssues() {
   
   try {
     console.log('🔄 Probando /api/instagram/conversations...');
-    const conversationsResponse = await fetch('https://genswave.onrender.com/api/instagram/conversations');
+    const conversationsResponse = await fetch('https://genswave.org/api/instagram/conversations');
     if (conversationsResponse.ok) {
       const conversations = await conversationsResponse.json();
       console.log(`✅ Endpoint funciona - ${conversations.length} conversaciones`);

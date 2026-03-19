@@ -1,6 +1,7 @@
 import express from 'express';
 import bcrypt from 'bcryptjs';
 import db from '../database.js';
+import { sendWelcomeEmail, sendProfileUpdateConfirmation } from '../utils/emailService.js';
 
 const router = express.Router();
 
@@ -29,6 +30,15 @@ router.post('/register', async (req, res) => {
         );
 
         const user = result.rows[0];
+
+        // Send welcome email
+        try {
+            await sendWelcomeEmail(user.email, user.name);
+            console.log(`✅ Welcome email sent to ${user.email}`);
+        } catch (emailError) {
+            console.error('❌ Failed to send welcome email:', emailError);
+            // Don't fail registration if email fails
+        }
 
         // Create session
         req.session.userId = user.id;
@@ -176,6 +186,12 @@ router.put('/profile', async (req, res) => {
         
         const { name, profile_photo } = req.body;
         
+        // Get current user data for comparison
+        const currentUser = await db.query(
+            'SELECT name, profile_photo FROM users WHERE id = $1',
+            [req.session.userId]
+        );
+        
         const result = await db.query(
             'UPDATE users SET name = $1, profile_photo = $2 WHERE id = $3 RETURNING id, name, email, profile_photo',
             [name, profile_photo, req.session.userId]
@@ -183,6 +199,25 @@ router.put('/profile', async (req, res) => {
         
         if (result.rows.length === 0) {
             return res.status(404).json({ error: 'Usuario no encontrado' });
+        }
+
+        // Send profile update confirmation email
+        try {
+            const changes = [];
+            if (currentUser.rows[0].name !== name) {
+                changes.push(`Nombre actualizado a: ${name}`);
+            }
+            if (currentUser.rows[0].profile_photo !== profile_photo) {
+                changes.push('Foto de perfil actualizada');
+            }
+            
+            if (changes.length > 0) {
+                await sendProfileUpdateConfirmation(result.rows[0].email, result.rows[0].name, changes);
+                console.log(`✅ Profile update email sent to ${result.rows[0].email}`);
+            }
+        } catch (emailError) {
+            console.error('❌ Failed to send profile update email:', emailError);
+            // Don't fail update if email fails
         }
         
         // Update session data

@@ -217,7 +217,7 @@ async function handleTextMessage(senderId, text, senderInfo) {
             `🛡️ Ciberseguridad\n\n` +
             `*CONTACTO DIRECTO:*\n` +
             `📧 support@genswave.org\n` +
-            `🌐 https://genswave.onrender.com\n\n` +
+            `🌐 https://genswave.org\n\n` +
             `¿En qué más podemos asistirle?`
           );
         } else {
@@ -367,7 +367,7 @@ async function processCompanyInput(senderId, text, state) {
       `🏢 *Empresa:* ${company}\n\n` +
       `🎫 *SU CÓDIGO:* ${code}\n\n` +
       `*INSTRUCCIONES:*\n` +
-      `1️⃣ Visite: https://genswave.onrender.com\n` +
+      `1️⃣ Visite: https://genswave.org\n` +
       `2️⃣ Haga clic en "Acceso Rápido"\n` +
       `3️⃣ Ingrese su código: ${code}\n\n` +
       `*Válido por 30 días*\n\n` +
@@ -638,7 +638,7 @@ async function processConsultationInput(senderId, text, state) {
           `📝 DESCRIPCIÓN:\n${result.description || 'Sin descripción disponible'}\n\n` +
           `${result.admin_notes ? `📋 NOTAS DEL EQUIPO:\n${result.admin_notes}\n\n` : ''}` +
           `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
-          `🌐 Dashboard completo:\nhttps://genswave.onrender.com\n` +
+          `🌐 Dashboard completo:\nhttps://genswave.org\n` +
           `📞 Soporte: support@genswave.org`
         );
       } else if (type === 'appointment') {
@@ -655,7 +655,7 @@ async function processConsultationInput(senderId, text, state) {
           `📅 *Solicitud creada:* ${createdDate}\n\n` +
           `📝 *Mensaje:*\n${result.message || 'Sin mensaje'}\n\n` +
           `${result.admin_notes ? `📋 *Notas del equipo:*\n${result.admin_notes}\n\n` : ''}` +
-          `Para más detalles, visite su dashboard en:\nhttps://genswave.onrender.com`
+          `Para más detalles, visite su dashboard en:\nhttps://genswave.org`
         );
       }
       else if (type === 'request') {
@@ -670,7 +670,7 @@ async function processConsultationInput(senderId, text, state) {
           `📅 *Solicitud creada:* ${createdDate}\n\n` +
           `📝 *Mensaje:*\n${result.message || 'Sin mensaje'}\n\n` +
           `${result.admin_notes ? `📋 *Notas del equipo:*\n${result.admin_notes}\n\n` : ''}` +
-          `Para más detalles, visite su dashboard en:\nhttps://genswave.onrender.com`
+          `Para más detalles, visite su dashboard en:\nhttps://genswave.org`
         );
       }
     } else {
@@ -937,7 +937,7 @@ async function processPasswordResetCommand(senderId, email) {
 
     // Call the password reset API
     const baseUrl = process.env.NODE_ENV === 'production' 
-      ? 'https://genswave.onrender.com' 
+      ? 'https://genswave.org' 
       : 'http://localhost:3000';
     
     const response = await fetch(`${baseUrl}/api/password-reset/request`, {
@@ -963,7 +963,7 @@ async function processPasswordResetCommand(senderId, email) {
         `3️⃣ Ingresa tu nueva contraseña\n\n` +
         `⏰ El enlace expira en 1 hora\n\n` +
         `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
-        `🌐 Dashboard: https://genswave.onrender.com\n` +
+        `🌐 Dashboard: https://genswave.org\n` +
         `📞 Soporte: support@genswave.org`
       );
     } else {

@@ -13,12 +13,17 @@ function Navbar() {
   const backgroundColor = useTransform(
     scrollY,
     [0, 100],
-    ['rgba(255, 255, 255, 0.8)', 'rgba(255, 255, 255, 0.95)']
+    ['rgba(255, 255, 255, 0.1)', 'rgba(255, 255, 255, 0.2)']
   );
-  const boxShadow = useTransform(
+  const backdropBlur = useTransform(
     scrollY,
     [0, 100],
-    ['0 0 0 rgba(0, 0, 0, 0)', '0 2px 20px rgba(0, 0, 0, 0.05)']
+    ['blur(20px)', 'blur(25px)']
+  );
+  const borderOpacity = useTransform(
+    scrollY,
+    [0, 100],
+    ['rgba(255, 255, 255, 0.2)', 'rgba(255, 255, 255, 0.3)']
   );
 
   useEffect(() => {
@@ -78,7 +83,12 @@ function Navbar() {
     <>
       <motion.nav 
         className="navbar"
-        style={{ backgroundColor, boxShadow }}
+        style={{ 
+          backgroundColor, 
+          backdropFilter: backdropBlur,
+          WebkitBackdropFilter: backdropBlur,
+          borderBottomColor: borderOpacity
+        }}
       >
         <div className="nav-container">
           <Link to="/">

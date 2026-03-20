@@ -16,6 +16,7 @@ import CasesPage from './pages/CasesPage';
 import DataDeletionPage from './pages/DataDeletionPage';
 import ContactInfoPage from './pages/ContactInfoPage';
 import ResetPassword from './pages/ResetPassword';
+import ElementTestPage from './components/ElementTestPage';
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
@@ -35,6 +36,7 @@ function App() {
       <Route path="/faq" element={<FAQPage />} />
       <Route path="/soporte" element={<SupportPage />} />
       <Route path="/casos" element={<CasesPage />} />
+      <Route path="/test-element" element={<ElementTestPage />} />
       <Route 
         path="/dashboard" 
         element={

@@ -6,6 +6,8 @@ function Hero() {
   const ref = useRef(null);
   const videoRef = useRef(null);
   const [businessName, setBusinessName] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadingProgress, setLoadingProgress] = useState(0);
   
   const { scrollYProgress } = useScroll({
     target: ref,
@@ -16,6 +18,18 @@ function Hero() {
   const opacity = useTransform(scrollYProgress, [0, 1], [1, 0]);
 
   useEffect(() => {
+    // System initialization loading effect
+    const loadingInterval = setInterval(() => {
+      setLoadingProgress(prev => {
+        if (prev >= 100) {
+          clearInterval(loadingInterval);
+          setTimeout(() => setIsLoading(false), 500);
+          return 100;
+        }
+        return prev + Math.random() * 15;
+      });
+    }, 150);
+
     // Listen for appointment submission to clear input
     const handleAppointmentSubmitted = () => {
       setBusinessName('');
@@ -92,6 +106,7 @@ function Hero() {
 
     return () => {
       window.removeEventListener('appointmentSubmitted', handleAppointmentSubmitted);
+      clearInterval(loadingInterval);
     };
   }, []);
 
@@ -143,7 +158,61 @@ function Hero() {
       </video>
       <div className="hero-video-overlay"></div>
 
-      <motion.div className="hero-content" style={{ y, opacity }}>
+      {/* Loading Screen */}
+      {isLoading && (
+        <motion.div 
+          className="system-loading"
+          initial={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <div className="loading-content">
+            <motion.h1 
+              className="loading-title"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+            >
+              GENSWAVE // SYSTEM INIT
+            </motion.h1>
+            
+            <div className="loading-bar-container">
+              <div className="loading-bar">
+                <motion.div 
+                  className="loading-progress"
+                  initial={{ width: 0 }}
+                  animate={{ width: `${loadingProgress}%` }}
+                  transition={{ duration: 0.3 }}
+                />
+              </div>
+              <motion.span 
+                className="loading-percentage"
+                key={Math.floor(loadingProgress)}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+              >
+                {Math.floor(loadingProgress)}%
+              </motion.span>
+            </div>
+            
+            <motion.p 
+              className="loading-status"
+              animate={{ opacity: [0.5, 1, 0.5] }}
+              transition={{ duration: 1.5, repeat: Infinity }}
+            >
+              &gt; inicializando sistemas digitales...
+            </motion.p>
+          </div>
+        </motion.div>
+      )}
+
+      <motion.div 
+        className="hero-content" 
+        style={{ y, opacity }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: isLoading ? 0 : 1 }}
+        transition={{ duration: 0.8, delay: 0.5 }}
+      >
         <motion.h1 
           className="hero-title"
           initial={{ opacity: 0, y: 50 }}

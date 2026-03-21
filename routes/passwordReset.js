@@ -1,5 +1,5 @@
 import express from 'express';
-import bcrypt from 'bcrypt';
+import bcryptjs from 'bcryptjs';
 import crypto from 'crypto';
 import { Resend } from 'resend';
 import db from '../database.js';
@@ -190,7 +190,7 @@ router.post('/reset', async (req, res) => {
     );
 
     // Hash new password
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    const hashedPassword = await bcryptjs.hash(newPassword, 10);
 
     // Update user password
     await db.query(

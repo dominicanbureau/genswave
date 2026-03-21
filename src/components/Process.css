@@ -1,45 +1,221 @@
 .process {
-  padding: 8rem 2rem 1rem;
-  background: var(--white);
+  padding: 8rem 2rem 4rem;
+  background: #ffffff;
+  position: relative;
+  overflow: hidden;
+}
+
+.process-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 0;
+}
+
+.process-line {
+  position: absolute;
+  top: 50%;
+  left: 10%;
+  right: 10%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.1), transparent);
+  transform: translateY(-50%);
+  transform-origin: left;
+}
+
+.geometric-shapes {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
+.geometric-shape {
+  position: absolute;
+  border: 2px solid rgba(0, 0, 0, 0.05);
+}
+
+.shape-1 {
+  width: 40px;
+  height: 40px;
+  top: 20%;
+  left: 15%;
+  border-radius: 50%;
+}
+
+.shape-2 {
+  width: 30px;
+  height: 30px;
+  top: 70%;
+  right: 20%;
+  transform: rotate(45deg);
+}
+
+.shape-3 {
+  width: 50px;
+  height: 50px;
+  top: 30%;
+  right: 10%;
+  clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+}
+
+.shape-4 {
+  width: 35px;
+  height: 35px;
+  bottom: 30%;
+  left: 10%;
+  border-radius: 20%;
+}
+
+.shape-5 {
+  width: 25px;
+  height: 25px;
+  top: 60%;
+  left: 50%;
+  border-radius: 50%;
+}
+
+.shape-6 {
+  width: 45px;
+  height: 45px;
+  bottom: 20%;
+  right: 30%;
+  clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+.section-header {
+  text-align: center;
+  margin-bottom: 6rem;
+}
+
+.section-title {
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  text-align: center;
+  margin-bottom: 2rem;
+  text-transform: uppercase;
+  background: linear-gradient(135deg, #000000 0%, #333333 50%, #000000 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.title-decoration {
+  height: 4px;
+  background: linear-gradient(90deg, transparent, #000000, transparent);
+  margin: 0 auto;
+  border-radius: 2px;
 }
 
 .process-steps {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 3rem;
   margin-top: 4rem;
+  perspective: 1000px;
 }
 
 .step {
   text-align: center;
   cursor: pointer;
+  position: relative;
+  padding: 2rem;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  transform-style: preserve-3d;
+  overflow: hidden;
+  box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.08),
+    0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.step::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.01) 0%, transparent 50%, rgba(0, 0, 0, 0.005) 100%);
+  z-index: -1;
+}
+
+.step-icon {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 2rem;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  position: relative;
+  overflow: hidden;
+}
+
+.icon-emoji {
+  font-size: 2rem;
+  z-index: 1;
 }
 
 .step-number {
-  font-size: 3rem;
-  font-weight: 700;
-  color: var(--gray-light);
-  margin-bottom: 1rem;
+  font-size: 3.5rem;
+  font-weight: 800;
+  color: rgba(0, 0, 0, 0.1);
+  margin-bottom: 1.5rem;
   letter-spacing: -2px;
-  transition: color 0.3s ease;
+  transition: all 0.3s ease;
+  text-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
 }
 
 .step h3 {
-  font-size: 1.5rem;
-  font-weight: 600;
-  margin-bottom: 1rem;
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
   letter-spacing: -0.5px;
+  color: #000000;
 }
 
 .step p {
-  color: var(--gray-medium);
+  color: #666666;
   line-height: 1.7;
+  font-size: 1rem;
+}
+
+.step-glow {
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  right: -50%;
+  bottom: -50%;
+  background: radial-gradient(circle, rgba(0, 0, 0, 0.03) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.step:hover {
+  box-shadow: 
+    0 30px 60px rgba(0, 0, 0, 0.12),
+    0 5px 15px rgba(0, 0, 0, 0.08);
 }
 
 .process-cta {
   display: flex;
   justify-content: center;
-  margin-top: 3rem;
+  margin-top: 4rem;
   background: transparent !important;
   width: 100%;
   padding: 0;
@@ -48,35 +224,82 @@
 }
 
 .process-button {
-  padding: 1rem 2.5rem;
-  background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
-  color: var(--white);
+  padding: 1.2rem 3rem;
+  background: linear-gradient(135deg, #000000 0%, #333333 100%);
+  color: #ffffff;
   border: none;
   border-radius: 50px;
-  font-size: 1rem;
-  font-weight: 500;
+  font-size: 1.1rem;
+  font-weight: 600;
   cursor: pointer;
   font-family: inherit;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15),
-              0 1px 3px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   text-decoration: none;
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
   transform: translateZ(0);
+}
+
+.process-button span {
   position: relative;
+  z-index: 2;
+}
+
+.button-ripple {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
   z-index: 1;
 }
 
 .process-button:hover {
-  transform: translateY(-2px) translateZ(0);
-  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2),
-              0 5px 10px rgba(0, 0, 0, 0.15);
+  transform: translateY(-3px) translateZ(0);
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
 }
 
 @media (max-width: 768px) {
   .process {
-    padding: 5rem 1.5rem;
+    padding: 5rem 1.5rem 3rem;
+  }
+  
+  .process-steps {
+    gap: 2rem;
+  }
+  
+  .step {
+    padding: 1.5rem;
+  }
+  
+  .step-icon {
+    width: 70px;
+    height: 70px;
+    margin-bottom: 1.5rem;
+  }
+  
+  .icon-emoji {
+    font-size: 1.8rem;
+  }
+  
+  .step-number {
+    font-size: 3rem;
+  }
+  
+  .step h3 {
+    font-size: 1.4rem;
+  }
+  
+  .step p {
+    font-size: 0.95rem;
   }
 }

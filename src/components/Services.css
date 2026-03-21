@@ -72,7 +72,7 @@
 }
 
 .service-card {
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   padding: 3rem 2.5rem;
@@ -83,7 +83,7 @@
   overflow: hidden;
   transform-style: preserve-3d;
   box-shadow: 
-    0 20px 40px rgba(0, 0, 0, 0.1),
+    0 20px 40px rgba(0, 0, 0, 0.08),
     0 1px 3px rgba(0, 0, 0, 0.05);
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -95,7 +95,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(135deg, rgba(0, 0, 0, 0.02) 0%, transparent 50%, rgba(0, 0, 0, 0.01) 100%);
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.005) 0%, transparent 50%, rgba(0, 0, 0, 0.002) 100%);
   z-index: -1;
 }
 
@@ -154,7 +154,7 @@
   left: -50%;
   right: -50%;
   bottom: -50%;
-  background: radial-gradient(circle, rgba(0, 0, 0, 0.05) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(0, 0, 0, 0.02) 0%, transparent 70%);
   opacity: 0;
   transition: opacity 0.3s ease;
   pointer-events: none;
@@ -168,39 +168,35 @@
 
 @media (max-width: 768px) {
   .services {
-    padding: 5rem 1.5rem;
+    padding: 6rem 2rem;
   }
   
   .services-grid {
-    display: flex;
-    gap: 2rem;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    padding-bottom: 1rem;
-    -webkit-overflow-scrolling: touch;
-    max-width: none;
-    margin: 0;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 3rem;
+    max-width: 400px;
+    margin: 0 auto;
   }
   
   .service-card {
-    flex: 0 0 300px;
-    scroll-snap-align: start;
-    padding: 2.5rem 2rem;
+    padding: 3rem 2.5rem;
   }
   
   .service-card h3 {
-    font-size: 1.4rem;
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
   }
   
   .service-card p {
-    font-size: 0.95rem;
-    line-height: 1.6;
+    font-size: 1rem;
+    line-height: 1.7;
   }
   
   .service-icon {
     width: 70px;
     height: 70px;
-    margin-bottom: 1.5rem;
+    margin-bottom: 2rem;
   }
   
   .service-icon svg {

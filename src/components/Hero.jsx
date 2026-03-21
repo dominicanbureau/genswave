@@ -6,8 +6,6 @@ function Hero() {
   const ref = useRef(null);
   const videoRef = useRef(null);
   const [businessName, setBusinessName] = useState('');
-  const [isLoading, setIsLoading] = useState(true);
-  const [loadingProgress, setLoadingProgress] = useState(0);
   
   const { scrollYProgress } = useScroll({
     target: ref,
@@ -18,18 +16,6 @@ function Hero() {
   const opacity = useTransform(scrollYProgress, [0, 1], [1, 0]);
 
   useEffect(() => {
-    // System initialization loading effect
-    const loadingInterval = setInterval(() => {
-      setLoadingProgress(prev => {
-        if (prev >= 100) {
-          clearInterval(loadingInterval);
-          setTimeout(() => setIsLoading(false), 500);
-          return 100;
-        }
-        return prev + Math.random() * 15;
-      });
-    }, 150);
-
     // Listen for appointment submission to clear input
     const handleAppointmentSubmitted = () => {
       setBusinessName('');
@@ -106,7 +92,6 @@ function Hero() {
 
     return () => {
       window.removeEventListener('appointmentSubmitted', handleAppointmentSubmitted);
-      clearInterval(loadingInterval);
     };
   }, []);
 
@@ -158,60 +143,82 @@ function Hero() {
       </video>
       <div className="hero-video-overlay"></div>
 
-      {/* Loading Screen */}
-      {isLoading && (
+      {/* Advanced Particle System */}
+      <div className="particle-system">
+        {[...Array(20)].map((_, i) => (
+          <motion.div
+            key={i}
+            className="particle"
+            initial={{ 
+              x: Math.random() * window.innerWidth,
+              y: Math.random() * window.innerHeight,
+              opacity: 0 
+            }}
+            animate={{
+              x: Math.random() * window.innerWidth,
+              y: Math.random() * window.innerHeight,
+              opacity: [0, 0.6, 0]
+            }}
+            transition={{
+              duration: 8 + Math.random() * 4,
+              repeat: Infinity,
+              delay: Math.random() * 5,
+              ease: "linear"
+            }}
+            style={{
+              width: `${2 + Math.random() * 4}px`,
+              height: `${2 + Math.random() * 4}px`,
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Morphing Shapes */}
+      <div className="morphing-shapes">
         <motion.div 
-          className="system-loading"
-          initial={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <div className="loading-content">
-            <motion.h1 
-              className="loading-title"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-            >
-              GENSWAVE // SYSTEM INIT
-            </motion.h1>
-            
-            <div className="loading-bar-container">
-              <div className="loading-bar">
-                <motion.div 
-                  className="loading-progress"
-                  initial={{ width: 0 }}
-                  animate={{ width: `${loadingProgress}%` }}
-                  transition={{ duration: 0.3 }}
-                />
-              </div>
-              <motion.span 
-                className="loading-percentage"
-                key={Math.floor(loadingProgress)}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-              >
-                {Math.floor(loadingProgress)}%
-              </motion.span>
-            </div>
-            
-            <motion.p 
-              className="loading-status"
-              animate={{ opacity: [0.5, 1, 0.5] }}
-              transition={{ duration: 1.5, repeat: Infinity }}
-            >
-              &gt; inicializando sistemas digitales...
-            </motion.p>
-          </div>
-        </motion.div>
-      )}
+          className="morph-shape morph-1"
+          animate={{
+            scale: [1, 1.2, 0.8, 1],
+            rotate: [0, 90, 180, 270, 360],
+            borderRadius: ["20%", "50%", "20%", "50%", "20%"]
+          }}
+          transition={{
+            duration: 12,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+        />
+        <motion.div 
+          className="morph-shape morph-2"
+          animate={{
+            scale: [0.8, 1.1, 0.9, 1.3, 0.8],
+            x: [0, 50, -30, 20, 0],
+            y: [0, -20, 40, -10, 0]
+          }}
+          transition={{
+            duration: 15,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+        />
+        <motion.div 
+          className="morph-shape morph-3"
+          animate={{
+            rotate: [0, -45, 90, -90, 0],
+            scale: [1, 0.7, 1.4, 0.9, 1],
+            skewX: [0, 10, -10, 5, 0]
+          }}
+          transition={{
+            duration: 18,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+        />
+      </div>
 
       <motion.div 
         className="hero-content" 
         style={{ y, opacity }}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: isLoading ? 0 : 1 }}
-        transition={{ duration: 0.8, delay: 0.5 }}
       >
         <motion.h1 
           className="hero-title"

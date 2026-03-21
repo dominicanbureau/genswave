@@ -8,7 +8,8 @@ import { sendPasswordResetConfirmation } from '../utils/emailService.js';
 const router = express.Router();
 
 // Initialize Resend
-const resend = new Resend('re_cxPRSFUo_3fnpLL5sbcjtd7Y9WuNPaHRv');
+const resendApiKey = process.env.RESEND_KEY || process.env.RESEND_API_KEY || 're_X3jJKunz_Q9mhaz7QGsfksisiUzxqLUZE';
+const resend = new Resend(resendApiKey);
 
 // Request password reset
 router.post('/request', async (req, res) => {

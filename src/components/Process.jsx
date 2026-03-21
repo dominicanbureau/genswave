@@ -19,8 +19,7 @@ const steps = [
         <path d="m21 21-4.35-4.35"/>
       </svg>
     ),
-    duration: '1-2 semanas',
-    glowColor: '#00ffff'
+    duration: '1-2 semanas'
   },
   {
     number: '02',
@@ -34,8 +33,7 @@ const steps = [
         <line x1="12" y1="22.08" x2="12" y2="12"/>
       </svg>
     ),
-    duration: '2-3 semanas',
-    glowColor: '#ff00ff'
+    duration: '2-3 semanas'
   },
   {
     number: '03',
@@ -48,8 +46,7 @@ const steps = [
         <polyline points="8 6 2 12 8 18"/>
       </svg>
     ),
-    duration: '3-6 semanas',
-    glowColor: '#ffff00'
+    duration: '3-6 semanas'
   },
   {
     number: '04',
@@ -64,8 +61,7 @@ const steps = [
         <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/>
       </svg>
     ),
-    duration: '1-2 semanas',
-    glowColor: '#00ff80'
+    duration: '1-2 semanas'
   }
 ];
 
@@ -77,14 +73,12 @@ function Process() {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // Advanced timeline animation
+      // Professional timeline animation
       const steps = processStepsRef.current?.children;
       if (steps) {
         gsap.set(steps, {
-          x: -100,
-          opacity: 0,
-          rotationY: -45,
-          transformPerspective: 1000
+          x: -50,
+          opacity: 0
         });
 
         ScrollTrigger.create({
@@ -95,88 +89,47 @@ function Process() {
             gsap.to(steps, {
               x: 0,
               opacity: 1,
-              rotationY: 0,
-              duration: 1.5,
-              ease: "power3.out",
+              duration: 0.8,
+              ease: "power2.out",
               stagger: {
-                each: 0.3,
+                each: 0.2,
                 from: "start"
               }
             });
           }
         });
 
-        // Interactive hover effects
-        Array.from(steps).forEach((step, index) => {
-          const stepData = steps[index];
-          
+        // Subtle hover effects
+        Array.from(steps).forEach((step) => {
           step.addEventListener('mouseenter', () => {
             gsap.to(step, {
-              scale: 1.05,
-              rotationY: 5,
-              z: 50,
-              duration: 0.5,
+              x: 10,
+              duration: 0.3,
               ease: "power2.out"
             });
 
             gsap.to(step.querySelector('.step-icon'), {
-              rotation: 360,
-              scale: 1.3,
-              duration: 1,
+              scale: 1.1,
+              duration: 0.3,
               ease: "power2.out"
-            });
-
-            gsap.to(step.querySelector('.step-glow'), {
-              opacity: 1,
-              scale: 1.2,
-              duration: 0.3
             });
           });
 
           step.addEventListener('mouseleave', () => {
             gsap.to(step, {
-              scale: 1,
-              rotationY: 0,
-              z: 0,
-              duration: 0.5,
+              x: 0,
+              duration: 0.3,
               ease: "power2.out"
             });
 
             gsap.to(step.querySelector('.step-icon'), {
-              rotation: 0,
               scale: 1,
-              duration: 1,
+              duration: 0.3,
               ease: "power2.out"
-            });
-
-            gsap.to(step.querySelector('.step-glow'), {
-              opacity: 0,
-              scale: 1,
-              duration: 0.3
             });
           });
         });
       }
-
-      // Animated connectors
-      const connectors = document.querySelectorAll('.step-connector');
-      connectors.forEach((connector, index) => {
-        gsap.to(connector, {
-          scaleY: 1,
-          duration: 1,
-          delay: index * 0.3 + 1,
-          ease: "power2.out"
-        });
-
-        // Flowing data effect
-        gsap.to(connector.querySelector('.connector-flow'), {
-          y: "100%",
-          duration: 2,
-          repeat: -1,
-          ease: "none",
-          delay: index * 0.5
-        });
-      });
 
     }, ref);
 
@@ -189,17 +142,7 @@ function Process() {
   };
 
   return (
-    <section id="proceso" className="process advanced-process" ref={ref}>
-      {/* Advanced Background Effects */}
-      <div className="process-bg-effects">
-        <div className="circuit-pattern"></div>
-        <div className="data-nodes">
-          {[...Array(12)].map((_, i) => (
-            <div key={i} className="data-node" />
-          ))}
-        </div>
-      </div>
-
+    <section id="proceso" className="process" ref={ref}>
       <div className="process-container">
         {/* Section Header */}
         <motion.div
@@ -208,21 +151,20 @@ function Process() {
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.8 }}
         >
-          <div className="header-badge holographic-badge">
-            <span>Metodología de Élite</span>
-            <div className="badge-pulse"></div>
+          <div className="header-badge">
+            <span>Metodología Probada</span>
           </div>
           <h2 className="process-title">
-            <span className="title-main">Un proceso diseñado para</span>
-            <span className="title-accent holographic-text"> resultados excepcionales</span>
+            Un proceso diseñado para
+            <span className="title-accent"> resultados excepcionales</span>
           </h2>
           <p className="process-subtitle">
-            Cada proyecto sigue nuestra metodología revolucionaria que garantiza 
-            calidad suprema, transparencia total y entrega puntual.
+            Cada proyecto sigue nuestra metodología refinada que garantiza 
+            calidad, transparencia y entrega puntual.
           </p>
         </motion.div>
 
-        {/* Advanced Process Steps */}
+        {/* Process Steps */}
         <div className="process-steps" ref={processStepsRef}>
           {steps.map((step, index) => (
             <ProcessStep 
@@ -243,18 +185,16 @@ function Process() {
           transition={{ duration: 0.8, delay: 0.6 }}
         >
           <motion.button
-            className="process-button magnetic-btn"
+            className="process-button"
             onClick={handleNavigate}
             whileHover={{ 
               scale: 1.02, 
-              y: -2,
-              boxShadow: "0 12px 40px rgba(0, 255, 255, 0.3)"
+              y: -2
             }}
             whileTap={{ scale: 0.98 }}
           >
             <span className="button-text">Ver proceso completo</span>
             <div className="button-shine"></div>
-            <div className="button-particles"></div>
           </motion.button>
         </motion.div>
       </div>
@@ -264,41 +204,15 @@ function Process() {
 
 function ProcessStep({ step, index, isInView, isLast }) {
   return (
-    <div className="process-step advanced-step">
-      {/* Step Glow Effect */}
-      <div 
-        className="step-glow" 
-        style={{ 
-          background: `radial-gradient(circle, ${step.glowColor}20 0%, transparent 70%)` 
-        }}
-      ></div>
-
-      {/* Holographic Frame */}
-      <div className="holographic-frame"></div>
-
+    <div className="process-step">
       <div className="step-content">
         <div className="step-header">
           <div className="step-icon-container">
-            <div 
-              className="step-icon"
-              style={{ 
-                background: `linear-gradient(135deg, ${step.glowColor}, ${step.glowColor}80)`,
-                boxShadow: `0 0 20px ${step.glowColor}40`
-              }}
-            >
+            <div className="step-icon">
               {step.icon}
             </div>
-            <div className="icon-orbit"></div>
           </div>
-          <div 
-            className="step-number"
-            style={{ 
-              color: step.glowColor,
-              textShadow: `0 0 10px ${step.glowColor}`
-            }}
-          >
-            {step.number}
-          </div>
+          <div className="step-number">{step.number}</div>
         </div>
 
         <div className="step-info">
@@ -306,34 +220,14 @@ function ProcessStep({ step, index, isInView, isLast }) {
           <p className="step-subtitle">{step.subtitle}</p>
           <p className="step-description">{step.description}</p>
           <div className="step-duration">
-            <div 
-              className="duration-dot"
-              style={{ 
-                background: step.glowColor,
-                boxShadow: `0 0 8px ${step.glowColor}`
-              }}
-            ></div>
+            <div className="duration-dot"></div>
             <span>{step.duration}</span>
           </div>
-        </div>
-
-        {/* Progress Indicator */}
-        <div className="step-progress">
-          <div 
-            className="progress-bar"
-            style={{ background: step.glowColor }}
-          ></div>
         </div>
       </div>
 
       {!isLast && (
-        <div className="step-connector">
-          <div className="connector-line"></div>
-          <div 
-            className="connector-flow"
-            style={{ background: step.glowColor }}
-          ></div>
-        </div>
+        <div className="step-connector" />
       )}
     </div>
   );

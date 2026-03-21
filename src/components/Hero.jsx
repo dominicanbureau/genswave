@@ -11,9 +11,7 @@ function Hero() {
   const ref = useRef(null);
   const videoRef = useRef(null);
   const heroRef = useRef(null);
-  const particlesRef = useRef(null);
-  const morphingShapeRef = useRef(null);
-  const hologramRef = useRef(null);
+  const morphContainerRef = useRef(null);
   const [businessName, setBusinessName] = useState('');
   
   const { scrollYProgress } = useScroll({
@@ -26,45 +24,57 @@ function Hero() {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // Advanced particle system
-      const particles = particlesRef.current?.children;
-      if (particles) {
-        gsap.set(particles, {
-          x: () => gsap.utils.random(-200, 200),
-          y: () => gsap.utils.random(-200, 200),
-          scale: () => gsap.utils.random(0.1, 1),
-          opacity: () => gsap.utils.random(0.1, 0.8),
+      // Professional morphing text effect
+      const words = document.querySelectorAll('.morph-word');
+      if (words.length > 0) {
+        gsap.set(words, {
+          opacity: 0,
+          filter: 'blur(20px)',
+          scale: 0.8
         });
 
-        gsap.to(particles, {
-          duration: () => gsap.utils.random(3, 8),
-          x: () => gsap.utils.random(-400, 400),
-          y: () => gsap.utils.random(-400, 400),
-          rotation: () => gsap.utils.random(0, 360),
-          scale: () => gsap.utils.random(0.2, 1.2),
-          opacity: () => gsap.utils.random(0.2, 1),
-          repeat: -1,
-          yoyo: true,
-          ease: "none",
-          stagger: {
-            each: 0.1,
-            from: "random"
-          }
-        });
-      }
-
-      // Holographic text effect
-      if (hologramRef.current) {
-        gsap.to(hologramRef.current, {
-          duration: 2,
-          textShadow: "0 0 10px #00ffff, 0 0 20px #00ffff, 0 0 30px #00ffff",
-          repeat: -1,
-          yoyo: true,
-          ease: "power2.inOut"
+        const tl = gsap.timeline({ repeat: -1 });
+        
+        words.forEach((word, index) => {
+          tl.to(word, {
+            opacity: 1,
+            filter: 'blur(0px)',
+            scale: 1,
+            duration: 0.8,
+            ease: "power2.out"
+          }, index * 3)
+          .to(word, {
+            opacity: 1,
+            filter: 'blur(0px)',
+            scale: 1,
+            duration: 1.4
+          })
+          .to(word, {
+            opacity: 0,
+            filter: 'blur(20px)',
+            scale: 1.2,
+            duration: 0.8,
+            ease: "power2.in"
+          });
         });
       }
 
-      // Advanced scroll-triggered animations
+      // Subtle floating elements
+      const floatingElements = document.querySelectorAll('.floating-element');
+      floatingElements.forEach((element, index) => {
+        gsap.to(element, {
+          y: () => gsap.utils.random(-20, 20),
+          x: () => gsap.utils.random(-15, 15),
+          rotation: () => gsap.utils.random(-5, 5),
+          duration: () => gsap.utils.random(4, 8),
+          repeat: -1,
+          yoyo: true,
+          ease: "sine.inOut",
+          delay: index * 0.5
+        });
+      });
+
+      // Professional scroll-triggered animations
       ScrollTrigger.create({
         trigger: heroRef.current,
         start: "top top",
@@ -73,56 +83,39 @@ function Hero() {
         onUpdate: (self) => {
           const progress = self.progress;
           gsap.to(".hero-content", {
-            y: progress * 100,
-            scale: 1 - progress * 0.2,
-            opacity: 1 - progress * 0.8,
-            duration: 0.3
-          });
-          
-          gsap.to(".floating-elements", {
-            rotation: progress * 360,
-            scale: 1 + progress * 0.5,
+            y: progress * 50,
+            scale: 1 - progress * 0.1,
+            opacity: 1 - progress * 0.5,
             duration: 0.3
           });
         }
       });
 
-      // Magnetic cursor effect for buttons
-      const buttons = document.querySelectorAll('.magnetic-btn');
-      buttons.forEach(btn => {
-        btn.addEventListener('mousemove', (e) => {
-          const rect = btn.getBoundingClientRect();
+      // Magnetic button effect
+      const magneticBtn = document.querySelector('.magnetic-btn');
+      if (magneticBtn) {
+        magneticBtn.addEventListener('mousemove', (e) => {
+          const rect = magneticBtn.getBoundingClientRect();
           const x = e.clientX - rect.left - rect.width / 2;
           const y = e.clientY - rect.top - rect.height / 2;
           
-          gsap.to(btn, {
-            x: x * 0.3,
-            y: y * 0.3,
+          gsap.to(magneticBtn, {
+            x: x * 0.2,
+            y: y * 0.2,
             duration: 0.3,
             ease: "power2.out"
           });
         });
 
-        btn.addEventListener('mouseleave', () => {
-          gsap.to(btn, {
+        magneticBtn.addEventListener('mouseleave', () => {
+          gsap.to(magneticBtn, {
             x: 0,
             y: 0,
             duration: 0.5,
             ease: "elastic.out(1, 0.3)"
           });
         });
-      });
-
-      // Liquid morphing background
-      const liquidTl = gsap.timeline({ repeat: -1 });
-      liquidTl.to(".liquid-blob", {
-        duration: 8,
-        ease: "power1.inOut"
-      })
-      .to(".liquid-blob", {
-        duration: 8,
-        ease: "power1.inOut"
-      });
+      }
 
     }, heroRef);
 
@@ -193,50 +186,31 @@ function Hero() {
 
   return (
     <section className="hero" ref={ref}>
+      {/* Noise Texture */}
+      <div className="noise"></div>
+
+      {/* SVG Filters for Morphing */}
+      <svg className="filters">
+        <defs>
+          <filter id="threshold">
+            <feColorMatrix in="SourceGraphic" type="matrix" values="1 0 0 0 0
+                        0 1 0 0 0
+                        0 0 1 0 0
+                        0 0 0 25 -9" result="goo" />
+            <feComposite in="SourceGraphic" in2="goo" operator="atop" />
+          </filter>
+        </defs>
+      </svg>
+
       <div className="hero-container" ref={heroRef}>
-        {/* Advanced Particle System */}
-        <div className="particle-system" ref={particlesRef}>
-          {[...Array(50)].map((_, i) => (
-            <div key={i} className="particle" />
-          ))}
-        </div>
-
-        {/* Morphing Geometric Shapes */}
-        <div className="morphing-shapes">
-          <svg className="morphing-svg" viewBox="0 0 100 100">
-            <path
-              ref={morphingShapeRef}
-              d="M50,20 C70,20 80,30 80,50 C80,70 70,80 50,80 C30,80 20,70 20,50 C20,30 30,20 50,20 Z"
-              className="morphing-path"
-            />
-          </svg>
-        </div>
-
-        {/* Liquid Morphing Background */}
-        <div className="liquid-background">
-          <svg className="liquid-svg" viewBox="0 0 100 100">
-            <path
-              className="liquid-blob"
-              d="M50,20 C70,20 80,30 80,50 C80,70 70,80 50,80 C30,80 20,70 20,50 C20,30 30,20 50,20 Z"
-            />
-          </svg>
-        </div>
-
-        {/* Floating Elements */}
+        {/* Subtle Floating Elements */}
         <div className="floating-elements">
-          <div className="floating-cube"></div>
-          <div className="floating-sphere"></div>
-          <div className="floating-pyramid"></div>
+          <div className="floating-element floating-dot"></div>
+          <div className="floating-element floating-line"></div>
+          <div className="floating-element floating-circle"></div>
         </div>
 
-        {/* Neural Network Background */}
-        <div className="neural-network">
-          {[...Array(20)].map((_, i) => (
-            <div key={i} className="neural-node" />
-          ))}
-        </div>
-
-        {/* Video Background with Advanced Effects */}
+        {/* Video Background */}
         <video 
           ref={videoRef}
           className="hero-video"
@@ -252,31 +226,28 @@ function Hero() {
           <source src="/backgroundstudio.mp4" type="video/mp4" />
         </video>
 
-        {/* Main Content with Advanced Effects */}
+        {/* Main Content */}
         <motion.div 
           className="hero-content"
           style={{ y, opacity }}
         >
           <motion.div
-            className="hero-badge holographic"
+            className="hero-badge"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <span className="badge-text">Desarrollo Digital de Élite</span>
-            <div className="badge-glow"></div>
+            <span className="badge-text">Desarrollo Digital Premium</span>
           </motion.div>
 
-          <motion.h1 
-            className="hero-title"
-            ref={hologramRef}
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, delay: 0.4 }}
-          >
-            <span className="title-line glitch-text">Creamos el futuro</span>
-            <span className="title-line title-accent holographic-text">de tu negocio</span>
-          </motion.h1>
+          {/* Morphing Title */}
+          <div className="morph-container" ref={morphContainerRef}>
+            <div className="word-rotator">
+              <div className="morph-word">CREAMOS</div>
+              <div className="morph-word">DISEÑAMOS</div>
+              <div className="morph-word">DESARROLLAMOS</div>
+            </div>
+          </div>
           
           <motion.p 
             className="hero-subtitle"
@@ -284,8 +255,7 @@ function Hero() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.6 }}
           >
-            Experiencias digitales revolucionarias que transforman 
-            ideas en soluciones tecnológicas de vanguardia
+            El futuro de tu negocio
           </motion.p>
           
           <motion.div
@@ -295,7 +265,7 @@ function Hero() {
             transition={{ duration: 0.8, delay: 0.8 }}
           >
             <div className="input-container">
-              <div className="input-wrapper advanced-input">
+              <div className="input-wrapper">
                 <input
                   type="text"
                   className="premium-input"
@@ -305,7 +275,6 @@ function Hero() {
                   onKeyDown={(e) => e.key === 'Enter' && handleStartProject()}
                 />
                 <div className="input-glow"></div>
-                <div className="input-particles"></div>
               </div>
               <motion.button
                 className="cta-button magnetic-btn"
@@ -315,7 +284,6 @@ function Hero() {
               >
                 <span className="button-text">Comenzar</span>
                 <div className="button-shine"></div>
-                <div className="button-ripple"></div>
               </motion.button>
             </div>
           </motion.div>
@@ -328,32 +296,24 @@ function Hero() {
           >
             <p className="login-text">
               ¿Ya tienes una cuenta?{' '}
-              <a href="/login" className="login-link holographic-link">
+              <a href="/login" className="login-link">
                 Iniciar sesión
               </a>
             </p>
           </motion.div>
         </motion.div>
 
-        {/* Advanced Scroll Indicator */}
+        {/* Professional Scroll Indicator */}
         <motion.div 
-          className="scroll-indicator advanced-scroll"
+          className="scroll-indicator"
           onClick={scrollToServices}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 1.2 }}
         >
-          <div className="scroll-text">Explorar</div>
-          <motion.div
-            className="scroll-arrow"
-            animate={{ y: [0, 8, 0] }}
-            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M12 5v14M19 12l-7 7-7-7" />
-            </svg>
-          </motion.div>
-          <div className="scroll-ripple"></div>
+          <div className="mouse">
+            <div className="wheel"></div>
+          </div>
         </motion.div>
       </div>
     </section>

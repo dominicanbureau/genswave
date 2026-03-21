@@ -19,9 +19,7 @@ const services = [
         <line x1="12" y1="17" x2="12" y2="21"/>
       </svg>
     ),
-    features: ['Diseño Responsivo', 'SEO Optimizado', 'Carga Ultrarrápida'],
-    gradient: 'linear-gradient(135deg, #00ffff 0%, #0080ff 100%)',
-    glowColor: '#00ffff'
+    features: ['Diseño Responsivo', 'SEO Optimizado', 'Carga Ultrarrápida']
   },
   {
     id: 'mobile',
@@ -34,9 +32,7 @@ const services = [
         <line x1="12" y1="18" x2="12.01" y2="18"/>
       </svg>
     ),
-    features: ['Nativo iOS/Android', 'UI/UX Premium', 'Offline Ready'],
-    gradient: 'linear-gradient(135deg, #ff00ff 0%, #8000ff 100%)',
-    glowColor: '#ff00ff'
+    features: ['Nativo iOS/Android', 'UI/UX Premium', 'Offline Ready']
   },
   {
     id: 'ecommerce',
@@ -50,9 +46,7 @@ const services = [
         <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/>
       </svg>
     ),
-    features: ['Pagos Seguros', 'Inventario Smart', 'Analytics Avanzado'],
-    gradient: 'linear-gradient(135deg, #ffff00 0%, #ff8000 100%)',
-    glowColor: '#ffff00'
+    features: ['Pagos Seguros', 'Inventario Smart', 'Analytics Avanzado']
   },
   {
     id: 'custom',
@@ -66,9 +60,7 @@ const services = [
         <path d="M2 12l10 5 10-5"/>
       </svg>
     ),
-    features: ['Arquitectura Escalable', 'Integración API', 'Soporte 24/7'],
-    gradient: 'linear-gradient(135deg, #00ff80 0%, #0080ff 100%)',
-    glowColor: '#00ff80'
+    features: ['Arquitectura Escalable', 'Integración API', 'Soporte 24/7']
   }
 ];
 
@@ -79,14 +71,12 @@ function Services() {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // Advanced card animations
+      // Professional card animations
       const cards = servicesGridRef.current?.children;
       if (cards) {
         gsap.set(cards, {
-          y: 100,
-          opacity: 0,
-          rotationX: 45,
-          transformPerspective: 1000
+          y: 60,
+          opacity: 0
         });
 
         ScrollTrigger.create({
@@ -97,82 +87,47 @@ function Services() {
             gsap.to(cards, {
               y: 0,
               opacity: 1,
-              rotationX: 0,
-              duration: 1.2,
-              ease: "power3.out",
+              duration: 0.8,
+              ease: "power2.out",
               stagger: {
-                each: 0.2,
+                each: 0.15,
                 from: "start"
               }
             });
           }
         });
 
-        // Hover effects for cards
-        Array.from(cards).forEach((card, index) => {
-          const service = services[index];
-          
+        // Subtle hover effects for cards
+        Array.from(cards).forEach((card) => {
           card.addEventListener('mouseenter', () => {
             gsap.to(card, {
-              y: -20,
-              rotationY: 5,
-              scale: 1.05,
-              duration: 0.5,
+              y: -8,
+              duration: 0.3,
               ease: "power2.out"
             });
             
             gsap.to(card.querySelector('.service-icon'), {
-              rotation: 360,
-              scale: 1.2,
-              duration: 0.8,
-              ease: "power2.out"
-            });
-
-            gsap.to(card.querySelector('.card-glow'), {
-              opacity: 1,
               scale: 1.1,
-              duration: 0.3
+              duration: 0.3,
+              ease: "power2.out"
             });
           });
 
           card.addEventListener('mouseleave', () => {
             gsap.to(card, {
               y: 0,
-              rotationY: 0,
-              scale: 1,
-              duration: 0.5,
+              duration: 0.3,
               ease: "power2.out"
             });
             
             gsap.to(card.querySelector('.service-icon'), {
-              rotation: 0,
               scale: 1,
-              duration: 0.8,
+              duration: 0.3,
               ease: "power2.out"
-            });
-
-            gsap.to(card.querySelector('.card-glow'), {
-              opacity: 0,
-              scale: 1,
-              duration: 0.3
             });
           });
         });
       }
-
-      // Floating particles for each service
-      const particles = document.querySelectorAll('.service-particle');
-      particles.forEach(particle => {
-        gsap.to(particle, {
-          y: () => gsap.utils.random(-50, 50),
-          x: () => gsap.utils.random(-30, 30),
-          rotation: () => gsap.utils.random(0, 360),
-          duration: () => gsap.utils.random(3, 6),
-          repeat: -1,
-          yoyo: true,
-          ease: "sine.inOut"
-        });
-      });
 
     }, ref);
 
@@ -180,17 +135,7 @@ function Services() {
   }, []);
 
   return (
-    <section id="servicios" className="services advanced-services" ref={ref}>
-      {/* Advanced Background Effects */}
-      <div className="services-bg-effects">
-        <div className="neural-grid"></div>
-        <div className="floating-orbs">
-          {[...Array(8)].map((_, i) => (
-            <div key={i} className="floating-orb" />
-          ))}
-        </div>
-      </div>
-
+    <section id="servicios" className="services" ref={ref}>
       <div className="services-container">
         {/* Section Header */}
         <motion.div
@@ -199,21 +144,20 @@ function Services() {
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.8 }}
         >
-          <div className="header-badge holographic-badge">
-            <span>Servicios de Élite</span>
-            <div className="badge-scanner"></div>
+          <div className="header-badge">
+            <span>Servicios Premium</span>
           </div>
           <h2 className="services-title">
-            <span className="title-main">Transformamos ideas en</span>
-            <span className="title-accent holographic-text"> experiencias digitales</span>
+            Transformamos ideas en
+            <span className="title-accent"> experiencias digitales</span>
           </h2>
           <p className="services-subtitle">
-            Cada proyecto es único. Creamos soluciones tecnológicas revolucionarias 
-            que impulsan el crecimiento exponencial de tu negocio.
+            Cada proyecto es único. Creamos soluciones tecnológicas personalizadas 
+            que impulsan el crecimiento de tu negocio.
           </p>
         </motion.div>
 
-        {/* Advanced Services Grid */}
+        {/* Services Grid */}
         <div className="services-grid" ref={servicesGridRef}>
           {services.map((service, index) => (
             <ServiceCard 
@@ -230,51 +174,13 @@ function Services() {
 }
 
 function ServiceCard({ service, index, isInView }) {
-  const cardRef = useRef(null);
-
   return (
-    <div
-      ref={cardRef}
-      className="service-card advanced-card"
-      data-service={service.id}
-    >
-      {/* Card Glow Effect */}
-      <div 
-        className="card-glow" 
-        style={{ 
-          background: `radial-gradient(circle, ${service.glowColor}20 0%, transparent 70%)` 
-        }}
-      ></div>
-
-      {/* Floating Particles */}
-      <div className="card-particles">
-        {[...Array(6)].map((_, i) => (
-          <div 
-            key={i} 
-            className="service-particle"
-            style={{ 
-              background: service.glowColor,
-              boxShadow: `0 0 10px ${service.glowColor}`
-            }}
-          />
-        ))}
-      </div>
-
-      {/* Holographic Border */}
-      <div className="holographic-border"></div>
-
+    <div className="service-card">
       <div className="card-content">
         <div className="service-icon-container">
-          <div 
-            className="service-icon"
-            style={{ 
-              background: service.gradient,
-              boxShadow: `0 0 20px ${service.glowColor}40`
-            }}
-          >
+          <div className="service-icon">
             {service.icon}
           </div>
-          <div className="icon-ripple"></div>
         </div>
 
         <div className="service-info">
@@ -285,24 +191,11 @@ function ServiceCard({ service, index, isInView }) {
           <ul className="service-features">
             {service.features.map((feature, idx) => (
               <li key={idx} className="feature-item">
-                <div 
-                  className="feature-dot"
-                  style={{ 
-                    background: service.glowColor,
-                    boxShadow: `0 0 8px ${service.glowColor}`
-                  }}
-                ></div>
+                <div className="feature-dot"></div>
                 <span>{feature}</span>
               </li>
             ))}
           </ul>
-        </div>
-
-        {/* Data Stream Effect */}
-        <div className="data-stream">
-          <div className="stream-line"></div>
-          <div className="stream-line"></div>
-          <div className="stream-line"></div>
         </div>
       </div>
     </div>

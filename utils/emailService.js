@@ -1,8 +1,11 @@
 import { Resend } from 'resend';
 
 // Initialize Resend with API key from environment variables
-const resendApiKey = process.env.RESEND_KEY || process.env.RESEND_API_KEY || 're_X3jJKunz_Q9mhaz7QGsfksisiUzxqLUZE';
-const resend = new Resend(resendApiKey);
+const resendApiKey = process.env.RESEND_KEY || process.env.RESEND_API_KEY;
+if (!resendApiKey) {
+  console.error('❌ RESEND_KEY environment variable is not set');
+}
+const resend = new Resend(resendApiKey || 're_X3jJKunz_Q9mhaz7QGsfksisiUzxqLUZE');
 
 // Email templates
 const getEmailTemplate = (type, data) => {

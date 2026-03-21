@@ -12,26 +12,21 @@ function Hero() {
     offset: ["start start", "end start"]
   });
 
-  const y = useTransform(scrollYProgress, [0, 1], ['0%', '50%']);
+  const y = useTransform(scrollYProgress, [0, 1], ['0%', '30%']);
   const opacity = useTransform(scrollYProgress, [0, 1], [1, 0]);
 
   useEffect(() => {
-    // Listen for appointment submission to clear input
     const handleAppointmentSubmitted = () => {
       setBusinessName('');
-      console.log('Hero input cleared after appointment submission');
     };
 
     window.addEventListener('appointmentSubmitted', handleAppointmentSubmitted);
-    
-    // Immediate video autoplay - bypass all browser restrictions
-    const startVideoImmediately = () => {
+
+    // Enhanced video autoplay
+    const startVideo = () => {
       const video = videoRef.current;
       if (!video) return;
       
-      console.log('🎬 Starting video immediately...');
-      
-      // Force all necessary properties
       video.muted = true;
       video.volume = 0;
       video.defaultMuted = true;
@@ -39,55 +34,22 @@ function Hero() {
       video.autoplay = true;
       video.loop = true;
       
-      // Set attributes directly on DOM
-      video.setAttribute('muted', 'true');
-      video.setAttribute('playsinline', 'true');
-      video.setAttribute('autoplay', 'true');
-      video.setAttribute('webkit-playsinline', 'true');
-      
-      // Force play immediately without waiting
-      video.play().then(() => {
-        console.log('✅ Video playing successfully!');
-      }).catch(() => {
-        // If blocked, force play on any interaction
+      video.play().catch(() => {
         const forcePlay = () => {
-          video.play().then(() => {
-            console.log('✅ Video started after interaction!');
-          }).catch(() => {
-            console.log('❌ Video play failed');
-          });
+          video.play().catch(() => {});
         };
         
-        // Listen for any user interaction
         document.addEventListener('touchstart', forcePlay, { once: true, passive: true });
         document.addEventListener('click', forcePlay, { once: true, passive: true });
         document.addEventListener('scroll', forcePlay, { once: true, passive: true });
-        document.addEventListener('mousemove', forcePlay, { once: true, passive: true });
-        
-        // Also try periodically
-        const interval = setInterval(() => {
-          video.play().then(() => {
-            console.log('✅ Video started via interval!');
-            clearInterval(interval);
-          }).catch(() => {
-            // Keep trying
-          });
-        }, 500);
-        
-        // Stop trying after 10 seconds
-        setTimeout(() => clearInterval(interval), 10000);
       });
     };
 
-    // Start video as soon as possible
     const video = videoRef.current;
     if (video) {
-      // Try immediately
-      startVideoImmediately();
-      
-      // Also try when video loads
-      video.addEventListener('loadedmetadata', startVideoImmediately);
-      video.addEventListener('canplay', startVideoImmediately);
+      startVideo();
+      video.addEventListener('loadedmetadata', startVideo);
+      video.addEventListener('canplay', startVideo);
     }
 
     return () => {
@@ -100,17 +62,12 @@ function Hero() {
   };
 
   const handleStartProject = () => {
-    // Store business name in sessionStorage
     if (businessName.trim()) {
       sessionStorage.setItem('businessName', businessName.trim());
-      console.log('Business name saved:', businessName.trim());
-      
-      // Dispatch custom event to notify AppointmentForm
       window.dispatchEvent(new CustomEvent('businessNameSet', { 
         detail: { businessName: businessName.trim() } 
       }));
     }
-    // Small delay to ensure sessionStorage is set before scrolling
     setTimeout(() => {
       scrollToContact();
     }, 100);
@@ -125,9 +82,25 @@ function Hero() {
 
   return (
     <section className="hero" ref={ref}>
+      {/* Crystal Background Layer */}
+      <div className="crystal-layer">
+        <div className="crystal-orb crystal-orb-1"></div>
+        <div className="crystal-orb crystal-orb-2"></div>
+        <div className="crystal-orb crystal-orb-3"></div>
+      </div>
+
+      {/* Liquid Glass Background */}
+      <div className="liquid-glass-bg">
+        <div className="glass-bubble glass-bubble-1"></div>
+        <div className="glass-bubble glass-bubble-2"></div>
+        <div className="glass-bubble glass-bubble-3"></div>
+        <div className="glass-bubble glass-bubble-4"></div>
+      </div>
+
+      {/* Video Background */}
       <video 
         ref={videoRef}
-        className="hero-video-background"
+        className="hero-video"
         autoPlay 
         loop 
         muted 
@@ -136,187 +109,109 @@ function Hero() {
         controls={false}
         disablePictureInPicture
         controlsList="nodownload nofullscreen noremoteplayback"
-        webkit-playsinline="true"
-        x5-playsinline="true"
       >
         <source src="/backgroundstudio.mp4" type="video/mp4" />
       </video>
-      <div className="hero-video-overlay"></div>
 
-      {/* Advanced Particle System */}
-      <div className="particle-system">
-        {[...Array(20)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="particle"
-            initial={{ 
-              x: Math.random() * window.innerWidth,
-              y: Math.random() * window.innerHeight,
-              opacity: 0 
-            }}
-            animate={{
-              x: Math.random() * window.innerWidth,
-              y: Math.random() * window.innerHeight,
-              opacity: [0, 0.6, 0]
-            }}
-            transition={{
-              duration: 8 + Math.random() * 4,
-              repeat: Infinity,
-              delay: Math.random() * 5,
-              ease: "linear"
-            }}
-            style={{
-              width: `${2 + Math.random() * 4}px`,
-              height: `${2 + Math.random() * 4}px`,
-            }}
-          />
-        ))}
-      </div>
-
-      {/* Morphing Shapes */}
-      <div className="morphing-shapes">
-        <motion.div 
-          className="morph-shape morph-1"
-          animate={{
-            scale: [1, 1.2, 0.8, 1],
-            rotate: [0, 90, 180, 270, 360],
-            borderRadius: ["20%", "50%", "20%", "50%", "20%"]
-          }}
-          transition={{
-            duration: 12,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
-        />
-        <motion.div 
-          className="morph-shape morph-2"
-          animate={{
-            scale: [0.8, 1.1, 0.9, 1.3, 0.8],
-            x: [0, 50, -30, 20, 0],
-            y: [0, -20, 40, -10, 0]
-          }}
-          transition={{
-            duration: 15,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
-        />
-        <motion.div 
-          className="morph-shape morph-3"
-          animate={{
-            rotate: [0, -45, 90, -90, 0],
-            scale: [1, 0.7, 1.4, 0.9, 1],
-            skewX: [0, 10, -10, 5, 0]
-          }}
-          transition={{
-            duration: 18,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
-        />
-      </div>
-
+      {/* Main Content */}
       <motion.div 
-        className="hero-content" 
+        className="hero-container"
         style={{ y, opacity }}
       >
-        <motion.h1 
-          className="hero-title"
-          initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
-        >
-          <motion.span 
-            className="line"
+        <div className="hero-content">
+          <motion.div
+            className="hero-badge"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
           >
-            DESARROLLAMOS EL FUTURO
-          </motion.span>
-          <motion.span 
-            className="line"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.6 }}
-          >
-            DE TU NEGOCIO
-          </motion.span>
-        </motion.h1>
-        
-        <motion.p 
-          className="hero-subtitle"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.8 }}
-        >
-          Creamos páginas web y aplicaciones que transforman ideas en experiencias digitales excepcionales
-        </motion.p>
-        
-        <motion.div
-          className="hero-input-container"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 1 }}
-        >
-          <div className="input-wrapper">
-            <input
-              type="text"
-              className="styled-input-bar"
-              placeholder=" "
-              value={businessName}
-              onChange={(e) => setBusinessName(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleStartProject()}
-            />
-            <label className="input-label">Nombre de tu negocio</label>
-          </div>
-          <motion.button
-            className="start-button"
-            onClick={handleStartProject}
-            whileHover={{ scale: 1.05, y: -2 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            Iniciemos
-          </motion.button>
-        </motion.div>
+            <span className="badge-text">Desarrollo Digital Premium</span>
+          </motion.div>
 
-        <motion.div
-          className="hero-login-text"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 1.2 }}
-        >
-          <p>
-            ¿Ya tienes una cuenta?{' '}
-            <a href="/login" className="login-link">
-              <strong>Inicia sesión</strong>
-            </a>
-          </p>
-        </motion.div>
+          <motion.h1 
+            className="hero-title"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, delay: 0.4 }}
+          >
+            <span className="title-line">Desarrollamos el futuro</span>
+            <span className="title-line title-accent">de tu negocio</span>
+          </motion.h1>
+          
+          <motion.p 
+            className="hero-subtitle"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.6 }}
+          >
+            Creamos experiencias digitales excepcionales que transforman 
+            ideas en soluciones tecnológicas de vanguardia
+          </motion.p>
+          
+          <motion.div
+            className="hero-input-section"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.8 }}
+          >
+            <div className="input-container">
+              <div className="input-wrapper">
+                <input
+                  type="text"
+                  className="premium-input"
+                  placeholder="Nombre de tu negocio"
+                  value={businessName}
+                  onChange={(e) => setBusinessName(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleStartProject()}
+                />
+                <div className="input-glow"></div>
+              </div>
+              <motion.button
+                className="cta-button"
+                onClick={handleStartProject}
+                whileHover={{ scale: 1.02, y: -2 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <span className="button-text">Comenzar</span>
+                <div className="button-shine"></div>
+              </motion.button>
+            </div>
+          </motion.div>
+
+          <motion.div
+            className="hero-login-section"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 1 }}
+          >
+            <p className="login-text">
+              ¿Ya tienes una cuenta?{' '}
+              <a href="/login" className="login-link">
+                Iniciar sesión
+              </a>
+            </p>
+          </motion.div>
+        </div>
       </motion.div>
 
+      {/* Scroll Indicator */}
       <motion.div 
         className="scroll-indicator"
         onClick={scrollToServices}
-        initial={{ opacity: 0, y: -20 }}
+        initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, delay: 1.2 }}
       >
-        <span>VER MAS</span>
-        <motion.svg
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
+        <div className="scroll-text">Explorar</div>
+        <motion.div
+          className="scroll-arrow"
           animate={{ y: [0, 8, 0] }}
-          transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
         >
-          <path d="M12 5v14M19 12l-7 7-7-7" />
-        </motion.svg>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M12 5v14M19 12l-7 7-7-7" />
+          </svg>
+        </motion.div>
       </motion.div>
     </section>
   );

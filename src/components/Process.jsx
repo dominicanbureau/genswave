@@ -4,54 +4,60 @@ import { useNavigate } from 'react-router-dom';
 import './Process.css';
 
 const steps = [
-  { 
-    number: '01', 
-    title: 'Descubrimiento', 
-    description: 'Entendemos tu visión, objetivos y necesidades',
+  {
+    number: '01',
+    title: 'Descubrimiento',
+    subtitle: 'Análisis profundo',
+    description: 'Entendemos tu visión, analizamos el mercado y definimos objetivos claros para tu proyecto digital.',
     icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
         <circle cx="11" cy="11" r="8"/>
         <path d="m21 21-4.35-4.35"/>
       </svg>
     ),
-    color: '#000000'
+    duration: '1-2 semanas'
   },
-  { 
-    number: '02', 
-    title: 'Diseño', 
-    description: 'Creamos prototipos y experiencias visuales únicas',
+  {
+    number: '02',
+    title: 'Diseño',
+    subtitle: 'Experiencia visual',
+    description: 'Creamos prototipos interactivos y diseños que combinan estética moderna con funcionalidad excepcional.',
     icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+        <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+        <line x1="12" y1="22.08" x2="12" y2="12"/>
       </svg>
     ),
-    color: '#1a1a1a'
+    duration: '2-3 semanas'
   },
-  { 
-    number: '03', 
-    title: 'Desarrollo', 
-    description: 'Construimos con las últimas tecnologías',
+  {
+    number: '03',
+    title: 'Desarrollo',
+    subtitle: 'Construcción técnica',
+    description: 'Desarrollamos con las tecnologías más avanzadas, asegurando código limpio, escalable y optimizado.',
     icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
         <polyline points="16 18 22 12 16 6"/>
         <polyline points="8 6 2 12 8 18"/>
       </svg>
     ),
-    color: '#2a2a2a'
+    duration: '3-6 semanas'
   },
-  { 
-    number: '04', 
-    title: 'Lanzamiento', 
-    description: 'Desplegamos y optimizamos tu proyecto',
+  {
+    number: '04',
+    title: 'Lanzamiento',
+    subtitle: 'Despliegue y optimización',
+    description: 'Desplegamos tu proyecto con monitoreo continuo, optimizaciones de rendimiento y soporte completo.',
     icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
         <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/>
         <path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/>
         <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/>
         <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/>
       </svg>
     ),
-    color: '#333333'
+    duration: '1-2 semanas'
   }
 ];
 
@@ -67,88 +73,59 @@ function Process() {
 
   return (
     <section id="proceso" className="process" ref={ref}>
-      <div className="process-background">
-        <motion.div 
-          className="process-line"
-          initial={{ scaleX: 0 }}
-          animate={isInView ? { scaleX: 1 } : {}}
-          transition={{ duration: 2, delay: 0.5 }}
-        />
-        
-        {/* Floating geometric shapes */}
-        <div className="geometric-shapes">
-          {[...Array(6)].map((_, i) => (
-            <motion.div
-              key={i}
-              className={`geometric-shape shape-${i + 1}`}
-              initial={{ opacity: 0, scale: 0, rotate: 0 }}
-              animate={isInView ? { 
-                opacity: [0, 0.6, 0], 
-                scale: [0, 1, 0],
-                rotate: [0, 180, 360]
-              } : {}}
-              transition={{ 
-                duration: 6 + Math.random() * 2, 
-                delay: i * 0.4,
-                repeat: Infinity,
-                repeatDelay: Math.random() * 4
-              }}
-            />
-          ))}
-        </div>
-      </div>
-      
-      <div className="container">
+      <div className="process-container">
+        {/* Section Header */}
         <motion.div
-          className="section-header"
-          initial={{ opacity: 0, y: 50 }}
+          className="process-header"
+          initial={{ opacity: 0, y: 40 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.8 }}
         >
-          <motion.h2 
-            className="section-title"
-            initial={{ opacity: 0, y: 30 }}
-            animate={isInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.6 }}
-          >
-            Nuestro proceso
-          </motion.h2>
-          <motion.div 
-            className="title-decoration"
-            initial={{ width: 0 }}
-            animate={isInView ? { width: '100px' } : {}}
-            transition={{ duration: 1, delay: 0.5 }}
-          />
+          <div className="header-badge">
+            <span>Metodología Probada</span>
+          </div>
+          <h2 className="process-title">
+            Un proceso diseñado para
+            <span className="title-accent"> resultados excepcionales</span>
+          </h2>
+          <p className="process-subtitle">
+            Cada proyecto sigue nuestra metodología refinada que garantiza 
+            calidad, transparencia y entrega puntual.
+          </p>
         </motion.div>
-        
+
+        {/* Process Steps */}
         <div className="process-steps">
           {steps.map((step, index) => (
-            <ProcessStep key={index} step={step} index={index} isInView={isInView} />
+            <ProcessStep 
+              key={step.number} 
+              step={step} 
+              index={index} 
+              isInView={isInView}
+              isLast={index === steps.length - 1}
+            />
           ))}
         </div>
 
+        {/* CTA Section */}
         <motion.div
           className="process-cta"
           initial={{ opacity: 0, y: 30 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6, delay: 1.2 }}
+          transition={{ duration: 0.8, delay: 0.6 }}
         >
           <motion.button
             className="process-button"
             onClick={handleNavigate}
             whileHover={{ 
-              scale: 1.05, 
-              y: -3,
-              boxShadow: "0 20px 50px rgba(0, 0, 0, 0.25)"
+              scale: 1.02, 
+              y: -2,
+              boxShadow: "0 12px 40px rgba(0, 0, 0, 0.15)"
             }}
-            whileTap={{ scale: 0.95 }}
+            whileTap={{ scale: 0.98 }}
           >
-            <span>Ver más</span>
-            <motion.div 
-              className="button-ripple"
-              whileHover={{ scale: 1.5, opacity: 0 }}
-              initial={{ scale: 0, opacity: 1 }}
-            />
+            <span className="button-text">Ver proceso completo</span>
+            <div className="button-shine"></div>
           </motion.button>
         </motion.div>
       </div>
@@ -156,80 +133,47 @@ function Process() {
   );
 }
 
-function ProcessStep({ step, index, isInView }) {
+function ProcessStep({ step, index, isInView, isLast }) {
   return (
     <motion.div
-      className="step"
-      initial={{ opacity: 0, y: 80, rotateY: 45 }}
-      animate={isInView ? { opacity: 1, y: 0, rotateY: 0 } : {}}
+      className="process-step"
+      initial={{ opacity: 0, y: 60 }}
+      animate={isInView ? { opacity: 1, y: 0 } : {}}
       transition={{ 
         duration: 0.8, 
-        delay: index * 0.2,
-        type: "spring",
-        stiffness: 100
-      }}
-      whileHover={{ 
-        scale: 1.05,
-        y: -10,
-        rotateY: 5,
-        transition: { duration: 0.3 }
+        delay: index * 0.15,
+        ease: [0.4, 0, 0.2, 1]
       }}
     >
-      <motion.div 
-        className="step-icon"
-        initial={{ scale: 0, rotate: -180 }}
-        animate={isInView ? { scale: 1, rotate: 0 } : {}}
-        transition={{ 
-          duration: 0.6, 
-          delay: index * 0.2 + 0.3,
-          type: "spring",
-          stiffness: 200
-        }}
-        whileHover={{ 
-          scale: 1.2,
-          rotate: [0, -10, 10, 0],
-          transition: { duration: 0.6 }
-        }}
-        style={{ background: step.color }}
-      >
-        {step.icon}
-      </motion.div>
-      
-      <motion.div 
-        className="step-number"
-        initial={{ opacity: 0, scale: 0 }}
-        animate={isInView ? { opacity: 1, scale: 1 } : {}}
-        transition={{ delay: index * 0.2 + 0.5 }}
-        whileHover={{ 
-          scale: 1.1,
-          color: '#000000',
-          textShadow: '0 0 20px rgba(0,0,0,0.3)'
-        }}
-      >
-        {step.number}
-      </motion.div>
-      
-      <motion.h3
-        initial={{ opacity: 0, x: -20 }}
-        animate={isInView ? { opacity: 1, x: 0 } : {}}
-        transition={{ delay: index * 0.2 + 0.6 }}
-      >
-        {step.title}
-      </motion.h3>
-      
-      <motion.p
-        initial={{ opacity: 0, x: -20 }}
-        animate={isInView ? { opacity: 1, x: 0 } : {}}
-        transition={{ delay: index * 0.2 + 0.7 }}
-      >
-        {step.description}
-      </motion.p>
-      
-      <motion.div 
-        className="step-glow"
-        whileHover={{ opacity: 1 }}
-        initial={{ opacity: 0 }}
-      />
+      <div className="step-content">
+        <div className="step-header">
+          <div className="step-icon-container">
+            <div className="step-icon">
+              {step.icon}
+            </div>
+          </div>
+          <div className="step-number">{step.number}</div>
+        </div>
+
+        <div className="step-info">
+          <h3 className="step-title">{step.title}</h3>
+          <p className="step-subtitle">{step.subtitle}</p>
+          <p className="step-description">{step.description}</p>
+          <div className="step-duration">
+            <div className="duration-dot"></div>
+            <span>{step.duration}</span>
+          </div>
+        </div>
+      </div>
+
+      {!isLast && (
+        <motion.div 
+          className="step-connector"
+          initial={{ scaleY: 0 }}
+          animate={isInView ? { scaleY: 1 } : {}}
+          transition={{ duration: 0.8, delay: index * 0.15 + 0.4 }}
+        />
+      )}
     </motion.div>
   );
 }

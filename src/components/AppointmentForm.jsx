@@ -91,142 +91,224 @@ function AppointmentForm() {
 
   return (
     <section id="contacto" className="appointment-section" ref={ref}>
-      <div className="container">
-        <motion.h2 
-          className="section-title"
-          initial={{ opacity: 0, y: 30 }}
+      {/* Crystal Background Layer */}
+      <div className="crystal-layer">
+        <div className="crystal-orb crystal-orb-1"></div>
+        <div className="crystal-orb crystal-orb-2"></div>
+      </div>
+
+      {/* Liquid Glass Background */}
+      <div className="liquid-glass-bg">
+        <div className="glass-bubble glass-bubble-1"></div>
+        <div className="glass-bubble glass-bubble-2"></div>
+        <div className="glass-bubble glass-bubble-3"></div>
+      </div>
+
+      <div className="appointment-container">
+        {/* Section Header */}
+        <motion.div
+          className="appointment-header"
+          initial={{ opacity: 0, y: 40 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6 }}
+          transition={{ duration: 0.8 }}
         >
-          Agenda una cita
-        </motion.h2>
-        
-        <motion.p 
-          className="appointment-subtitle"
-          initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6, delay: 0.2 }}
-        >
-          Cuéntanos sobre tu proyecto y te contactaremos pronto
-        </motion.p>
+          <div className="header-badge">
+            <span>Comienza tu Proyecto</span>
+          </div>
+          <h2 className="appointment-title">
+            Transformemos tu idea en
+            <span className="title-accent"> realidad digital</span>
+          </h2>
+          <p className="appointment-subtitle">
+            Cuéntanos sobre tu proyecto y nuestro equipo te contactará 
+            para crear una solución personalizada.
+          </p>
+        </motion.div>
         
         <motion.form 
           className="appointment-form"
           onSubmit={handleSubmit}
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 40 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6, delay: 0.4 }}
+          transition={{ duration: 0.8, delay: 0.3 }}
         >
-          <div className="form-row">
-            <motion.div className="form-group" whileFocus={{ scale: 1.02 }}>
-              <input
-                type="text"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                placeholder="Nombre completo"
-                required
-              />
+          <div className="form-grid">
+            <motion.div 
+              className="form-group"
+              initial={{ opacity: 0, y: 20 }}
+              animate={isInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.6, delay: 0.4 }}
+            >
+              <div className="input-wrapper">
+                <input
+                  type="text"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  placeholder="Nombre completo"
+                  required
+                  className="premium-input"
+                />
+                <div className="input-glow"></div>
+              </div>
             </motion.div>
-            <motion.div className="form-group" whileFocus={{ scale: 1.02 }}>
-              <input
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                placeholder="Email"
-                required
-              />
+
+            <motion.div 
+              className="form-group"
+              initial={{ opacity: 0, y: 20 }}
+              animate={isInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.6, delay: 0.5 }}
+            >
+              <div className="input-wrapper">
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  placeholder="Email corporativo"
+                  required
+                  className="premium-input"
+                />
+                <div className="input-glow"></div>
+              </div>
+            </motion.div>
+
+            <motion.div 
+              className="form-group form-group-full"
+              initial={{ opacity: 0, y: 20 }}
+              animate={isInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.6, delay: 0.6 }}
+            >
+              <div className="input-wrapper">
+                <input
+                  type="text"
+                  name="businessName"
+                  value={formData.businessName}
+                  onChange={handleChange}
+                  placeholder="Nombre de tu empresa"
+                  className="premium-input"
+                />
+                <div className="input-glow"></div>
+              </div>
+            </motion.div>
+
+            <motion.div 
+              className="form-group"
+              initial={{ opacity: 0, y: 20 }}
+              animate={isInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.6, delay: 0.7 }}
+            >
+              <div className="input-wrapper">
+                <input
+                  type="tel"
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleChange}
+                  placeholder="Teléfono de contacto"
+                  required
+                  className="premium-input"
+                />
+                <div className="input-glow"></div>
+              </div>
+            </motion.div>
+
+            <motion.div 
+              className="form-group"
+              initial={{ opacity: 0, y: 20 }}
+              animate={isInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.6, delay: 0.8 }}
+            >
+              <div className="input-wrapper">
+                <select
+                  name="service"
+                  value={formData.service}
+                  onChange={handleChange}
+                  required
+                  className="premium-select"
+                >
+                  <option value="">Tipo de proyecto</option>
+                  <option value="web">Desarrollo Web</option>
+                  <option value="app">Aplicación Móvil</option>
+                  <option value="custom">Solución Custom</option>
+                  <option value="consultation">Consultoría Técnica</option>
+                </select>
+                <div className="select-arrow">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M6 9l6 6 6-6" />
+                  </svg>
+                </div>
+                <div className="input-glow"></div>
+              </div>
+            </motion.div>
+
+            <motion.div 
+              className="form-group form-group-full"
+              initial={{ opacity: 0, y: 20 }}
+              animate={isInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.6, delay: 0.9 }}
+            >
+              <div className="input-wrapper">
+                <input
+                  type="date"
+                  name="preferredDate"
+                  value={formData.preferredDate}
+                  onChange={handleChange}
+                  min={today}
+                  required
+                  className="premium-input"
+                />
+                <div className="input-glow"></div>
+              </div>
+            </motion.div>
+
+            <motion.div 
+              className="form-group form-group-full"
+              initial={{ opacity: 0, y: 20 }}
+              animate={isInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.6, delay: 1.0 }}
+            >
+              <div className="input-wrapper">
+                <textarea
+                  name="message"
+                  value={formData.message}
+                  onChange={handleChange}
+                  placeholder="Describe tu proyecto, objetivos y cualquier detalle relevante..."
+                  rows="4"
+                  className="premium-textarea"
+                />
+                <div className="input-glow"></div>
+              </div>
             </motion.div>
           </div>
           
-          <div className="form-row">
-            <motion.div className="form-group form-group-full" whileFocus={{ scale: 1.02 }}>
-              <input
-                type="text"
-                name="businessName"
-                value={formData.businessName}
-                onChange={handleChange}
-                placeholder="Nombre del negocio"
-              />
-            </motion.div>
-          </div>
-          
-          <div className="form-row">
-            <motion.div className="form-group" whileFocus={{ scale: 1.02 }}>
-              <input
-                type="tel"
-                name="phone"
-                value={formData.phone}
-                onChange={handleChange}
-                placeholder="Teléfono"
-                required
-              />
-            </motion.div>
-            <motion.div className="form-group" whileFocus={{ scale: 1.02 }}>
-              <select
-                name="service"
-                value={formData.service}
-                onChange={handleChange}
-                required
-              >
-                <option value="">Selecciona un servicio</option>
-                <option value="web">Página Web</option>
-                <option value="app">Aplicación Móvil</option>
-                <option value="custom">Solución a Medida</option>
-                <option value="consultation">Consultoría</option>
-              </select>
-            </motion.div>
-          </div>
-          
-          <div className="form-row">
-            <motion.div className="form-group" whileFocus={{ scale: 1.02 }}>
-              <input
-                type="date"
-                name="preferredDate"
-                value={formData.preferredDate}
-                onChange={handleChange}
-                min={today}
-                required
-              />
-            </motion.div>
-          </div>
-          
-          <motion.div className="form-group" whileFocus={{ scale: 1.02 }}>
-            <textarea
-              name="message"
-              value={formData.message}
-              onChange={handleChange}
-              placeholder="Cuéntanos sobre tu proyecto"
-              rows="5"
-            />
-          </motion.div>
-          
-          <motion.button 
-            type="submit" 
-            className="cta-button"
-            whileHover={{ scale: 1.05, y: -2 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            Enviar solicitud
-          </motion.button>
-          
-          <motion.div 
-            className="alternative-option"
-            initial={{ opacity: 0, y: 10 }}
+          <motion.div
+            className="form-actions"
+            initial={{ opacity: 0, y: 20 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.6, delay: 0.8 }}
+            transition={{ duration: 0.6, delay: 1.1 }}
           >
-            <span className="alternative-text">O crea una cuenta</span>
-            <motion.button
-              type="button"
-              className="create-account-btn"
-              onClick={() => window.location.href = '/login?mode=register'}
-              whileHover={{ scale: 1.02 }}
+            <motion.button 
+              type="submit" 
+              className="submit-button"
+              whileHover={{ scale: 1.02, y: -2 }}
               whileTap={{ scale: 0.98 }}
             >
-              Registrarse
+              <span className="button-text">Enviar Solicitud</span>
+              <div className="button-shine"></div>
             </motion.button>
+            
+            <div className="alternative-section">
+              <span className="alternative-text">¿Ya tienes una cuenta?</span>
+              <motion.button
+                type="button"
+                className="login-button"
+                onClick={() => window.location.href = '/login?mode=register'}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                Iniciar Sesión
+              </motion.button>
+            </div>
           </motion.div>
         </motion.form>
         
@@ -237,7 +319,21 @@ function AppointmentForm() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
           >
-            {message.text}
+            <div className="message-icon">
+              {message.type === 'success' ? (
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M9 12l2 2 4-4" />
+                  <circle cx="12" cy="12" r="10" />
+                </svg>
+              ) : (
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <circle cx="12" cy="12" r="10" />
+                  <line x1="15" y1="9" x2="9" y2="15" />
+                  <line x1="9" y1="9" x2="15" y2="15" />
+                </svg>
+              )}
+            </div>
+            <span>{message.text}</span>
           </motion.div>
         )}
       </div>

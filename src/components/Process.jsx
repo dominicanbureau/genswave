@@ -7,25 +7,25 @@ const steps = [
     number: '01',
     title: 'Descubrimiento',
     description: 'Entendemos tu visión y definimos objetivos claros',
-    duration: '1-2 semanas'
+    icon: 'search'
   },
   {
     number: '02',
     title: 'Diseño',
     description: 'Creamos prototipos y diseños funcionales',
-    duration: '2-3 semanas'
+    icon: 'palette'
   },
   {
     number: '03',
     title: 'Desarrollo',
     description: 'Construimos con tecnologías avanzadas',
-    duration: '3-6 semanas'
+    icon: 'code'
   },
   {
     number: '04',
     title: 'Lanzamiento',
     description: 'Desplegamos y optimizamos tu proyecto',
-    duration: '1-2 semanas'
+    icon: 'rocket_launch'
   }
 ];
 
@@ -61,29 +61,35 @@ function Process() {
       <div className="process-container">
         <div className="process-header fade-in">
           <h2 className="process-title">
-            Proceso probado para resultados excepcionales
+            Achieve new heights
+            <span className="title-highlight">with our proven process</span>
           </h2>
           <p className="process-subtitle">
-            Metodología que garantiza calidad y transparencia
+            Metodología que garantiza calidad y transparencia en cada fase
           </p>
         </div>
 
-        <div className="process-steps">
+        <div className="process-timeline">
           {steps.map((step, index) => (
-            <div key={step.number} className="process-step fade-in" style={{ transitionDelay: `${index * 100}ms` }}>
-              <div className="step-number">{step.number}</div>
-              <div className="step-content">
-                <h3 className="step-title">{step.title}</h3>
-                <p className="step-description">{step.description}</p>
-                <span className="step-duration">{step.duration}</span>
+            <div 
+              key={step.number} 
+              className="process-step fade-in"
+              style={{ '--delay': `${index * 0.15}s` }}
+            >
+              <div className="step-icon">
+                <span className="material-icons">{step.icon}</span>
               </div>
+              <div className="step-number">{step.number}</div>
+              <h3 className="step-title">{step.title}</h3>
+              <p className="step-description">{step.description}</p>
             </div>
           ))}
         </div>
 
         <div className="process-cta fade-in">
           <button className="process-button" onClick={handleNavigate}>
-            Ver proceso completo
+            <span>Explore Product</span>
+            <span className="material-icons">arrow_forward</span>
           </button>
         </div>
       </div>

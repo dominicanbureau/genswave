@@ -5,26 +5,30 @@ const services = [
   {
     id: 'web',
     title: 'Desarrollo Web',
-    description: 'Sitios web modernos y optimizados que convierten visitantes en clientes',
-    features: ['Diseño Responsivo', 'SEO Optimizado', 'Performance']
+    subtitle: 'Sitios modernos y optimizados',
+    description: 'Experiencias web que convierten visitantes en clientes con tecnología de vanguardia',
+    icon: 'code'
   },
   {
     id: 'mobile',
     title: 'Apps Móviles',
-    description: 'Aplicaciones nativas iOS y Android con experiencias excepcionales',
-    features: ['iOS & Android', 'UI/UX Premium', 'Offline Ready']
+    subtitle: 'Aplicaciones nativas',
+    description: 'Apps iOS y Android con experiencias de usuario excepcionales y rendimiento óptimo',
+    icon: 'phone_iphone'
   },
   {
     id: 'ecommerce',
     title: 'E-Commerce',
-    description: 'Plataformas de comercio con sistemas de pago seguros',
-    features: ['Pagos Seguros', 'Inventario', 'Analytics']
+    subtitle: 'Tiendas digitales',
+    description: 'Plataformas de comercio con sistemas de pago seguros y gestión avanzada',
+    icon: 'shopping_cart'
   },
   {
     id: 'custom',
     title: 'Soluciones Custom',
-    description: 'Desarrollo personalizado para necesidades específicas',
-    features: ['Escalable', 'Integración API', 'Soporte 24/7']
+    subtitle: 'Desarrollo a medida',
+    description: 'Soluciones tecnológicas personalizadas para necesidades específicas de tu negocio',
+    icon: 'auto_awesome'
   }
 ];
 
@@ -54,23 +58,28 @@ function Services() {
       <div className="services-container">
         <div className="services-header fade-in">
           <h2 className="services-title">
-            Soluciones para cada necesidad
+            Built for businesses
+            <span className="title-highlight">for the digital era</span>
           </h2>
-          <p className="services-subtitle">
-            Tecnología adaptada a tu negocio
-          </p>
         </div>
 
         <div className="services-grid">
           {services.map((service, index) => (
-            <div key={service.id} className="service-card fade-in" style={{ transitionDelay: `${index * 100}ms` }}>
+            <div 
+              key={service.id} 
+              className="service-card fade-in"
+              style={{ '--delay': `${index * 0.1}s` }}
+            >
+              <div className="service-icon">
+                <span className="material-icons">{service.icon}</span>
+              </div>
               <h3 className="service-title">{service.title}</h3>
+              <p className="service-subtitle">{service.subtitle}</p>
               <p className="service-description">{service.description}</p>
-              <ul className="service-features">
-                {service.features.map((feature, idx) => (
-                  <li key={idx}>{feature}</li>
-                ))}
-              </ul>
+              <button className="service-link">
+                <span>Explorar</span>
+                <span className="material-icons">arrow_forward</span>
+              </button>
             </div>
           ))}
         </div>

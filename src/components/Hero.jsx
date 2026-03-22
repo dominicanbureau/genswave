@@ -1,6 +1,14 @@
 import { useRef, useState, useEffect } from 'react';
 import './Hero.css';
 
+const floatingIcons = [
+  'plus_code', 'file_copy', 'code_blocks', 'device_hub', 'keyboard_command_key',
+  'terminal', 'spark', 'code', 'deployed_code', 'commit',
+  'pen_spark', 'folder', 'search_spark', 'keyboard_return', 'dashboard_customize',
+  'spark', 'merge', 'keyboard_tab', 'check_circle', 'refresh',
+  'data_object', 'developer_mode_tv'
+];
+
 function Hero() {
   const videoRef = useRef(null);
   const [businessName, setBusinessName] = useState('');
@@ -46,16 +54,48 @@ function Hero() {
         <source src="/genswave.mov" type="video/mp4" />
       </video>
 
+      {/* Floating Icons Background */}
+      <div className="floating-icons-container">
+        {floatingIcons.map((icon, index) => (
+          <div 
+            key={`${icon}-${index}`}
+            className="floating-icon"
+            style={{
+              '--delay': `${index * 0.3}s`,
+              '--duration': `${20 + (index % 5) * 5}s`,
+              '--start-x': `${(index % 8) * 12}%`,
+              '--start-y': `${Math.floor(index / 8) * 25}%`,
+              '--end-x': `${((index + 3) % 8) * 12}%`,
+              '--end-y': `${(Math.floor(index / 8) + 1) * 25}%`
+            }}
+          >
+            <span className="material-icons">{icon}</span>
+          </div>
+        ))}
+      </div>
+
       <div className="hero-content">
         <h1 className="hero-title">
-          Desarrollamos el futuro de tu negocio
+          <span className="title-text">Desarrollamos el futuro</span>
+          <span className="title-text">de tu negocio</span>
         </h1>
         
         <p className="hero-subtitle">
-          Transformamos ideas en experiencias digitales excepcionales con tecnología de vanguardia
+          Experience liftoff with next-generation development
         </p>
 
         <div className="hero-actions">
+          <button className="hero-btn primary" onClick={handleStartProject}>
+            <span>Comenzar proyecto</span>
+          </button>
+          <button className="hero-btn secondary">
+            <span className="material-icons">play_arrow</span>
+            <span>Play intro</span>
+            <span className="material-icons">play_arrow</span>
+          </button>
+        </div>
+
+        <div className="hero-input-section">
           <input
             type="text"
             className="hero-input"
@@ -64,9 +104,6 @@ function Hero() {
             onChange={(e) => setBusinessName(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleStartProject()}
           />
-          <button className="hero-button" onClick={handleStartProject}>
-            Comenzar proyecto
-          </button>
         </div>
 
         <p className="hero-login">

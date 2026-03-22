@@ -1,162 +1,58 @@
-import { motion, useScroll, useTransform } from 'framer-motion';
 import { useRef, useState, useEffect } from 'react';
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import './Hero.css';
 
-// Register GSAP plugins
-gsap.registerPlugin(ScrollTrigger);
-
 function Hero() {
-  const ref = useRef(null);
   const videoRef = useRef(null);
-  const heroRef = useRef(null);
-  const morphContainerRef = useRef(null);
   const [businessName, setBusinessName] = useState('');
-  
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start start", "end start"]
-  });
-
-  const y = useTransform(scrollYProgress, [0, 1], ['0%', '30%']);
-  const opacity = useTransform(scrollYProgress, [0, 1], [1, 0]);
+  const [currentWord, setCurrentWord] = useState(0);
+  const [isVideoEnded, setIsVideoEnded] = useState(false);
+  const words = ['CREAR', 'DISEÑAR', 'DESARROLLAR'];
 
   useEffect(() => {
-    const ctx = gsap.context(() => {
-      // Professional morphing text effect
-      const words = document.querySelectorAll('.morph-word');
-      if (words.length > 0) {
-        gsap.set(words, {
-          opacity: 0,
-          filter: 'blur(20px)',
-          scale: 0.8
-        });
+    // Video intro logic
+    const video = videoRef.current;
+    if (video) {
+      video.muted = true;
+      video.playsInline = true;
+      
+      const handleVideoEnd = () => {
+        setIsVideoEnded(true);
+        video.pause();
+      };
 
-        const tl = gsap.timeline({ repeat: -1 });
-        
-        words.forEach((word, index) => {
-          tl.to(word, {
-            opacity: 1,
-            filter: 'blur(0px)',
-            scale: 1,
-            duration: 0.8,
-            ease: "power2.out"
-          }, index * 3)
-          .to(word, {
-            opacity: 1,
-            filter: 'blur(0px)',
-            scale: 1,
-            duration: 1.4
-          })
-          .to(word, {
-            opacity: 0,
-            filter: 'blur(20px)',
-            scale: 1.2,
-            duration: 0.8,
-            ease: "power2.in"
-          });
-        });
-      }
-
-      // Subtle floating elements
-      const floatingElements = document.querySelectorAll('.floating-element');
-      floatingElements.forEach((element, index) => {
-        gsap.to(element, {
-          y: () => gsap.utils.random(-20, 20),
-          x: () => gsap.utils.random(-15, 15),
-          rotation: () => gsap.utils.random(-5, 5),
-          duration: () => gsap.utils.random(4, 8),
-          repeat: -1,
-          yoyo: true,
-          ease: "sine.inOut",
-          delay: index * 0.5
-        });
+      video.addEventListener('ended', handleVideoEnd);
+      
+      // Start video
+      video.play().catch(() => {
+        // Fallback if autoplay fails
+        setIsVideoEnded(true);
       });
 
-      // Professional scroll-triggered animations
-      ScrollTrigger.create({
-        trigger: heroRef.current,
-        start: "top top",
-        end: "bottom top",
-        scrub: 1,
-        onUpdate: (self) => {
-          const progress = self.progress;
-          gsap.to(".hero-content", {
-            y: progress * 50,
-            scale: 1 - progress * 0.1,
-            opacity: 1 - progress * 0.5,
-            duration: 0.3
-          });
-        }
-      });
+      return () => {
+        video.removeEventListener('ended', handleVideoEnd);
+      };
+    }
+  }, []);
 
-      // Magnetic button effect
-      const magneticBtn = document.querySelector('.magnetic-btn');
-      if (magneticBtn) {
-        magneticBtn.addEventListener('mousemove', (e) => {
-          const rect = magneticBtn.getBoundingClientRect();
-          const x = e.clientX - rect.left - rect.width / 2;
-          const y = e.clientY - rect.top - rect.height / 2;
-          
-          gsap.to(magneticBtn, {
-            x: x * 0.2,
-            y: y * 0.2,
-            duration: 0.3,
-            ease: "power2.out"
-          });
-        });
+  useEffect(() => {
+    // Word rotation after video ends
+    if (isVideoEnded) {
+      const interval = setInterval(() => {
+        setCurrentWord((prev) => (prev + 1) % words.length);
+      }, 3000);
 
-        magneticBtn.addEventListener('mouseleave', () => {
-          gsap.to(magneticBtn, {
-            x: 0,
-            y: 0,
-            duration: 0.5,
-            ease: "elastic.out(1, 0.3)"
-          });
-        });
-      }
+      return () => clearInterval(interval);
+    }
+  }, [isVideoEnded, words.length]);
 
-    }, heroRef);
-
+  useEffect(() => {
     const handleAppointmentSubmitted = () => {
       setBusinessName('');
     };
 
     window.addEventListener('appointmentSubmitted', handleAppointmentSubmitted);
 
-    // Enhanced video autoplay
-    const startVideo = () => {
-      const video = videoRef.current;
-      if (!video) return;
-      
-      video.muted = true;
-      video.volume = 0;
-      video.defaultMuted = true;
-      video.playsInline = true;
-      video.autoplay = true;
-      video.loop = true;
-      
-      video.play().catch(() => {
-        const forcePlay = () => {
-          video.play().catch(() => {});
-        };
-        
-        document.addEventListener('touchstart', forcePlay, { once: true, passive: true });
-        document.addEventListener('click', forcePlay, { once: true, passive: true });
-        document.addEventListener('scroll', forcePlay, { once: true, passive: true });
-      });
-    };
-
-    const video = videoRef.current;
-    if (video) {
-      startVideo();
-      video.addEventListener('loadedmetadata', startVideo);
-      video.addEventListener('canplay', startVideo);
-    }
-
     return () => {
-      ctx.revert();
       window.removeEventListener('appointmentSubmitted', handleAppointmentSubmitted);
     };
   }, []);
@@ -185,11 +81,11 @@ function Hero() {
   };
 
   return (
-    <section className="hero" ref={ref}>
+    <>
       {/* Noise Texture */}
       <div className="noise"></div>
 
-      {/* SVG Filters for Morphing */}
+      {/* SVG Filters */}
       <svg className="filters">
         <defs>
           <filter id="threshold">
@@ -202,121 +98,78 @@ function Hero() {
         </defs>
       </svg>
 
-      <div className="hero-container" ref={heroRef}>
-        {/* Subtle Floating Elements */}
-        <div className="floating-elements">
-          <div className="floating-element floating-dot"></div>
-          <div className="floating-element floating-line"></div>
-          <div className="floating-element floating-circle"></div>
-        </div>
-
+      <section className="hero">
         {/* Video Background */}
         <video 
           ref={videoRef}
-          className="hero-video"
-          autoPlay 
-          loop 
+          className={`hero-video ${isVideoEnded ? 'ended' : ''}`}
           muted 
           playsInline
           preload="auto"
-          controls={false}
-          disablePictureInPicture
-          controlsList="nodownload nofullscreen noremoteplayback"
         >
-          <source src="/backgroundstudio.mp4" type="video/mp4" />
+          <source src="/genswave.mov" type="video/mp4" />
         </video>
 
-        {/* Main Content */}
-        <motion.div 
-          className="hero-content"
-          style={{ y, opacity }}
-        >
-          <motion.div
-            className="hero-badge"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-          >
-            <span className="badge-text">Desarrollo Digital Premium</span>
-          </motion.div>
-
-          {/* Morphing Title */}
-          <div className="morph-container" ref={morphContainerRef}>
+        {/* Hero Content - Shows after video */}
+        <div className={`hero-content ${isVideoEnded ? 'visible' : ''}`}>
+          <div className="morph-container">
             <div className="word-rotator">
-              <div className="morph-word">CREAMOS</div>
-              <div className="morph-word">DISEÑAMOS</div>
-              <div className="morph-word">DESARROLLAMOS</div>
+              {words.map((word, index) => (
+                <div 
+                  key={word} 
+                  className={`word ${index === currentWord ? 'active' : ''}`}
+                >
+                  {word}
+                </div>
+              ))}
             </div>
           </div>
           
-          <motion.p 
-            className="hero-subtitle"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.6 }}
-          >
-            El futuro de tu negocio
-          </motion.p>
-          
-          <motion.div
-            className="hero-input-section"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.8 }}
-          >
-            <div className="input-container">
-              <div className="input-wrapper">
-                <input
-                  type="text"
-                  className="premium-input"
-                  placeholder="Nombre de tu negocio"
-                  value={businessName}
-                  onChange={(e) => setBusinessName(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && handleStartProject()}
-                />
-                <div className="input-glow"></div>
-              </div>
-              <motion.button
-                className="cta-button magnetic-btn"
-                onClick={handleStartProject}
-                whileHover={{ scale: 1.02, y: -2 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                <span className="button-text">Comenzar</span>
-                <div className="button-shine"></div>
-              </motion.button>
-            </div>
-          </motion.div>
+          <p className="subtext">El Arte del Código</p>
 
-          <motion.div
-            className="hero-login-section"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 1 }}
-          >
+          <div className="hero-actions">
+            <div className="input-container">
+              <input
+                type="text"
+                className="business-input"
+                placeholder="Nombre de tu negocio"
+                value={businessName}
+                onChange={(e) => setBusinessName(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleStartProject()}
+              />
+              <button
+                className="cta-button"
+                onClick={handleStartProject}
+              >
+                <span>Comenzar</span>
+                <div className="button-glow"></div>
+              </button>
+            </div>
+            
             <p className="login-text">
               ¿Ya tienes una cuenta?{' '}
               <a href="/login" className="login-link">
                 Iniciar sesión
               </a>
             </p>
-          </motion.div>
-        </motion.div>
-
-        {/* Professional Scroll Indicator */}
-        <motion.div 
-          className="scroll-indicator"
-          onClick={scrollToServices}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 1.2 }}
-        >
-          <div className="mouse">
-            <div className="wheel"></div>
           </div>
-        </motion.div>
-      </div>
-    </section>
+
+          <div className="scroll-indicator" onClick={scrollToServices}>
+            <div className="mouse">
+              <div className="wheel"></div>
+            </div>
+            <span>Explorar</span>
+          </div>
+        </div>
+
+        {/* Animated Background Elements */}
+        <div className="bg-elements">
+          <div className="floating-dot"></div>
+          <div className="floating-line"></div>
+          <div className="floating-circle"></div>
+        </div>
+      </section>
+    </>
   );
 }
 

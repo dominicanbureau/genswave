@@ -1,204 +1,118 @@
-import { motion, useInView } from 'framer-motion';
-import { useRef, useEffect } from 'react';
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useRef, useEffect, useState } from 'react';
 import './Services.css';
-
-gsap.registerPlugin(ScrollTrigger);
 
 const services = [
   {
     id: 'web',
     title: 'Desarrollo Web',
-    subtitle: 'Sitios web de vanguardia',
-    description: 'Experiencias web modernas, responsivas y optimizadas que convierten visitantes en clientes leales.',
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-        <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
-        <line x1="8" y1="21" x2="16" y2="21"/>
-        <line x1="12" y1="17" x2="12" y2="21"/>
-      </svg>
-    ),
-    features: ['Diseño Responsivo', 'SEO Optimizado', 'Carga Ultrarrápida']
+    description: 'Experiencias web modernas y optimizadas que convierten visitantes en clientes.',
+    features: ['Diseño Responsivo', 'SEO Optimizado', 'Carga Ultrarrápida'],
+    icon: '🌐'
   },
   {
     id: 'mobile',
     title: 'Apps Móviles',
-    subtitle: 'Aplicaciones nativas',
-    description: 'Apps iOS y Android con experiencias de usuario intuitivas y rendimiento excepcional.',
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-        <rect x="5" y="2" width="14" height="20" rx="2" ry="2"/>
-        <line x1="12" y1="18" x2="12.01" y2="18"/>
-      </svg>
-    ),
-    features: ['Nativo iOS/Android', 'UI/UX Premium', 'Offline Ready']
+    description: 'Aplicaciones nativas iOS y Android con experiencias de usuario excepcionales.',
+    features: ['Nativo iOS/Android', 'UI/UX Premium', 'Offline Ready'],
+    icon: '📱'
   },
   {
     id: 'ecommerce',
     title: 'E-Commerce',
-    subtitle: 'Tiendas digitales',
-    description: 'Plataformas de comercio electrónico completas con sistemas de pago seguros y gestión avanzada.',
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-        <circle cx="8" cy="21" r="1"/>
-        <circle cx="19" cy="21" r="1"/>
-        <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/>
-      </svg>
-    ),
-    features: ['Pagos Seguros', 'Inventario Smart', 'Analytics Avanzado']
+    description: 'Plataformas de comercio electrónico con sistemas de pago seguros.',
+    features: ['Pagos Seguros', 'Inventario Smart', 'Analytics Avanzado'],
+    icon: '🛒'
   },
   {
     id: 'custom',
     title: 'Soluciones Custom',
-    subtitle: 'Desarrollo a medida',
-    description: 'Soluciones tecnológicas personalizadas diseñadas específicamente para las necesidades de tu negocio.',
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-        <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-        <path d="M2 17l10 5 10-5"/>
-        <path d="M2 12l10 5 10-5"/>
-      </svg>
-    ),
-    features: ['Arquitectura Escalable', 'Integración API', 'Soporte 24/7']
+    description: 'Soluciones tecnológicas personalizadas para las necesidades de tu negocio.',
+    features: ['Arquitectura Escalable', 'Integración API', 'Soporte 24/7'],
+    icon: '⚡'
   }
 ];
 
 function Services() {
   const ref = useRef(null);
-  const servicesGridRef = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-100px" });
+  const [hoveredCard, setHoveredCard] = useState(null);
 
   useEffect(() => {
-    const ctx = gsap.context(() => {
-      // Professional card animations
-      const cards = servicesGridRef.current?.children;
-      if (cards) {
-        gsap.set(cards, {
-          y: 60,
-          opacity: 0
-        });
-
-        ScrollTrigger.create({
-          trigger: servicesGridRef.current,
-          start: "top 80%",
-          end: "bottom 20%",
-          onEnter: () => {
-            gsap.to(cards, {
-              y: 0,
-              opacity: 1,
-              duration: 0.8,
-              ease: "power2.out",
-              stagger: {
-                each: 0.15,
-                from: "start"
-              }
-            });
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('animate');
           }
         });
+      },
+      { threshold: 0.1 }
+    );
 
-        // Subtle hover effects for cards
-        Array.from(cards).forEach((card) => {
-          card.addEventListener('mouseenter', () => {
-            gsap.to(card, {
-              y: -8,
-              duration: 0.3,
-              ease: "power2.out"
-            });
-            
-            gsap.to(card.querySelector('.service-icon'), {
-              scale: 1.1,
-              duration: 0.3,
-              ease: "power2.out"
-            });
-          });
+    const elements = ref.current?.querySelectorAll('.animate-on-scroll');
+    elements?.forEach((el) => observer.observe(el));
 
-          card.addEventListener('mouseleave', () => {
-            gsap.to(card, {
-              y: 0,
-              duration: 0.3,
-              ease: "power2.out"
-            });
-            
-            gsap.to(card.querySelector('.service-icon'), {
-              scale: 1,
-              duration: 0.3,
-              ease: "power2.out"
-            });
-          });
-        });
-      }
-
-    }, ref);
-
-    return () => ctx.revert();
+    return () => observer.disconnect();
   }, []);
 
   return (
     <section id="servicios" className="services" ref={ref}>
       <div className="services-container">
-        {/* Section Header */}
-        <motion.div
-          className="services-header"
-          initial={{ opacity: 0, y: 40 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8 }}
-        >
+        <div className="services-header animate-on-scroll">
           <div className="header-badge">
             <span>Servicios Premium</span>
+            <div className="badge-glow"></div>
           </div>
           <h2 className="services-title">
-            Transformamos ideas en
-            <span className="title-accent"> experiencias digitales</span>
+            Transformamos ideas en<br />
+            <span className="title-gradient">experiencias digitales</span>
           </h2>
           <p className="services-subtitle">
             Cada proyecto es único. Creamos soluciones tecnológicas personalizadas 
-            que impulsan el crecimiento de tu negocio.
+            que impulsan el crecimiento de tu negocio con la más alta calidad.
           </p>
-        </motion.div>
+        </div>
 
-        {/* Services Grid */}
-        <div className="services-grid" ref={servicesGridRef}>
+        <div className="services-grid">
           {services.map((service, index) => (
-            <ServiceCard 
+            <div 
               key={service.id} 
-              service={service} 
-              index={index} 
-              isInView={isInView} 
-            />
+              className="service-card animate-on-scroll"
+              style={{ '--delay': `${index * 0.15}s` }}
+              onMouseEnter={() => setHoveredCard(service.id)}
+              onMouseLeave={() => setHoveredCard(null)}
+            >
+              <div className="card-content">
+                <div className="service-icon">
+                  <span>{service.icon}</span>
+                  <div className="icon-glow"></div>
+                </div>
+                
+                <h3 className="service-title">{service.title}</h3>
+                <p className="service-description">{service.description}</p>
+                
+                <ul className="service-features">
+                  {service.features.map((feature, idx) => (
+                    <li key={idx} className="feature-item">
+                      <div className="feature-dot"></div>
+                      <span>{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                <div className="card-hover-effect"></div>
+              </div>
+            </div>
           ))}
+        </div>
+
+        {/* Floating Background Elements */}
+        <div className="bg-shapes">
+          <div className="shape shape-1"></div>
+          <div className="shape shape-2"></div>
+          <div className="shape shape-3"></div>
         </div>
       </div>
     </section>
-  );
-}
-
-function ServiceCard({ service, index, isInView }) {
-  return (
-    <div className="service-card">
-      <div className="card-content">
-        <div className="service-icon-container">
-          <div className="service-icon">
-            {service.icon}
-          </div>
-        </div>
-
-        <div className="service-info">
-          <h3 className="service-title">{service.title}</h3>
-          <p className="service-subtitle">{service.subtitle}</p>
-          <p className="service-description">{service.description}</p>
-          
-          <ul className="service-features">
-            {service.features.map((feature, idx) => (
-              <li key={idx} className="feature-item">
-                <div className="feature-dot"></div>
-                <span>{feature}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
-    </div>
   );
 }
 

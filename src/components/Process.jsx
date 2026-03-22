@@ -7,25 +7,52 @@ const steps = [
     number: '01',
     title: 'Descubrimiento',
     description: 'Entendemos tu visión, analizamos el mercado y definimos objetivos claros para tu proyecto digital.',
-    duration: '1-2 semanas'
+    duration: '1-2 semanas',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+        <circle cx="11" cy="11" r="8"/>
+        <path d="m21 21-4.35-4.35"/>
+      </svg>
+    )
   },
   {
     number: '02',
     title: 'Diseño',
     description: 'Creamos prototipos interactivos y diseños que combinan estética moderna con funcionalidad excepcional.',
-    duration: '2-3 semanas'
+    duration: '2-3 semanas',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+        <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+        <line x1="12" y1="22.08" x2="12" y2="12"/>
+      </svg>
+    )
   },
   {
     number: '03',
     title: 'Desarrollo',
     description: 'Desarrollamos con las tecnologías más avanzadas, asegurando código limpio, escalable y optimizado.',
-    duration: '3-6 semanas'
+    duration: '3-6 semanas',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+        <polyline points="16 18 22 12 16 6"/>
+        <polyline points="8 6 2 12 8 18"/>
+      </svg>
+    )
   },
   {
     number: '04',
     title: 'Lanzamiento',
     description: 'Desplegamos tu proyecto con monitoreo continuo, optimizaciones de rendimiento y soporte completo.',
-    duration: '1-2 semanas'
+    duration: '1-2 semanas',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+        <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/>
+        <path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/>
+        <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/>
+        <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/>
+      </svg>
+    )
   }
 ];
 
@@ -42,7 +69,7 @@ function Process() {
           }
         });
       },
-      { threshold: 0.1 }
+      { threshold: 0.1, rootMargin: '-50px' }
     );
 
     const elements = ref.current?.querySelectorAll('.animate-on-scroll');
@@ -60,39 +87,67 @@ function Process() {
     <section id="proceso" className="process" ref={ref}>
       <div className="process-container">
         <div className="process-header animate-on-scroll">
+          <div className="section-badge">
+            <span>Nuestro Proceso</span>
+          </div>
           <h2 className="process-title">
-            Un proceso diseñado para<br />
-            resultados excepcionales.
+            Metodología probada para
+            <span className="title-gradient"> resultados excepcionales</span>
           </h2>
           <p className="process-subtitle">
             Cada proyecto sigue nuestra metodología refinada que garantiza 
-            calidad, transparencia y entrega puntual.
+            calidad, transparencia y entrega puntual en cada fase del desarrollo.
           </p>
         </div>
 
-        <div className="process-steps">
-          {steps.map((step, index) => (
-            <div 
-              key={step.number} 
-              className="process-step animate-on-scroll"
-              style={{ '--delay': `${index * 0.1}s` }}
-            >
-              <div className="step-content">
-                <div className="step-number">{step.number}</div>
-                <div className="step-info">
-                  <h3 className="step-title">{step.title}</h3>
-                  <p className="step-description">{step.description}</p>
-                  <div className="step-duration">{step.duration}</div>
+        <div className="process-timeline">
+          <div className="timeline-line">
+            <div className="timeline-progress"></div>
+          </div>
+
+          <div className="process-steps">
+            {steps.map((step, index) => (
+              <div 
+                key={step.number} 
+                className="process-step animate-on-scroll"
+                style={{ '--delay': `${index * 0.2}s` }}
+              >
+                <div className="step-glass">
+                  <div className="step-number-container">
+                    <div className="step-number">{step.number}</div>
+                    <div className="step-icon">
+                      {step.icon}
+                    </div>
+                  </div>
+
+                  <div className="step-content">
+                    <h3 className="step-title">{step.title}</h3>
+                    <p className="step-description">{step.description}</p>
+                    <div className="step-duration">
+                      <div className="duration-icon">⏱</div>
+                      <span>{step.duration}</span>
+                    </div>
+                  </div>
+
+                  <div className="step-shine"></div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
 
         <div className="process-cta animate-on-scroll">
           <button className="process-button" onClick={handleNavigate}>
-            Ver proceso completo
+            <span>Ver proceso completo</span>
+            <div className="button-glow"></div>
           </button>
+        </div>
+
+        {/* Background Elements */}
+        <div className="bg-elements">
+          <div className="bg-mesh"></div>
+          <div className="bg-orb bg-orb-1"></div>
+          <div className="bg-orb bg-orb-2"></div>
         </div>
       </div>
     </section>

@@ -1,14 +1,16 @@
-/* Clean Services Section */
+/* Crystallized Services Section */
 .services {
   padding: 8rem 2rem;
-  background-color: #ffffff;
-  color: #1d1d1f;
+  background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 50%, #f8f9fa 100%);
   position: relative;
+  overflow: hidden;
 }
 
 .services-container {
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
+  position: relative;
+  z-index: 2;
 }
 
 /* Section Header */
@@ -18,23 +20,58 @@
   max-width: 800px;
   margin-left: auto;
   margin-right: auto;
+  opacity: 0;
+  transform: translateY(50px);
+  transition: all 1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.services-header.animate {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.section-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.75rem 1.5rem;
+  background: rgba(102, 126, 234, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(102, 126, 234, 0.2);
+  border-radius: 50px;
+  margin-bottom: 2rem;
+}
+
+.section-badge span {
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #667eea;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
 }
 
 .services-title {
-  font-family: "Space Grotesk", sans-serif;
-  font-size: clamp(3rem, 6vw, 4rem);
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: clamp(2.5rem, 6vw, 4rem);
   font-weight: 700;
   line-height: 1.1;
-  color: #1d1d1f;
-  margin-bottom: 2rem;
+  color: #1a1a1a;
+  margin-bottom: 1.5rem;
   letter-spacing: -0.02em;
 }
 
+.title-gradient {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
 .services-subtitle {
-  font-family: "Space Grotesk", sans-serif;
-  font-size: 1.1rem;
-  font-weight: 300;
-  color: #aaa;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 1.25rem;
+  font-weight: 400;
+  color: #666;
   line-height: 1.6;
   max-width: 600px;
   margin: 0 auto;
@@ -43,91 +80,129 @@
 /* Services Grid */
 .services-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   gap: 2rem;
+  position: relative;
+  z-index: 3;
 }
 
 /* Service Card */
 .service-card {
-  background: rgba(0, 0, 0, 0.03);
-  border: 1px solid rgba(0, 0, 0, 0.05);
-  padding: 2rem;
-  border-radius: 1px;
-  position: relative;
-  overflow: hidden;
-  transition: all 0.5s ease;
   opacity: 0;
-  transform: translateY(30px);
+  transform: translateY(50px) scale(0.95);
+  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .service-card.animate {
   opacity: 1;
-  transform: translateY(0);
-  animation: cardFadeIn 0.6s ease-out forwards;
+  transform: translateY(0) scale(1);
   animation-delay: var(--delay, 0s);
 }
 
-@keyframes cardFadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.card-glass {
+  position: relative;
+  padding: 2.5rem;
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 20px;
+  box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
 }
 
-.service-card::before {
-  content: "";
+.card-glass::before {
+  content: '';
   position: absolute;
   top: 0;
   left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.6) 0%,
+    transparent 50%,
+    rgba(255, 255, 255, 0.3) 100%
+  );
+  border-radius: 20px;
+  pointer-events: none;
+}
+
+.card-glass:hover {
+  transform: translateY(-10px);
+  box-shadow: 
+    0 30px 60px rgba(0, 0, 0, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  border-color: rgba(102, 126, 234, 0.3);
+}
+
+.card-shine {
+  position: absolute;
+  top: 0;
+  left: -100%;
   width: 100%;
   height: 100%;
-  background: radial-gradient(
-    circle at 50% 50%,
-    rgba(0, 0, 0, 0.06),
-    transparent 60%
-  );
-  opacity: 0;
-  transition: opacity 0.5s;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  transition: left 0.8s ease;
+  pointer-events: none;
 }
 
-.service-card:hover::before {
-  opacity: 1;
+.card-glass:hover .card-shine {
+  left: 100%;
 }
 
-.service-card:hover {
-  border-color: rgba(0, 0, 0, 0.2);
-}
-
-.card-content {
-  position: relative;
-  height: 100%;
+/* Service Icon */
+.service-icon {
+  width: 60px;
+  height: 60px;
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 16px;
+  margin-bottom: 1.5rem;
+  color: white;
+  box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+  transition: all 0.3s ease;
+  position: relative;
   z-index: 2;
 }
 
-/* Service Info */
+.service-icon svg {
+  width: 28px;
+  height: 28px;
+}
+
+.card-glass:hover .service-icon {
+  transform: scale(1.1) rotate(5deg);
+  box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
+}
+
+/* Service Content */
 .service-title {
-  font-family: "Space Grotesk", sans-serif;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 1.5rem;
   font-weight: 700;
-  color: #1d1d1f;
+  color: #1a1a1a;
   margin-bottom: 1rem;
   letter-spacing: -0.01em;
+  position: relative;
+  z-index: 2;
 }
 
 .service-description {
-  font-family: "Space Grotesk", sans-serif;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 1rem;
-  font-weight: 300;
+  font-weight: 400;
   color: #666;
   line-height: 1.6;
   margin-bottom: 2rem;
-  flex-grow: 1;
+  position: relative;
+  z-index: 2;
 }
 
 /* Service Features */
@@ -135,32 +210,107 @@
   list-style: none;
   padding: 0;
   margin: 0;
+  position: relative;
+  z-index: 2;
 }
 
 .feature-item {
-  font-family: "Space Grotesk", sans-serif;
-  font-size: 0.9375rem;
-  font-weight: 400;
-  color: #888;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
   margin-bottom: 0.75rem;
-  position: relative;
-  padding-left: 1rem;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: #555;
+  transition: all 0.3s ease;
 }
 
 .feature-item:last-child {
   margin-bottom: 0;
 }
 
-.feature-item::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0.6em;
-  width: 4px;
-  height: 4px;
-  background: #1d1d1f;
+.card-glass:hover .feature-item {
+  color: #333;
+  transform: translateX(5px);
+}
+
+.feature-dot {
+  width: 6px;
+  height: 6px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   border-radius: 50%;
-  transform: translateY(-50%);
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+}
+
+.card-glass:hover .feature-dot {
+  transform: scale(1.3);
+  box-shadow: 0 0 10px rgba(102, 126, 234, 0.5);
+}
+
+/* Background Elements */
+.bg-elements {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.bg-circle {
+  position: absolute;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+  animation-duration: 20s;
+  animation-iteration-count: infinite;
+  animation-timing-function: ease-in-out;
+}
+
+.bg-circle-1 {
+  width: 300px;
+  height: 300px;
+  top: 10%;
+  left: -5%;
+  animation-name: floatCircle1;
+}
+
+.bg-circle-2 {
+  width: 200px;
+  height: 200px;
+  bottom: 10%;
+  right: -5%;
+  animation-name: floatCircle2;
+  animation-delay: -10s;
+}
+
+.bg-gradient {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(102, 126, 234, 0.03) 0%, transparent 70%);
+  transform: translate(-50%, -50%);
+  animation: pulse 8s ease-in-out infinite;
+}
+
+@keyframes floatCircle1 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(30px, -20px) scale(1.1); }
+  66% { transform: translate(-20px, 30px) scale(0.9); }
+}
+
+@keyframes floatCircle2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-40px, -30px) scale(1.2); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.3; transform: translate(-50%, -50%) scale(1); }
+  50% { opacity: 0.6; transform: translate(-50%, -50%) scale(1.1); }
 }
 
 /* Responsive Design */
@@ -174,11 +324,11 @@
   }
 
   .services-title {
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
   }
 
   .services-subtitle {
-    font-size: 1rem;
+    font-size: 1.125rem;
   }
 
   .services-grid {
@@ -186,8 +336,19 @@
     gap: 1.5rem;
   }
 
-  .service-card {
-    padding: 1.5rem;
+  .card-glass {
+    padding: 2rem;
+  }
+
+  .service-icon {
+    width: 50px;
+    height: 50px;
+    margin-bottom: 1.25rem;
+  }
+
+  .service-icon svg {
+    width: 24px;
+    height: 24px;
   }
 
   .service-title {
@@ -210,8 +371,8 @@
     padding: 4rem 1rem;
   }
 
-  .service-card {
-    padding: 1.25rem;
+  .card-glass {
+    padding: 1.5rem;
   }
 
   .service-title {

@@ -4,46 +4,27 @@ import './Hero.css';
 function Hero() {
   const videoRef = useRef(null);
   const [businessName, setBusinessName] = useState('');
-  const [currentWord, setCurrentWord] = useState(0);
-  const [isVideoEnded, setIsVideoEnded] = useState(false);
-  const words = ['CREAR', 'DISEÑAR', 'DESARROLLAR'];
+  const [isVideoLoaded, setIsVideoLoaded] = useState(false);
 
   useEffect(() => {
-    // Video intro logic
     const video = videoRef.current;
     if (video) {
       video.muted = true;
       video.playsInline = true;
+      video.loop = true;
       
-      const handleVideoEnd = () => {
-        setIsVideoEnded(true);
-        video.pause();
+      const handleLoadedData = () => {
+        setIsVideoLoaded(true);
+        video.play().catch(console.log);
       };
 
-      video.addEventListener('ended', handleVideoEnd);
+      video.addEventListener('loadeddata', handleLoadedData);
       
-      // Start video
-      video.play().catch(() => {
-        // Fallback if autoplay fails
-        setIsVideoEnded(true);
-      });
-
       return () => {
-        video.removeEventListener('ended', handleVideoEnd);
+        video.removeEventListener('loadeddata', handleLoadedData);
       };
     }
   }, []);
-
-  useEffect(() => {
-    // Word rotation after video ends
-    if (isVideoEnded) {
-      const interval = setInterval(() => {
-        setCurrentWord((prev) => (prev + 1) % words.length);
-      }, 3000);
-
-      return () => clearInterval(interval);
-    }
-  }, [isVideoEnded, words.length]);
 
   useEffect(() => {
     const handleAppointmentSubmitted = () => {
@@ -81,67 +62,55 @@ function Hero() {
   };
 
   return (
-    <>
-      {/* Noise Texture */}
-      <div className="noise"></div>
-
-      {/* SVG Filters */}
-      <svg className="filters">
-        <defs>
-          <filter id="threshold">
-            <feColorMatrix in="SourceGraphic" type="matrix" values="1 0 0 0 0
-                        0 1 0 0 0
-                        0 0 1 0 0
-                        0 0 0 25 -9" result="goo" />
-            <feComposite in="SourceGraphic" in2="goo" operator="atop" />
-          </filter>
-        </defs>
-      </svg>
-
-      <section className="hero">
-        {/* Video Background */}
+    <section className="hero">
+      {/* Video Background */}
+      <div className="video-container">
         <video 
           ref={videoRef}
-          className={`hero-video ${isVideoEnded ? 'ended' : ''}`}
+          className="hero-video"
           muted 
           playsInline
+          loop
           preload="auto"
         >
           <source src="/genswave.mov" type="video/mp4" />
         </video>
+        <div className="video-overlay"></div>
+      </div>
 
-        {/* Hero Content - Shows after video */}
-        <div className={`hero-content ${isVideoEnded ? 'visible' : ''}`}>
-          <div className="morph-container">
-            <div className="word-rotator">
-              {words.map((word, index) => (
-                <div 
-                  key={word} 
-                  className={`word ${index === currentWord ? 'active' : ''}`}
-                >
-                  {word}
-                </div>
-              ))}
-            </div>
+      {/* Glass Container */}
+      <div className={`glass-container ${isVideoLoaded ? 'visible' : ''}`}>
+        <div className="hero-content">
+          <div className="hero-badge">
+            <span>Desarrollo Premium</span>
           </div>
           
-          <p className="subtext">El Arte del Código</p>
+          <h1 className="hero-title">
+            Transformamos ideas en
+            <span className="title-highlight"> experiencias digitales</span>
+          </h1>
+          
+          <p className="hero-subtitle">
+            Creamos soluciones tecnológicas excepcionales que impulsan 
+            el crecimiento de tu negocio con la más alta calidad.
+          </p>
 
           <div className="hero-actions">
-            <div className="input-container">
+            <div className="input-group">
               <input
                 type="text"
-                className="business-input"
+                className="glass-input"
                 placeholder="Nombre de tu negocio"
                 value={businessName}
                 onChange={(e) => setBusinessName(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleStartProject()}
               />
               <button
-                className="cta-button"
+                className="glass-button"
                 onClick={handleStartProject}
               >
-                Comenzar
+                <span>Comenzar Proyecto</span>
+                <div className="button-shine"></div>
               </button>
             </div>
             
@@ -152,15 +121,22 @@ function Hero() {
               </a>
             </p>
           </div>
-
-          <div className="scroll-indicator" onClick={scrollToServices}>
-            <div className="mouse">
-              <div className="wheel"></div>
-            </div>
-          </div>
         </div>
-      </section>
-    </>
+      </div>
+
+      {/* Scroll Indicator */}
+      <div className="scroll-indicator" onClick={scrollToServices}>
+        <div className="scroll-line"></div>
+        <span>Explorar</span>
+      </div>
+
+      {/* Floating Elements */}
+      <div className="floating-elements">
+        <div className="float-element float-1"></div>
+        <div className="float-element float-2"></div>
+        <div className="float-element float-3"></div>
+      </div>
+    </section>
   );
 }
 

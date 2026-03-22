@@ -76,8 +76,7 @@ function Hero() {
 
       <div className="hero-content">
         <h1 className="hero-title">
-          <span className="title-text">Desarrollamos el futuro</span>
-          <span className="title-text">de tu negocio</span>
+          Desarrollamos el futuro de tu negocio
         </h1>
         
         <p className="hero-subtitle">
@@ -94,21 +93,21 @@ function Hero() {
             <span className="material-icons">play_arrow</span>
           </button>
         </div>
+      </div>
 
-        <div className="hero-input-section">
-          <input
-            type="text"
-            className="hero-input"
-            placeholder="Nombre de tu negocio"
-            value={businessName}
-            onChange={(e) => setBusinessName(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleStartProject()}
-          />
+      {/* Bottom Section with Icons */}
+      <div className="hero-bottom">
+        <div className="hero-icons-row">
+          {floatingIcons.slice(0, 11).map((icon, index) => (
+            <div 
+              key={`bottom-${icon}-${index}`}
+              className="bottom-icon"
+              style={{ '--delay': `${index * 0.1}s` }}
+            >
+              <span className="material-icons">{icon}</span>
+            </div>
+          ))}
         </div>
-
-        <p className="hero-login">
-          ¿Ya tienes cuenta? <a href="/login">Iniciar sesión</a>
-        </p>
       </div>
     </section>
   );

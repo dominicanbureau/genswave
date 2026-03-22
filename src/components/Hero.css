@@ -5,11 +5,12 @@
   position: relative;
   min-height: 100vh;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   background: #000000;
   overflow: hidden;
-  padding: 80px 0;
+  padding: 100px 24px 60px;
 }
 
 .hero-video {
@@ -19,7 +20,7 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  opacity: 0.1;
+  opacity: 0.08;
   filter: blur(0px);
 }
 
@@ -46,9 +47,9 @@
 }
 
 .floating-icon .material-icons {
-  font-size: 32px;
-  color: rgba(255, 255, 255, 0.2);
-  text-shadow: 0 0 30px rgba(255, 255, 255, 0.4);
+  font-size: 28px;
+  color: rgba(255, 255, 255, 0.15);
+  text-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
   font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 48;
 }
 
@@ -58,14 +59,14 @@
     opacity: 0;
   }
   5% {
-    opacity: 0.3;
+    opacity: 0.25;
   }
   50% {
     transform: translate(calc(var(--end-x) - var(--start-x)), calc(var(--end-y) - var(--start-y))) rotate(360deg);
-    opacity: 0.5;
+    opacity: 0.4;
   }
   95% {
-    opacity: 0.3;
+    opacity: 0.25;
   }
 }
 
@@ -73,38 +74,21 @@
 .hero-content {
   position: relative;
   z-index: 10;
-  max-width: 1000px;
+  max-width: 900px;
   margin: 0 auto;
-  padding: 0 24px;
   text-align: center;
 }
 
 .hero-title {
   font-family: 'Google Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-  font-size: clamp(48px, 8vw, 96px);
+  font-size: clamp(40px, 7vw, 72px);
   font-weight: 400;
   line-height: 1.1;
   letter-spacing: -0.03em;
   color: #ffffff;
-  margin: 0 0 32px 0;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.title-text {
-  display: block;
-  animation: fadeInUp 1s ease-out forwards;
+  margin: 0 0 24px 0;
+  animation: fadeInUp 0.8s ease-out forwards;
   opacity: 0;
-}
-
-.title-text:nth-child(1) {
-  animation-delay: 0.2s;
-}
-
-.title-text:nth-child(2) {
-  animation-delay: 0.4s;
 }
 
 @keyframes fadeInUp {
@@ -118,56 +102,52 @@
   }
 }
 
-@keyframes fadeIn {
-  to { opacity: 1; }
-}
-
 .hero-subtitle {
   font-family: 'Google Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-  font-size: clamp(18px, 3vw, 22px);
+  font-size: clamp(16px, 2.5vw, 20px);
   font-weight: 400;
   line-height: 1.5;
-  color: rgba(255, 255, 255, 0.65);
-  margin: 0 0 48px 0;
-  animation: fadeInUp 1s ease-out 0.8s forwards;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0 0 40px 0;
+  animation: fadeInUp 0.8s ease-out 0.2s forwards;
   opacity: 0;
 }
 
 /* Hero Actions */
 .hero-actions {
   display: flex;
-  gap: 16px;
+  gap: 12px;
   justify-content: center;
-  margin-bottom: 32px;
-  animation: fadeInUp 1s ease-out 1s forwards;
+  flex-wrap: wrap;
+  animation: fadeInUp 0.8s ease-out 0.4s forwards;
   opacity: 0;
 }
 
 .hero-btn {
-  height: 56px;
-  padding: 0 32px;
+  height: 48px;
+  padding: 0 28px;
   font-family: 'Google Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 500;
   border: none;
-  border-radius: 28px;
+  border-radius: 24px;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.2s ease;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
 
 .hero-btn.primary {
   background: #4285f4;
   color: #ffffff;
-  box-shadow: 0 4px 16px rgba(66, 133, 244, 0.4);
+  box-shadow: 0 2px 12px rgba(66, 133, 244, 0.4);
 }
 
 .hero-btn.primary:hover {
   background: #5a95f5;
-  box-shadow: 0 8px 24px rgba(66, 133, 244, 0.6);
-  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(66, 133, 244, 0.5);
+  transform: translateY(-1px);
 }
 
 .hero-btn.secondary {
@@ -181,81 +161,122 @@
 .hero-btn.secondary:hover {
   background: rgba(255, 255, 255, 0.12);
   border-color: rgba(255, 255, 255, 0.25);
-  transform: translateY(-2px);
+  transform: translateY(-1px);
 }
 
 .hero-btn .material-icons {
-  font-size: 20px;
+  font-size: 18px;
 }
 
-/* Input Section */
-.hero-input-section {
-  max-width: 500px;
-  margin: 0 auto 24px;
-  animation: fadeInUp 1s ease-out 1.2s forwards;
+/* Bottom Icons Row */
+.hero-bottom {
+  position: absolute;
+  bottom: 40px;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  animation: fadeInUp 0.8s ease-out 0.6s forwards;
   opacity: 0;
 }
 
-.hero-input {
-  width: 100%;
-  height: 56px;
+.hero-icons-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 32px;
+  max-width: 1200px;
+  margin: 0 auto;
   padding: 0 24px;
-  font-family: 'Google Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-  font-size: 16px;
-  color: #ffffff;
+  flex-wrap: wrap;
+}
+
+.bottom-icon {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 28px;
-  outline: none;
+  border-radius: 8px;
   transition: all 0.3s ease;
-  backdrop-filter: blur(10px);
-}
-
-.hero-input::placeholder {
-  color: rgba(255, 255, 255, 0.4);
-}
-
-.hero-input:focus {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: #4285f4;
-  box-shadow: 0 0 0 4px rgba(66, 133, 244, 0.2);
-}
-
-.hero-login {
-  font-family: 'Google Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-  font-size: 15px;
-  color: rgba(255, 255, 255, 0.6);
-  margin: 0;
-  animation: fadeInUp 1s ease-out 1.4s forwards;
+  animation: fadeIn 0.6s ease-out forwards;
+  animation-delay: var(--delay);
   opacity: 0;
 }
 
-.hero-login a {
-  color: #4285f4;
-  text-decoration: none;
-  font-weight: 500;
-  transition: color 0.2s ease;
+.bottom-icon:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-4px);
 }
 
-.hero-login a:hover {
-  color: #5a95f5;
+.bottom-icon .material-icons {
+  font-size: 20px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+  }
 }
 
 @media (max-width: 768px) {
+  .hero {
+    padding: 80px 20px 40px;
+  }
+
   .hero-content {
-    padding: 0 20px;
+    padding: 0;
   }
 
   .hero-actions {
     flex-direction: column;
     align-items: stretch;
+    width: 100%;
+    max-width: 300px;
+    margin: 0 auto;
   }
 
   .hero-btn {
     justify-content: center;
+    width: 100%;
   }
 
   .floating-icon .material-icons {
+    font-size: 20px;
+  }
+
+  .hero-icons-row {
+    gap: 16px;
+  }
+
+  .bottom-icon {
+    width: 36px;
+    height: 36px;
+  }
+
+  .bottom-icon .material-icons {
     font-size: 18px;
+  }
+
+  .hero-bottom {
+    bottom: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-icons-row {
+    gap: 12px;
+  }
+
+  .bottom-icon {
+    width: 32px;
+    height: 32px;
+  }
+
+  .bottom-icon .material-icons {
+    font-size: 16px;
   }
 }

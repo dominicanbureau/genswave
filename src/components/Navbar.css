@@ -3,11 +3,11 @@
   position: fixed;
   top: 0;
   width: 100%;
-  background: rgba(0, 0, 0, 0.8);
+  background: rgba(255, 255, 255, 0.98);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: none;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid #e8eaed;
   z-index: 1000;
   transition: all 0.3s ease;
 }
@@ -39,7 +39,6 @@
 .logo-image {
   height: 32px;
   width: auto;
-  filter: brightness(0) invert(1);
 }
 
 .nav-menu {
@@ -53,7 +52,7 @@
 
 .nav-menu a {
   text-decoration: none;
-  color: rgba(255, 255, 255, 0.85);
+  color: #5f6368;
   font-family: 'Google Sans', -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 14px;
   font-weight: 400;
@@ -64,27 +63,26 @@
 }
 
 .nav-menu a:hover {
-  color: #ffffff;
+  color: #202124;
 }
 
 .nav-menu a.active {
-  color: #ffffff;
+  color: #202124;
+  font-weight: 500;
 }
 
 .login-btn {
   padding: 8px 20px;
-  background: rgba(255, 255, 255, 0.1);
+  background: #4285f4;
   color: #ffffff !important;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: none;
   border-radius: 20px;
   transition: all 0.2s ease;
   font-weight: 500;
-  backdrop-filter: blur(10px);
 }
 
 .login-btn:hover {
-  background: rgba(255, 255, 255, 0.15);
-  border-color: rgba(255, 255, 255, 0.3);
+  background: #5a95f5;
 }
 
 /* Mobile Hamburger Menu */
@@ -95,8 +93,8 @@
   align-items: center;
   width: 40px;
   height: 40px;
-  background: rgba(255, 255, 255, 0.1);
-  border: none;
+  background: #f8f9fa;
+  border: 1px solid #e8eaed;
   border-radius: 8px;
   cursor: pointer;
   padding: 0;
@@ -105,13 +103,13 @@
 }
 
 .hamburger:hover {
-  background: rgba(255, 255, 255, 0.15);
+  background: #e8eaed;
 }
 
 .hamburger-line {
   width: 18px;
   height: 2px;
-  background: #ffffff;
+  background: #5f6368;
   margin: 2px 0;
   transition: all 0.3s ease;
   transform-origin: center;
@@ -178,7 +176,6 @@
 .mobile-logo-image {
   height: 32px;
   width: auto;
-  filter: brightness(0) invert(1);
 }
 
 .close-btn {

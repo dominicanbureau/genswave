@@ -76,7 +76,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #4285f4 0%, #34a853 100%);
+  background: #f8f9fa;
+  border: 1px solid #e8eaed;
   border-radius: 20px;
   margin-bottom: 28px;
   transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
@@ -84,11 +85,17 @@
 
 .service-card:hover .service-icon {
   transform: scale(1.08) rotate(3deg);
+  background: #4285f4;
+}
+
+.service-card:hover .service-icon .material-icons {
+  color: #ffffff;
 }
 
 .service-icon .material-icons {
   font-size: 36px;
-  color: #ffffff;
+  color: #5f6368;
+  transition: color 0.3s ease;
 }
 
 .service-title {

@@ -68,7 +68,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #4285f4 0%, #34a853 50%, #fbbc04 75%, #ea4335 100%);
+  background: #f8f9fa;
+  border: 1px solid #e8eaed;
   border-radius: 50%;
   margin: 0 auto 28px;
   transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
@@ -76,11 +77,17 @@
 
 .process-step:hover .step-icon {
   transform: scale(1.08) rotate(8deg);
+  background: #4285f4;
+}
+
+.process-step:hover .step-icon .material-icons {
+  color: #ffffff;
 }
 
 .step-icon .material-icons {
   font-size: 44px;
-  color: #ffffff;
+  color: #5f6368;
+  transition: color 0.3s ease;
 }
 
 .step-number {

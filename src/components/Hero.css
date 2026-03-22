@@ -1,4 +1,4 @@
-/* Google Antigravity Inspired Hero */
+/* Google Antigravity Exact Replica */
 @import url('https://fonts.googleapis.com/icon?family=Material+Icons');
 
 .hero {
@@ -10,7 +10,7 @@
   justify-content: center;
   background: #000000;
   overflow: hidden;
-  padding: 100px 24px 60px;
+  padding: 100px 24px 80px;
 }
 
 .hero-video {
@@ -20,7 +20,7 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  opacity: 0.08;
+  opacity: 0.05;
   filter: blur(0px);
 }
 
@@ -47,10 +47,9 @@
 }
 
 .floating-icon .material-icons {
-  font-size: 28px;
-  color: rgba(255, 255, 255, 0.15);
-  text-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
-  font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 48;
+  font-size: 24px;
+  color: rgba(255, 255, 255, 0.12);
+  text-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
 }
 
 @keyframes float {
@@ -59,14 +58,14 @@
     opacity: 0;
   }
   5% {
-    opacity: 0.25;
+    opacity: 0.2;
   }
   50% {
     transform: translate(calc(var(--end-x) - var(--start-x)), calc(var(--end-y) - var(--start-y))) rotate(360deg);
-    opacity: 0.4;
+    opacity: 0.3;
   }
   95% {
-    opacity: 0.25;
+    opacity: 0.2;
   }
 }
 
@@ -74,32 +73,40 @@
 .hero-content {
   position: relative;
   z-index: 10;
-  max-width: 900px;
+  max-width: 1000px;
   margin: 0 auto;
   text-align: center;
+  width: 100%;
+}
+
+.hero-title-wrapper {
+  margin-bottom: 16px;
 }
 
 .hero-title {
   font-family: 'Google Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-  font-size: clamp(40px, 7vw, 72px);
+  font-size: clamp(48px, 8vw, 96px);
   font-weight: 400;
-  line-height: 1.1;
-  letter-spacing: -0.03em;
+  line-height: 1;
   color: #ffffff;
-  margin: 0 0 24px 0;
-  animation: fadeInUp 0.8s ease-out forwards;
-  opacity: 0;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100px;
 }
 
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.cursor-blink {
+  display: inline-block;
+  font-size: clamp(48px, 8vw, 96px);
+  color: #4285f4;
+  animation: blink 1s step-end infinite;
+  font-weight: 300;
+}
+
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
 }
 
 .hero-subtitle {
@@ -108,9 +115,26 @@
   font-weight: 400;
   line-height: 1.5;
   color: rgba(255, 255, 255, 0.6);
-  margin: 0 0 40px 0;
-  animation: fadeInUp 0.8s ease-out 0.2s forwards;
-  opacity: 0;
+  margin: 0 0 32px 0;
+}
+
+/* Hero Image/Video Placeholder */
+.hero-image-placeholder {
+  width: 100%;
+  max-width: 800px;
+  height: 450px;
+  margin: 0 auto 32px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  overflow: hidden;
+  position: relative;
+}
+
+.hero-main-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 /* Hero Actions */
@@ -119,8 +143,6 @@
   gap: 12px;
   justify-content: center;
   flex-wrap: wrap;
-  animation: fadeInUp 0.8s ease-out 0.4s forwards;
-  opacity: 0;
 }
 
 .hero-btn {
@@ -136,6 +158,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
+  white-space: nowrap;
 }
 
 .hero-btn.primary {
@@ -155,12 +178,25 @@
   color: #ffffff;
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.15);
-  gap: 4px;
 }
 
 .hero-btn.secondary:hover {
   background: rgba(255, 255, 255, 0.12);
   border-color: rgba(255, 255, 255, 0.25);
+  transform: translateY(-1px);
+}
+
+.hero-btn.tertiary {
+  background: rgba(255, 255, 255, 0.05);
+  color: #ffffff;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  gap: 4px;
+}
+
+.hero-btn.tertiary:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
   transform: translateY(-1px);
 }
 
@@ -175,16 +211,14 @@
   left: 0;
   right: 0;
   z-index: 10;
-  animation: fadeInUp 0.8s ease-out 0.6s forwards;
-  opacity: 0;
 }
 
 .hero-icons-row {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 32px;
-  max-width: 1200px;
+  gap: 16px;
+  max-width: 1400px;
   margin: 0 auto;
   padding: 0 24px;
   flex-wrap: wrap;
@@ -196,8 +230,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 8px;
   transition: all 0.3s ease;
   animation: fadeIn 0.6s ease-out forwards;
@@ -206,14 +240,14 @@
 }
 
 .bottom-icon:hover {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.15);
   transform: translateY(-4px);
 }
 
 .bottom-icon .material-icons {
   font-size: 20px;
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.5);
 }
 
 @keyframes fadeIn {
@@ -222,13 +256,92 @@
   }
 }
 
+/* Features Section */
+.features-section {
+  background: #ffffff;
+  padding: 120px 24px;
+}
+
+.features-container {
+  max-width: 1200px;
+  margin: 0 auto 60px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 40px;
+}
+
+.feature-card {
+  text-align: left;
+}
+
+.feature-icon {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(66, 133, 244, 0.1);
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.cursor-blink-small {
+  font-size: 32px;
+  color: #4285f4;
+  animation: blink 1s step-end infinite;
+  font-weight: 300;
+}
+
+.feature-title {
+  font-family: 'Google Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 20px;
+  font-weight: 500;
+  color: #202124;
+  margin: 0 0 12px 0;
+  line-height: 1.3;
+}
+
+.feature-description {
+  font-family: 'Google Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.6;
+  color: #5f6368;
+  margin: 0;
+}
+
+.features-cta {
+  text-align: center;
+}
+
+.explore-btn {
+  height: 48px;
+  padding: 0 32px;
+  font-family: 'Google Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  background: #4285f4;
+  color: #ffffff;
+  border: none;
+  border-radius: 24px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 12px rgba(66, 133, 244, 0.3);
+}
+
+.explore-btn:hover {
+  background: #5a95f5;
+  box-shadow: 0 4px 16px rgba(66, 133, 244, 0.4);
+  transform: translateY(-1px);
+}
+
 @media (max-width: 768px) {
   .hero {
-    padding: 80px 20px 40px;
+    padding: 80px 20px 60px;
   }
 
-  .hero-content {
-    padding: 0;
+  .hero-image-placeholder {
+    height: 300px;
   }
 
   .hero-actions {
@@ -245,11 +358,11 @@
   }
 
   .floating-icon .material-icons {
-    font-size: 20px;
+    font-size: 18px;
   }
 
   .hero-icons-row {
-    gap: 16px;
+    gap: 12px;
   }
 
   .bottom-icon {
@@ -264,11 +377,24 @@
   .hero-bottom {
     bottom: 20px;
   }
+
+  .features-section {
+    padding: 80px 20px;
+  }
+
+  .features-container {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
 }
 
 @media (max-width: 480px) {
+  .hero-image-placeholder {
+    height: 200px;
+  }
+
   .hero-icons-row {
-    gap: 12px;
+    gap: 8px;
   }
 
   .bottom-icon {

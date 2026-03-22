@@ -1,508 +1,159 @@
-/* Crystallized Process Section */
+/* Clean Process Section */
 .process {
-  padding: 8rem 2rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  position: relative;
-  overflow: hidden;
-}
-
-.process::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.1) 0%,
-    rgba(255, 255, 255, 0.05) 50%,
-    rgba(255, 255, 255, 0.1) 100%
-  );
-  pointer-events: none;
+  padding: 120px 0;
+  background: #ffffff;
 }
 
 .process-container {
-  max-width: 1200px;
+  max-width: 1000px;
   margin: 0 auto;
-  position: relative;
-  z-index: 2;
+  padding: 0 24px;
 }
 
-/* Section Header */
 .process-header {
   text-align: center;
-  margin-bottom: 6rem;
-  max-width: 800px;
-  margin-left: auto;
-  margin-right: auto;
-  opacity: 0;
-  transform: translateY(50px);
-  transition: all 1s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.process-header.animate {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.section-badge {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.75rem 1.5rem;
-  background: rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 50px;
-  margin-bottom: 2rem;
-}
-
-.section-badge span {
-  font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: white;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
+  margin-bottom: 80px;
 }
 
 .process-title {
-  font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
-  font-size: clamp(2.5rem, 6vw, 4rem);
-  font-weight: 700;
-  line-height: 1.1;
-  color: white;
-  margin-bottom: 1.5rem;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: clamp(32px, 5vw, 48px);
+  font-weight: 600;
+  line-height: 1.2;
   letter-spacing: -0.02em;
-}
-
-.title-gradient {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: #0a2540;
+  margin: 0 0 16px 0;
 }
 
 .process-subtitle {
-  font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
-  font-size: 1.25rem;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 20px;
   font-weight: 400;
-  color: rgba(255, 255, 255, 0.8);
-  line-height: 1.6;
-  max-width: 600px;
-  margin: 0 auto;
+  color: #425466;
+  margin: 0;
 }
 
-/* Process Timeline */
-.process-timeline {
-  position: relative;
-  margin-bottom: 6rem;
-}
-
-.timeline-line {
-  position: absolute;
-  top: 80px;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: rgba(255, 255, 255, 0.2);
-  z-index: 1;
-}
-
-.timeline-progress {
-  height: 100%;
-  background: linear-gradient(90deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.4));
-  width: 100%;
-  animation: progressFlow 3s ease-in-out infinite;
-}
-
-@keyframes progressFlow {
-  0%, 100% { transform: scaleX(0.8); }
-  50% { transform: scaleX(1); }
-}
-
-/* Process Steps */
 .process-steps {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 2rem;
-  position: relative;
-  z-index: 2;
+  gap: 24px;
+  margin-bottom: 60px;
 }
 
 .process-step {
-  opacity: 0;
-  transform: translateY(50px) scale(0.95);
-  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.process-step.animate {
-  opacity: 1;
-  transform: translateY(0) scale(1);
-  animation-delay: var(--delay, 0s);
-}
-
-.step-glass {
-  position: relative;
-  padding: 2.5rem;
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 20px;
-  box-shadow: 
-    0 20px 40px rgba(0, 0, 0, 0.1),
-    inset 0 1px 0 rgba(255, 255, 255, 0.3);
-  overflow: hidden;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  cursor: pointer;
-}
-
-.step-glass::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.3) 0%,
-    transparent 50%,
-    rgba(255, 255, 255, 0.1) 100%
-  );
-  border-radius: 20px;
-  pointer-events: none;
-}
-
-.step-glass:hover {
-  transform: translateY(-10px);
-  box-shadow: 
-    0 30px 60px rgba(0, 0, 0, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.4);
-  border-color: rgba(255, 255, 255, 0.4);
-}
-
-.step-shine {
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-  transition: left 0.8s ease;
-  pointer-events: none;
-}
-
-.step-glass:hover .step-shine {
-  left: 100%;
-}
-
-/* Step Number Container */
-.step-number-container {
   display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-  position: relative;
-  z-index: 2;
+  gap: 24px;
+  padding: 32px;
+  background: #f6f9fc;
+  border: 1px solid #e3e8ee;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.process-step:hover {
+  border-color: #c1c9d2;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 .step-number {
-  width: 60px;
-  height: 60px;
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(10px);
-  border: 2px solid rgba(255, 255, 255, 0.3);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 20px;
+  font-weight: 600;
+  color: #635bff;
+  background: #ffffff;
+  border: 2px solid #635bff;
   border-radius: 50%;
-  font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: white;
-  transition: all 0.3s ease;
 }
 
-.step-icon {
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  color: white;
-  transition: all 0.3s ease;
-}
-
-.step-icon svg {
-  width: 20px;
-  height: 20px;
-}
-
-.step-glass:hover .step-number {
-  background: rgba(255, 255, 255, 0.3);
-  border-color: rgba(255, 255, 255, 0.5);
-  transform: scale(1.1);
-}
-
-.step-glass:hover .step-icon {
-  background: rgba(255, 255, 255, 0.2);
-  transform: scale(1.1) rotate(5deg);
-}
-
-/* Step Content */
 .step-content {
-  position: relative;
-  z-index: 2;
+  flex: 1;
 }
 
 .step-title {
-  font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: white;
-  margin-bottom: 1rem;
-  letter-spacing: -0.01em;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 20px;
+  font-weight: 600;
+  color: #0a2540;
+  margin: 0 0 8px 0;
 }
 
 .step-description {
-  font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
-  font-size: 1rem;
-  font-weight: 400;
-  color: rgba(255, 255, 255, 0.8);
-  line-height: 1.6;
-  margin-bottom: 1.5rem;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  color: #425466;
+  margin: 0 0 12px 0;
 }
 
 .step-duration {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
-  font-size: 0.9375rem;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.7);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 14px;
+  color: #6b7c93;
 }
 
-.duration-icon {
-  font-size: 1rem;
-}
-
-/* CTA Section */
 .process-cta {
   text-align: center;
-  opacity: 0;
-  transform: translateY(30px);
-  transition: all 1s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.process-cta.animate {
+.process-button {
+  height: 48px;
+  padding: 0 32px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  color: #635bff;
+  background: #ffffff;
+  border: 1px solid #635bff;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.process-button:hover {
+  background: #635bff;
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(99, 91, 255, 0.3);
+}
+
+.process-button:active {
+  transform: translateY(0);
+}
+
+/* Fade in animation */
+.fade-in {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.fade-in.visible {
   opacity: 1;
   transform: translateY(0);
 }
 
-.process-button {
-  position: relative;
-  padding: 1.2rem 3rem;
-  background: rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(20px);
-  color: white;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  border-radius: 16px;
-  font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
-  font-size: 1.1rem;
-  font-weight: 600;
-  cursor: pointer;
-  overflow: hidden;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.process-button span {
-  position: relative;
-  z-index: 2;
-}
-
-.process-button:hover {
-  background: rgba(255, 255, 255, 0.3);
-  border-color: rgba(255, 255, 255, 0.5);
-  transform: translateY(-3px);
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
-}
-
-.button-glow {
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-  transition: left 0.8s ease;
-}
-
-.process-button:hover .button-glow {
-  left: 100%;
-}
-
-/* Background Elements */
-.bg-elements {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 1;
-  pointer-events: none;
-}
-
-.bg-mesh {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-image: 
-    linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
-  background-size: 50px 50px;
-  animation: meshMove 20s linear infinite;
-}
-
-@keyframes meshMove {
-  0% { transform: translate(0, 0); }
-  100% { transform: translate(50px, 50px); }
-}
-
-.bg-orb {
-  position: absolute;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
-  animation-duration: 15s;
-  animation-iteration-count: infinite;
-  animation-timing-function: ease-in-out;
-}
-
-.bg-orb-1 {
-  width: 400px;
-  height: 400px;
-  top: -10%;
-  left: -10%;
-  animation-name: orbFloat1;
-}
-
-.bg-orb-2 {
-  width: 300px;
-  height: 300px;
-  bottom: -10%;
-  right: -10%;
-  animation-name: orbFloat2;
-  animation-delay: -7s;
-}
-
-@keyframes orbFloat1 {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  33% { transform: translate(50px, -30px) scale(1.1); }
-  66% { transform: translate(-30px, 40px) scale(0.9); }
-}
-
-@keyframes orbFloat2 {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  50% { transform: translate(-60px, -50px) scale(1.2); }
-}
-
-/* Responsive Design */
 @media (max-width: 768px) {
   .process {
-    padding: 6rem 1.5rem;
+    padding: 80px 0;
   }
 
   .process-header {
-    margin-bottom: 4rem;
+    margin-bottom: 60px;
   }
 
-  .process-title {
-    margin-bottom: 1rem;
-  }
-
-  .process-subtitle {
-    font-size: 1.125rem;
-  }
-
-  .process-timeline {
-    margin-bottom: 4rem;
-  }
-
-  .timeline-line {
-    display: none;
-  }
-
-  .process-steps {
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
-  }
-
-  .step-glass {
-    padding: 2rem;
-  }
-
-  .step-number-container {
-    margin-bottom: 1.25rem;
+  .process-step {
+    flex-direction: column;
+    padding: 24px;
   }
 
   .step-number {
-    width: 50px;
-    height: 50px;
-    font-size: 1.25rem;
-  }
-
-  .step-icon {
-    width: 35px;
-    height: 35px;
-  }
-
-  .step-icon svg {
-    width: 18px;
-    height: 18px;
-  }
-
-  .step-title {
-    font-size: 1.375rem;
-  }
-
-  .step-description {
-    font-size: 0.9375rem;
-    margin-bottom: 1.25rem;
-  }
-
-  .process-button {
-    padding: 1rem 2.5rem;
-    font-size: 1rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .process {
-    padding: 4rem 1rem;
-  }
-
-  .step-glass {
-    padding: 1.5rem;
-  }
-
-  .step-title {
-    font-size: 1.25rem;
-  }
-
-  .step-description {
-    font-size: 0.875rem;
-  }
-
-  .process-button {
-    padding: 0.875rem 2rem;
-    font-size: 0.9375rem;
+    width: 40px;
+    height: 40px;
+    font-size: 18px;
   }
 }

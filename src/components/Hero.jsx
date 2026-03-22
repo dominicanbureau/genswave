@@ -141,8 +141,7 @@ function Hero() {
                 className="cta-button"
                 onClick={handleStartProject}
               >
-                <span>Comenzar</span>
-                <div className="button-glow"></div>
+                Comenzar
               </button>
             </div>
             
@@ -158,15 +157,7 @@ function Hero() {
             <div className="mouse">
               <div className="wheel"></div>
             </div>
-            <span>Explorar</span>
           </div>
-        </div>
-
-        {/* Animated Background Elements */}
-        <div className="bg-elements">
-          <div className="floating-dot"></div>
-          <div className="floating-line"></div>
-          <div className="floating-circle"></div>
         </div>
       </section>
     </>

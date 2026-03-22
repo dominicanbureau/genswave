@@ -3,19 +3,20 @@
   position: fixed;
   top: 0;
   width: 100%;
-  background: rgba(255, 255, 255, 0.98);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
   border: none;
-  border-bottom: 1px solid #e8eaed;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
   z-index: 1000;
   transition: all 0.3s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .nav-container {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 16px 24px;
+  padding: 12px 32px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -37,14 +38,14 @@
 }
 
 .logo-image {
-  height: 32px;
+  height: 36px;
   width: auto;
 }
 
 .nav-menu {
   display: flex;
   list-style: none;
-  gap: 32px;
+  gap: 40px;
   align-items: center;
   margin: 0;
   padding: 0;
@@ -54,7 +55,7 @@
   text-decoration: none;
   color: #5f6368;
   font-family: 'Google Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 400;
   cursor: pointer;
   transition: color 0.2s ease;
@@ -72,17 +73,26 @@
 }
 
 .login-btn {
-  padding: 8px 20px;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  padding: 0 24px !important;
   background: #4285f4;
   color: #ffffff !important;
   border: none;
   border-radius: 20px;
   transition: all 0.2s ease;
   font-weight: 500;
+  font-size: 14px;
+  white-space: nowrap;
+  box-shadow: 0 1px 3px rgba(66, 133, 244, 0.3);
 }
 
 .login-btn:hover {
   background: #5a95f5;
+  box-shadow: 0 2px 6px rgba(66, 133, 244, 0.4);
+  transform: translateY(-1px);
 }
 
 /* Mobile Hamburger Menu */
@@ -91,8 +101,8 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   background: #f8f9fa;
   border: 1px solid #e8eaed;
   border-radius: 8px;
@@ -104,13 +114,14 @@
 
 .hamburger:hover {
   background: #e8eaed;
+  border-color: #dadce0;
 }
 
 .hamburger-line {
-  width: 18px;
+  width: 20px;
   height: 2px;
   background: #5f6368;
-  margin: 2px 0;
+  margin: 3px 0;
   transition: all 0.3s ease;
   transform-origin: center;
   border-radius: 1px;
@@ -174,7 +185,7 @@
 }
 
 .mobile-logo-image {
-  height: 32px;
+  height: 36px;
   width: auto;
 }
 
@@ -267,20 +278,24 @@
   justify-content: center;
   gap: 8px;
   width: 100%;
-  padding: 12px 20px;
+  height: 48px;
+  padding: 0 24px;
   background: #4285f4;
   color: #ffffff !important;
   border: none;
   border-radius: 24px;
   font-family: 'Google Sans', sans-serif;
   font-weight: 500;
-  font-size: 14px;
+  font-size: 15px;
   text-decoration: none;
   transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(66, 133, 244, 0.3);
 }
 
 .mobile-login-btn:hover {
   background: #5a95f5 !important;
+  box-shadow: 0 4px 12px rgba(66, 133, 244, 0.4);
+  transform: translateY(-1px) !important;
 }
 
 /* Responsive Design */

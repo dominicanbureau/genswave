@@ -61,8 +61,8 @@ function Process() {
       <div className="process-container">
         <div className="process-header fade-in">
           <h2 className="process-title">
-            Achieve new heights
-            <span className="title-highlight">with our proven process</span>
+            Alcanza nuevas alturas
+            <span className="title-highlight">con nuestro proceso probado</span>
           </h2>
           <p className="process-subtitle">
             Metodología que garantiza calidad y transparencia en cada fase
@@ -88,7 +88,7 @@ function Process() {
 
         <div className="process-cta fade-in">
           <button className="process-button" onClick={handleNavigate}>
-            <span>Explore Product</span>
+            <span>Explorar Producto</span>
             <span className="material-icons">arrow_forward</span>
           </button>
         </div>

@@ -58,8 +58,8 @@ function Services() {
       <div className="services-container">
         <div className="services-header fade-in">
           <h2 className="services-title">
-            Built for businesses
-            <span className="title-highlight">for the digital era</span>
+            Construido para empresas
+            <span className="title-highlight">de la era digital</span>
           </h2>
         </div>
 

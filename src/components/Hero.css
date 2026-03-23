@@ -99,7 +99,7 @@
 .cursor-blink {
   display: inline-block;
   font-size: clamp(48px, 8vw, 96px);
-  color: #4285f4;
+  color: #000000;
   animation: blink 1s step-end infinite;
   font-weight: 300;
 }
@@ -162,14 +162,14 @@
 }
 
 .hero-btn.primary {
-  background: #4285f4;
+  background: #000000;
   color: #ffffff;
-  box-shadow: 0 2px 12px rgba(66, 133, 244, 0.4);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
 }
 
 .hero-btn.primary:hover {
-  background: #5a95f5;
-  box-shadow: 0 4px 16px rgba(66, 133, 244, 0.5);
+  background: #333333;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
   transform: translateY(-1px);
 }
 
@@ -286,7 +286,7 @@
 
 .cursor-blink-small {
   font-size: 28px;
-  color: #4285f4;
+  color: #000000;
   animation: blink 1s step-end infinite;
   font-weight: 300;
 }
@@ -319,18 +319,18 @@
   font-family: 'Google Sans', -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 15px;
   font-weight: 500;
-  background: #4285f4;
+  background: #000000;
   color: #ffffff;
   border: none;
   border-radius: 24px;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 2px 12px rgba(66, 133, 244, 0.3);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
 }
 
 .explore-btn:hover {
-  background: #5a95f5;
-  box-shadow: 0 4px 16px rgba(66, 133, 244, 0.4);
+  background: #333333;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
   transform: translateY(-1px);
 }
 

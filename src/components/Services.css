@@ -28,26 +28,29 @@
 
 .title-highlight {
   display: block;
-  color: #4285f4;
+  color: #000000;
 }
 
 .services-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 32px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+  max-width: 1000px;
+  margin: 0 auto;
 }
 
 .service-card {
-  padding: 40px 32px;
+  padding: 36px 28px;
   background: #ffffff;
   border: 1px solid #e8eaed;
-  border-radius: 16px;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 12px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
-  min-height: 340px;
   display: flex;
   flex-direction: column;
+  align-items: center;
+  text-align: center;
 }
 
 .service-card::before {
@@ -56,8 +59,8 @@
   top: 0;
   left: 0;
   width: 100%;
-  height: 4px;
-  background: #4285f4;
+  height: 3px;
+  background: #000000;
   transform: scaleX(0);
   transform-origin: left;
   transition: transform 0.3s ease;
@@ -68,9 +71,9 @@
 }
 
 .service-card:hover {
-  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.1);
-  transform: translateY(-8px);
-  border-color: #dadce0;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  transform: translateY(-4px);
+  border-color: #000000;
 }
 
 .service-icon {
@@ -89,7 +92,7 @@
 
 .service-card:hover .service-icon {
   transform: scale(1.05);
-  background: #4285f4;
+  background: #000000;
 }
 
 .service-card:hover .service-icon .material-icons {
@@ -115,7 +118,7 @@
   font-family: 'Google Sans', -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 13px;
   font-weight: 400;
-  color: #4285f4;
+  color: #000000;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   margin: 0 0 16px 0;
@@ -140,7 +143,7 @@
   font-family: 'Google Sans', -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 15px;
   font-weight: 500;
-  color: #4285f4;
+  color: #000000;
   background: none;
   border: none;
   cursor: pointer;

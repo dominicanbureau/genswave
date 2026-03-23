@@ -44,6 +44,8 @@
   animation-delay: var(--delay);
   opacity: 0;
   will-change: transform, opacity;
+  transform: translateZ(0);
+  backface-visibility: hidden;
 }
 
 .floating-icon .material-icons {

@@ -4,7 +4,7 @@ import './AppointmentForm.css';
 
 function AppointmentForm() {
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-100px" });
+  const isInView = useInView(ref, { once: true, margin: "-50px" });
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -108,9 +108,9 @@ function AppointmentForm() {
         {/* Section Header */}
         <motion.div
           className="appointment-header"
-          initial={{ opacity: 0, y: 40 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8 }}
+          transition={{ duration: 0.4 }}
         >
           <div className="header-badge">
             <span>Comienza tu Proyecto</span>
@@ -128,9 +128,9 @@ function AppointmentForm() {
         <motion.form 
           className="appointment-form"
           onSubmit={handleSubmit}
-          initial={{ opacity: 0, y: 40 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8, delay: 0.3 }}
+          transition={{ duration: 0.4, delay: 0.1 }}
         >
           <div className="form-grid">
             <motion.div 

@@ -44,7 +44,7 @@ function Services() {
           }
         });
       },
-      { threshold: 0.1 }
+      { threshold: 0.05, rootMargin: '50px' }
     );
 
     const elements = ref.current?.querySelectorAll('.fade-in');

@@ -1,115 +1,112 @@
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import './Hero.css';
-
-const floatingIcons = [
-  'plus_code', 'file_copy', 'code_blocks', 'device_hub', 'keyboard_command_key',
-  'terminal', 'spark', 'code', 'deployed_code', 'commit',
-  'pen_spark', 'folder', 'search_spark', 'keyboard_return', 'dashboard_customize',
-  'spark', 'merge', 'keyboard_tab', 'check_circle', 'refresh',
-  'data_object', 'developer_mode_tv'
-];
 
 function Hero() {
   const videoRef = useRef(null);
-  const [businessName, setBusinessName] = useState('');
+  const [videoEnded, setVideoEnded] = useState(false);
 
   useEffect(() => {
     const video = videoRef.current;
     if (video) {
       video.muted = true;
       video.playsInline = true;
-      video.loop = true;
-      video.play().catch(() => {});
+      video.defaultMuted = true;
+      
+      // Reproducir automáticamente
+      const playPromise = video.play();
+      
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            console.log('Video playing successfully');
+          })
+          .catch((error) => {
+            console.log('Autoplay prevented:', error);
+            setTimeout(() => {
+              video.play().catch(() => {});
+            }, 100);
+          });
+      }
+
+      // Cuando el video termina, pausar en el último frame
+      const handleVideoEnd = () => {
+        video.pause();
+        setVideoEnded(true);
+      };
+
+      video.addEventListener('ended', handleVideoEnd);
+
+      return () => {
+        video.removeEventListener('ended', handleVideoEnd);
+      };
     }
   }, []);
-
-  useEffect(() => {
-    const handleAppointmentSubmitted = () => setBusinessName('');
-    window.addEventListener('appointmentSubmitted', handleAppointmentSubmitted);
-    return () => window.removeEventListener('appointmentSubmitted', handleAppointmentSubmitted);
-  }, []);
-
-  const handleStartProject = () => {
-    if (businessName.trim()) {
-      sessionStorage.setItem('businessName', businessName.trim());
-      window.dispatchEvent(new CustomEvent('businessNameSet', { 
-        detail: { businessName: businessName.trim() } 
-      }));
-    }
-    setTimeout(() => {
-      document.getElementById('contacto')?.scrollIntoView({ behavior: 'smooth' });
-    }, 100);
-  };
 
   return (
-    <section className="hero">
-      <video 
-        ref={videoRef}
-        className="hero-video"
-        muted 
-        playsInline
-        loop
-        autoPlay
-      >
-        <source src="/genswave.mov" type="video/mp4" />
-      </video>
+    <>
+      <div className="noise"></div>
 
-      {/* Floating Icons Background */}
-      <div className="floating-icons-container">
-        {floatingIcons.map((icon, index) => (
-          <div 
-            key={`${icon}-${index}`}
-            className="floating-icon"
-            style={{
-              '--delay': `${index * 0.3}s`,
-              '--duration': `${20 + (index % 5) * 5}s`,
-              '--start-x': `${(index % 8) * 12}%`,
-              '--start-y': `${Math.floor(index / 8) * 25}%`,
-              '--end-x': `${((index + 3) % 8) * 12}%`,
-              '--end-y': `${(Math.floor(index / 8) + 1) * 25}%`
-            }}
-          >
-            <span className="material-icons">{icon}</span>
-          </div>
-        ))}
-      </div>
+      {/* Threshold Filter for Morph Effect */}
+      <svg className="filters">
+        <defs>
+          <filter id="threshold">
+            {/* Alpha thresholding */}
+            <feColorMatrix in="SourceGraphic" type="matrix" values="1 0 0 0 0
+                        0 1 0 0 0
+                        0 0 1 0 0
+                        0 0 0 25 -9" result="goo" />
+            <feComposite in="SourceGraphic" in2="goo" operator="atop" />
+          </filter>
+        </defs>
+      </svg>
 
-      <div className="hero-content">
-        <h1 className="hero-title">
-          Desarrollamos el futuro de tu negocio
-        </h1>
-        
-        <p className="hero-subtitle">
-          Experience liftoff with next-generation development
-        </p>
-
-        <div className="hero-actions">
-          <button className="hero-btn primary" onClick={handleStartProject}>
-            <span>Comenzar proyecto</span>
-          </button>
-          <button className="hero-btn secondary">
-            <span className="material-icons">play_arrow</span>
-            <span>Play intro</span>
-            <span className="material-icons">play_arrow</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Bottom Section with Icons */}
-      <div className="hero-bottom">
-        <div className="hero-icons-row">
-          {floatingIcons.slice(0, 11).map((icon, index) => (
-            <div 
-              key={`bottom-${icon}-${index}`}
-              className="bottom-icon"
-              style={{ '--delay': `${index * 0.1}s` }}
-            >
-              <span className="material-icons">{icon}</span>
+      <section className="hero">
+        <div className="morph-container">
+          <div className="word-rotator">
+            <div className="word word-video">
+              <video 
+                ref={videoRef}
+                className="hero-video-element"
+                muted
+                defaultMuted
+                playsInline
+                preload="auto"
+              >
+                <source src="/genswave.mp4" type="video/mp4" />
+              </video>
             </div>
-          ))}
+            <div className="word">GENSWAVE</div>
+          </div>
         </div>
-      </div>
-    </section>
+        <p className="subtext">Desarrollo Digital de Próxima Generación</p>
+
+        <div className="scroll-indicator">
+          <div className="mouse">
+            <div className="wheel"></div>
+          </div>
+        </div>
+      </section>
+
+      <section className="content">
+        <div className="content-text">
+          <h2>Construimos Legados<br />Digitales.</h2>
+          <p>
+            En un mundo de ruido, creamos claridad. Nuestro estudio fusiona visión estratégica
+            con diseño impecable para forjar productos digitales que resisten el paso del tiempo
+            y definen el futuro de la interacción.
+          </p>
+        </div>
+        <div className="card">
+          <h3>Artesanía Visionaria</h3>
+          <br />
+          <p style={{ marginBottom: 0 }}>
+            No perseguimos tendencias; las establecemos. Al deconstruir problemas complejos
+            en soluciones elegantes, empoderamos a las marcas para conectar con su audiencia
+            de formas significativas y duraderas.
+          </p>
+        </div>
+      </section>
+    </>
   );
 }
 

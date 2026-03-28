@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import HeroVisual from '../components/HeroVisual';
+import Footer from '../components/Footer';
 import './Home.css';
 
 function Home() {
@@ -190,8 +191,30 @@ function Home() {
 
               <div className="mobile-menu-footer">
                 <div className="mobile-menu-contact">
-                  <a href="mailto:contacto@genswave.com">contacto@genswave.com</a>
-                  <a href="tel:+525555555555">+52 55 5555 5555</a>
+                  <a href="mailto:info@genswave.org">info@genswave.org</a>
+                  <span className="mobile-menu-location">Distrito Nacional, Santo Domingo</span>
+                </div>
+                <div className="mobile-menu-social">
+                  <a href="https://instagram.com/genswave" target="_blank" rel="noopener noreferrer" className="mobile-social-icon" aria-label="Instagram">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                      <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+                      <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+                      <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+                    </svg>
+                  </a>
+                  <a href="#" className="mobile-social-icon" aria-label="Dribbble">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                      <circle cx="12" cy="12" r="10"/>
+                      <path d="M8.56 2.75c4.37 6.03 6.02 9.42 8.03 17.5m2.54-15.38c-3.72 4.35-8.94 5.66-16.88 5.85m19.5 1.9c-3.5-.93-6.63-.82-8.94 0-2.58.92-5.01 2.86-7.44 6.32"/>
+                    </svg>
+                  </a>
+                  <a href="#" className="mobile-social-icon" aria-label="LinkedIn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                      <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/>
+                      <rect x="2" y="9" width="4" height="12"/>
+                      <circle cx="4" cy="4" r="2"/>
+                    </svg>
+                  </a>
                 </div>
                 <a href="/login" className="mobile-menu-login-btn" onClick={toggleMobileMenu}>
                   Iniciar Sesión
@@ -423,12 +446,13 @@ function Home() {
         <div className="closing-section">
           <div className="closer">
             <strong>Comienza tu proyecto hoy.</strong>
-            hola@genswave.com<br />
-            +52 (55) 1234 5678<br />
-            Ciudad de México, México
+            info@genswave.org<br />
+            Distrito Nacional, Santo Domingo
           </div>
         </div>
       </div>
+
+      <Footer />
     </div>
     </div>
   );

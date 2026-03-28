@@ -1,6 +1,6 @@
 import { motion, useScroll, useTransform, useInView } from 'framer-motion';
-import { useRef } from 'react';
-import Navbar from '../components/Navbar';
+import { useRef, useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import Footer from '../components/Footer';
 import './ProcessPage.css';
 
@@ -9,7 +9,7 @@ const processSteps = [
     number: '01',
     title: 'Descubrimiento',
     subtitle: 'Entendemos tu visión',
-    description: 'Comenzamos con una inmersión profunda en tu negocio, objetivos y desafíos. Realizamos investigación de mercado y análisis competitivo',
+    description: 'Comenzamos con una inmersión profunda en tu negocio, objetivos y desafíos. Realizamos investigación de mercado y análisis competitivo para establecer bases sólidas.',
     activities: [
       'Reunión inicial y briefing',
       'Investigación de mercado',
@@ -18,7 +18,7 @@ const processSteps = [
       'Identificación de audiencia',
       'Propuesta de valor'
     ],
-    deliverables: ['Fecha de Reunion', 'Roadmap inicial', 'Propuesta técnica'],
+    deliverables: ['Fecha de Reunión', 'Roadmap inicial', 'Propuesta técnica'],
     duration: '5 Horas'
   },
   {
@@ -28,66 +28,142 @@ const processSteps = [
     description: 'Diseñamos la arquitectura de información, definimos la experiencia de usuario y creamos un plan detallado que guiará todo el desarrollo del proyecto.',
     activities: [
       'Arquitectura de información',
-      'Estrategias de adaptacion',
+      'Estrategias de adaptación',
       'Definición de tecnologías',
       'Planificación de proyecto',
       'Estimación de recursos'
     ],
     deliverables: ['Arquitectura técnica', 'Cronograma detallado'],
-    duration: '2 Dias'
+    duration: '2 Días'
   },
   {
     number: '03',
     title: 'Diseño',
     subtitle: 'Creamos la experiencia',
-    description: 'Transformamos la estrategia en al palpable. Creamos prototipos interactivos que permiten validar la experiencia antes del desarrollo.',
+    description: 'Transformamos la estrategia en algo palpable. Creamos prototipos interactivos que permiten validar la experiencia antes del desarrollo.',
     activities: [
-      'Sistema de creacion',
+      'Sistema de creación',
       'UI mockups de alta calidad',
       'Prototipos interactivos',
-      'Ajustes de diseño',
+      'Ajustes de diseño'
     ],
-    deliverables: ['Modelo de demostracion', 'Recomendaciones', 'Detalles finales'],
-    duration: '4 Dias'
+    deliverables: ['Modelo de demostración', 'Recomendaciones', 'Detalles finales'],
+    duration: '4 Días'
   },
   {
-    number: '05',
-    title: 'Finalizacion',
-    subtitle: 'Garantizamos la calidad y tomamos lo nuestro',
-    description: 'Realizamos pruebas exhaustivas en caso de haber solicitado sitios/apps. Optimizamos y te hacemos entrega',
+    number: '04',
+    title: 'Finalización',
+    subtitle: 'Garantizamos la calidad',
+    description: 'Realizamos pruebas exhaustivas en caso de haber solicitado sitios/apps. Optimizamos y te hacemos entrega del proyecto completo.',
     activities: [
       'Prueba de funcionalidad',
       'Prueba de rendimiento',
       'Prueba de seguridad',
       'Reajustes de servicio',
       'Pago de cuotas restantes',
-      'Proceso de Fidelizacion'
+      'Proceso de fidelización'
     ],
-    deliverables: ['Reporte de resultados', 'Muestra de rendimiento', 'Certificaciones Correspondientes'],
-    duration: '4 Dias'
+    deliverables: ['Reporte de resultados', 'Muestra de rendimiento', 'Certificaciones correspondientes'],
+    duration: '4 Días'
   }
 ];
 
 function ProcessPage() {
+  const [isDarkMode, setIsDarkMode] = useState(true);
+  const [scrolled, setScrolled] = useState(false);
   const containerRef = useRef(null);
+  
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start start", "end end"]
   });
 
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) {
+      setIsDarkMode(savedTheme === 'dark');
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+  }, [isDarkMode]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 50);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const toggleTheme = () => {
+    setIsDarkMode(!isDarkMode);
+  };
+
   return (
-    <div className="process-page" ref={containerRef}>
-      <Navbar />
-      
-      <HeroSection />
-      
-      <TimelineSection scrollYProgress={scrollYProgress} />
-      
-      <MethodologySection />
-      
-      <CTASection />
-      
-      <Footer />
+    <div className={isDarkMode ? 'dark-mode' : 'light-mode'}>
+      <div className="process-page" ref={containerRef}>
+        <nav className={`main-navbar ${scrolled ? 'scrolled' : ''}`}>
+          <div className="navbar-container">
+            <Link to="/" className="navbar-logo">
+              <img src="/genswave.png" alt="Genswave" className="navbar-logo-image" />
+            </Link>
+
+            <div className="navbar-center">
+              <Link to="/proceso" className="nav-link active">
+                <span className="link-text">Proceso</span>
+                <span className="link-indicator"></span>
+              </Link>
+              <Link to="/servicios" className="nav-link">
+                <span className="link-text">Servicios</span>
+                <span className="link-indicator"></span>
+              </Link>
+              <Link to="/contacto" className="nav-link">
+                <span className="link-text">Contactar</span>
+                <span className="link-indicator"></span>
+              </Link>
+            </div>
+
+            <div className="navbar-actions">
+              <div className="icon-trio">
+                <Link to="/contacto" className="icon-btn icon-left" aria-label="Contacto">
+                  <svg className="icon" width="18" height="18" viewBox="0 0 24 24" fill="none">
+                    <path d="M3 5C3 3.89543 3.89543 3 5 3H8.27924C8.70967 3 9.09181 3.27543 9.22792 3.68377L10.7257 8.17721C10.8831 8.64932 10.6694 9.16531 10.2243 9.38787L7.96701 10.5165C9.06925 12.9612 11.0388 14.9308 13.4835 16.033L14.6121 13.7757C14.8347 13.3306 15.3507 13.1169 15.8228 13.2743L20.3162 14.7721C20.7246 14.9082 21 15.2903 21 15.7208V19C21 20.1046 20.1046 21 19 21H18C9.71573 21 3 14.2843 3 6V5Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </Link>
+                
+                <button onClick={toggleTheme} className="icon-btn icon-center" aria-label="Toggle theme">
+                  <svg className="icon" width="18" height="18" viewBox="0 0 20 20" fill="none">
+                    {isDarkMode ? (
+                      <path d="M10 2V4M10 16V18M4 10H2M18 10H16M15.657 4.343L14.243 5.757M5.757 14.243L4.343 15.657M15.657 15.657L14.243 14.243M5.757 5.757L4.343 4.343M13 10C13 11.657 11.657 13 10 13C8.343 13 7 11.657 7 10C7 8.343 8.343 7 10 7C11.657 7 13 8.343 13 10Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                    ) : (
+                      <path d="M17 10C17 13.866 13.866 17 10 17C6.134 17 3 13.866 3 10C3 6.134 6.134 3 10 3C10.395 3 10.782 3.034 11.158 3.099C9.838 4.034 9 5.415 9 7C9 9.761 11.239 12 14 12C15.585 12 16.966 11.162 17.901 9.842C17.966 10.218 18 10.605 18 11C18 10.667 17.667 10.333 17 10Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    )}
+                  </svg>
+                </button>
+
+                <Link to="/login" className="icon-btn icon-right" aria-label="Login">
+                  <svg className="icon" width="18" height="18" viewBox="0 0 20 20" fill="none">
+                    <path d="M10 11C12.2091 11 14 9.20914 14 7C14 4.79086 12.2091 3 10 3C7.79086 3 6 4.79086 6 7C6 9.20914 7.79086 11 10 11Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M3 18C3 14.134 6.13401 11 10 11C13.866 11 17 14.134 17 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </Link>
+              </div>
+            </div>
+          </div>
+        </nav>
+        
+        <HeroSection />
+        
+        <TimelineSection scrollYProgress={scrollYProgress} />
+        
+        <MethodologySection />
+        
+        <CTASection />
+        
+        <Footer />
+      </div>
     </div>
   );
 }
@@ -96,26 +172,49 @@ function HeroSection() {
   return (
     <section className="process-hero">
       <motion.div
-        className="process-hero-header"
-        initial={{ opacity: 0, y: 30 }}
+        className="process-hero-content"
+        initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay: 0.2 }}
+        transition={{ duration: 0.8, delay: 0.3 }}
       >
-        <h1>DESCUBRE COMO TRABAJAMOS</h1>
+        <motion.span 
+          className="hero-label"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.4 }}
+        >
+          NUESTRO PROCESO
+        </motion.span>
+        <motion.h1
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.5 }}
+        >
+          De la idea a la<br />realidad digital
+        </motion.h1>
+        <motion.p
+          className="hero-description"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.6 }}
+        >
+          Un enfoque estructurado y transparente que transforma<br />
+          tu visión en experiencias digitales excepcionales
+        </motion.p>
       </motion.div>
     </section>
   );
 }
 
 function TimelineSection({ scrollYProgress }) {
-  const lineHeight = useTransform(scrollYProgress, [0, 1], ['0%', '100%']);
+  const lineHeight = useTransform(scrollYProgress, [0.1, 0.7], ['0%', '100%']);
 
   return (
     <section className="timeline-section">
       <div className="timeline-container">
         <motion.div 
           className="timeline-line"
-          style={{ height: lineHeight }}
+          style={{ scaleY: lineHeight }}
         />
         
         {processSteps.map((step, index) => (
@@ -128,73 +227,75 @@ function TimelineSection({ scrollYProgress }) {
 
 function ProcessStep({ step, index }) {
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-150px" });
+  const isInView = useInView(ref, { once: true, margin: "-100px" });
 
   return (
     <motion.div
       ref={ref}
-      className={`process-step ${index % 2 === 0 ? 'left' : 'right'}`}
-      initial={{ opacity: 0, x: index % 2 === 0 ? -100 : 100 }}
-      animate={isInView ? { opacity: 1, x: 0 } : {}}
+      className="process-step"
+      initial={{ opacity: 0, y: 60 }}
+      animate={isInView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.8, delay: 0.2 }}
     >
       <motion.div 
-        className="step-marker"
-        initial={{ scale: 0 }}
-        animate={isInView ? { scale: 1 } : {}}
-        transition={{ duration: 0.5, delay: 0.4 }}
-        whileHover={{ scale: 1.2 }}
+        className="step-number"
+        initial={{ scale: 0, opacity: 0 }}
+        animate={isInView ? { scale: 1, opacity: 1 } : {}}
+        transition={{ duration: 0.6, delay: 0.4, type: "spring", stiffness: 200 }}
       >
-        <span>{step.number}</span>
+        {step.number}
       </motion.div>
       
       <motion.div 
-        className="step-card"
-        whileHover={{ y: -10, boxShadow: '0 30px 60px rgba(0, 0, 0, 0.15)' }}
-        transition={{ duration: 0.3 }}
+        className="step-content"
+        initial={{ opacity: 0, x: -30 }}
+        animate={isInView ? { opacity: 1, x: 0 } : {}}
+        transition={{ duration: 0.8, delay: 0.3 }}
       >
         <div className="step-header">
-          <h2>{step.title}</h2>
-          <h3>{step.subtitle}</h3>
+          <div>
+            <h2>{step.title}</h2>
+            <h3>{step.subtitle}</h3>
+          </div>
           <span className="step-duration">{step.duration}</span>
         </div>
         
         <p className="step-description">{step.description}</p>
         
-        <div className="step-activities">
-          <h4>Actividades clave</h4>
-          <div className="activities-grid">
-            {step.activities.map((activity, idx) => (
-              <motion.div
-                key={idx}
-                className="activity-item"
-                initial={{ opacity: 0, y: 10 }}
-                animate={isInView ? { opacity: 1, y: 0 } : {}}
-                transition={{ duration: 0.4, delay: 0.6 + idx * 0.1 }}
-                whileHover={{ x: 5 }}
-              >
-                <div className="activity-dot" />
-                <span>{activity}</span>
-              </motion.div>
-            ))}
+        <div className="step-details">
+          <div className="step-activities">
+            <h4>Actividades clave</h4>
+            <div className="activities-list">
+              {step.activities.map((activity, idx) => (
+                <motion.div
+                  key={idx}
+                  className="activity-item"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={isInView ? { opacity: 1, x: 0 } : {}}
+                  transition={{ duration: 0.5, delay: 0.5 + idx * 0.08 }}
+                >
+                  <span className="activity-dot"></span>
+                  <span>{activity}</span>
+                </motion.div>
+              ))}
+            </div>
           </div>
-        </div>
-        
-        <div className="step-deliverables">
-          <h4>Entregables</h4>
-          <div className="deliverables-list">
-            {step.deliverables.map((deliverable, idx) => (
-              <motion.span
-                key={idx}
-                className="deliverable-tag"
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={isInView ? { opacity: 1, scale: 1 } : {}}
-                transition={{ duration: 0.4, delay: 0.8 + idx * 0.1 }}
-                whileHover={{ scale: 1.1, y: -3 }}
-              >
-                {deliverable}
-              </motion.span>
-            ))}
+          
+          <div className="step-deliverables">
+            <h4>Entregables</h4>
+            <div className="deliverables-list">
+              {step.deliverables.map((deliverable, idx) => (
+                <motion.span
+                  key={idx}
+                  className="deliverable-tag"
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={isInView ? { opacity: 1, scale: 1 } : {}}
+                  transition={{ duration: 0.4, delay: 0.7 + idx * 0.1 }}
+                >
+                  {deliverable}
+                </motion.span>
+              ))}
+            </div>
           </div>
         </div>
       </motion.div>
@@ -204,24 +305,24 @@ function ProcessStep({ step, index }) {
 
 function MethodologySection() {
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: true });
+  const isInView = useInView(ref, { once: true, margin: "-100px" });
 
   const methodologies = [
     {
       title: 'Estrategia',
-      description: 'Definimos las metas para trabajar con un norte.'
+      description: 'Definimos las metas para trabajar con un norte claro y objetivos medibles.'
     },
     {
-      title: 'Cooperacion',
-      description: 'Eres la cabeza de la idea, nosotros le damos vida.'
+      title: 'Cooperación',
+      description: 'Eres la cabeza de la idea, nosotros le damos vida con nuestra experiencia.'
     },
     {
       title: 'Desarrollo',
-      description: 'Integración continua para entregas más rápidas'
+      description: 'Integración continua y entregas incrementales para resultados más rápidos.'
     },
     {
       title: 'Flexibilidad',
-      description: 'Entregamos tu proyecto y flexibilizamos tus pagos'
+      description: 'Entregamos tu proyecto y flexibilizamos tus pagos según tus necesidades.'
     }
   ];
 
@@ -229,23 +330,36 @@ function MethodologySection() {
     <section className="methodology-section" ref={ref}>
       <motion.div
         className="methodology-content"
-        initial={{ opacity: 0, y: 50 }}
+        initial={{ opacity: 0, y: 60 }}
         animate={isInView ? { opacity: 1, y: 0 } : {}}
         transition={{ duration: 0.8 }}
       >
-        <h2>Nuestra metodología</h2>
-        <p>Combinamos las mejores prácticas de la industria para entregar resultados excepcionales</p>
+        <motion.span 
+          className="section-label"
+          initial={{ opacity: 0, y: 20 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.6, delay: 0.2 }}
+        >
+          METODOLOGÍA
+        </motion.span>
+        <motion.h2
+          initial={{ opacity: 0, y: 30 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.8, delay: 0.3 }}
+        >
+          Principios que guían<br />nuestro trabajo
+        </motion.h2>
         
         <div className="methodology-grid">
           {methodologies.map((method, index) => (
             <motion.div
               key={index}
               className="methodology-card"
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 0, y: 40 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.6, delay: 0.2 + index * 0.1 }}
-              whileHover={{ y: -10, scale: 1.02 }}
+              transition={{ duration: 0.6, delay: 0.4 + index * 0.1 }}
             >
+              <span className="method-number">0{index + 1}</span>
               <h3>{method.title}</h3>
               <p>{method.description}</p>
             </motion.div>
@@ -264,20 +378,34 @@ function CTASection() {
     <section className="process-cta" ref={ref}>
       <motion.div
         className="cta-content"
-        initial={{ opacity: 0, y: 50 }}
+        initial={{ opacity: 0, y: 60 }}
         animate={isInView ? { opacity: 1, y: 0 } : {}}
         transition={{ duration: 0.8 }}
       >
-        <h2>¿Quieres saber más sobre nuestro proceso?</h2>
-        <p>Agenda una llamada y te explicaremos cómo podemos adaptar nuestro proceso a tu proyecto</p>
-        <motion.a
-          href="/contacto"
-          className="cta-button"
-          whileHover={{ scale: 1.05, y: -5 }}
-          whileTap={{ scale: 0.95 }}
+        <motion.h2
+          initial={{ opacity: 0, y: 30 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.8, delay: 0.2 }}
         >
-          Agendar llamada
-        </motion.a>
+          ¿Listo para comenzar<br />tu proyecto?
+        </motion.h2>
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.8, delay: 0.3 }}
+        >
+          Agenda una llamada y te explicaremos cómo podemos<br />
+          adaptar nuestro proceso a tus necesidades específicas
+        </motion.p>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.8, delay: 0.4 }}
+        >
+          <Link to="/contacto" className="cta-button">
+            Agendar llamada
+          </Link>
+        </motion.div>
       </motion.div>
     </section>
   );

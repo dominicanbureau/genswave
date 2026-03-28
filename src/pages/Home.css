@@ -1772,6 +1772,33 @@ h1 {
   color: rgba(255, 255, 255, 0.9);
 }
 
+.mobile-menu-location {
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.8rem;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+}
+
+.mobile-menu-social {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  padding: 0.5rem 0;
+}
+
+.mobile-social-icon {
+  color: rgba(255, 255, 255, 0.5);
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mobile-social-icon:active {
+  color: rgba(255, 255, 255, 0.9);
+  transform: scale(0.95);
+}
+
 .mobile-menu-login-btn {
   display: block;
   text-align: center;
@@ -1821,6 +1848,18 @@ h1 {
 }
 
 .light-mode .mobile-menu-contact a:active {
+  color: rgba(0, 0, 0, 0.9);
+}
+
+.light-mode .mobile-menu-location {
+  color: rgba(0, 0, 0, 0.4);
+}
+
+.light-mode .mobile-social-icon {
+  color: rgba(0, 0, 0, 0.5);
+}
+
+.light-mode .mobile-social-icon:active {
   color: rgba(0, 0, 0, 0.9);
 }
 

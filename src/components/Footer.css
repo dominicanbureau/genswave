@@ -236,3 +236,74 @@
     height: 18px;
   }
 }
+
+/* Light Mode */
+.light-mode .footer {
+  background: var(--white);
+  color: var(--black);
+}
+
+.light-mode .footer::before {
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    rgba(0, 0, 0, 0.2) 50%, 
+    transparent 100%);
+}
+
+.light-mode .footer-main {
+  border-bottom-color: rgba(0, 0, 0, 0.1);
+}
+
+.light-mode .footer-brand h2 {
+  color: var(--black);
+}
+
+.light-mode .footer-brand p {
+  color: rgba(0, 0, 0, 0.7);
+}
+
+.light-mode .social-link {
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--black);
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+.light-mode .social-link:hover {
+  background: var(--black);
+  color: var(--white);
+  border-color: var(--black);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.light-mode .footer-column h3 {
+  color: var(--black);
+}
+
+.light-mode .footer-column a,
+.light-mode .footer-column span {
+  color: rgba(0, 0, 0, 0.7);
+}
+
+.light-mode .footer-column a:hover {
+  color: var(--black);
+}
+
+.light-mode .contact-info svg {
+  color: rgba(0, 0, 0, 0.7);
+}
+
+.light-mode .footer-bottom p {
+  color: rgba(0, 0, 0, 0.5);
+}
+
+.light-mode .footer-bottom-links a {
+  color: rgba(0, 0, 0, 0.5);
+}
+
+.light-mode .footer-bottom-links a:hover {
+  color: var(--black);
+}
+
+.light-mode .footer-bottom-links span {
+  color: rgba(0, 0, 0, 0.3);
+}

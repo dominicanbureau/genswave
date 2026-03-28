@@ -70,20 +70,20 @@ const services = [
     technologies: ['Python', 'Node.js', 'PostgreSQL', 'AWS']
   },
   {
-    id: 'cloud',
+    id: 'automation',
     number: '05',
-    title: 'Infraestructura Cloud',
-    subtitle: 'Escalabilidad y seguridad garantizadas',
-    description: 'Arquitectura moderna en la nube que crece contigo, con alta disponibilidad y seguridad empresarial.',
+    title: 'Automatización e IA',
+    subtitle: 'Inteligencia artificial al servicio de tu negocio',
+    description: 'Implementamos soluciones de automatización inteligente que optimizan procesos, mejoran la atención al cliente y aumentan la eficiencia operativa.',
     features: [
-      'Migración a la nube',
-      'DevOps y CI/CD',
-      'Monitoreo 24/7',
-      'Backups automáticos',
-      'Escalado automático',
-      'Seguridad avanzada'
+      'Chatbots con IA',
+      'Automatización de redes sociales',
+      'Soporte automatizado 24/7',
+      'Procesamiento de lenguaje natural',
+      'Integración con sistemas',
+      'Análisis predictivo'
     ],
-    technologies: ['AWS', 'Azure', 'Docker', 'Kubernetes']
+    technologies: ['OpenAI', 'ChatGPT', 'Dialogflow', 'Python']
   },
   {
     id: 'consulting',
@@ -104,15 +104,12 @@ const services = [
 ];
 
 function ServicesPage() {
-  const [isDarkMode, setIsDarkMode] = useState(true);
-  const [scrolled, setScrolled] = useState(false);
-
-  useEffect(() => {
+  const [isDarkMode, setIsDarkMode] = useState(() => {
     const savedTheme = localStorage.getItem('theme');
-    if (savedTheme) {
-      setIsDarkMode(savedTheme === 'dark');
-    }
-  }, []);
+    return savedTheme === 'dark';
+  });
+  const [scrolled, setScrolled] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
@@ -128,6 +125,10 @@ function ServicesPage() {
 
   const toggleTheme = () => {
     setIsDarkMode(!isDarkMode);
+  };
+
+  const toggleMobileMenu = () => {
+    setMobileMenuOpen(!mobileMenuOpen);
   };
 
   return (
@@ -179,6 +180,57 @@ function ServicesPage() {
                   </svg>
                 </Link>
               </div>
+
+              <button className="hamburger" onClick={toggleMobileMenu} aria-label="Menu">
+                <span className={`hamburger-line ${mobileMenuOpen ? 'open' : ''}`}></span>
+                <span className={`hamburger-line ${mobileMenuOpen ? 'open' : ''}`}></span>
+                <span className={`hamburger-line ${mobileMenuOpen ? 'open' : ''}`}></span>
+              </button>
+            </div>
+
+            {/* Mobile Menu */}
+            <div className={`mobile-menu ${mobileMenuOpen ? 'open' : ''}`}>
+              <div className="mobile-menu-header">
+                <img src="/genswave.png" alt="Genswave" className="mobile-menu-logo" />
+              </div>
+              
+              <nav className="mobile-menu-nav">
+                <Link to="/proceso" className="mobile-menu-link" onClick={toggleMobileMenu}>Proceso</Link>
+                <Link to="/servicios" className="mobile-menu-link" onClick={toggleMobileMenu}>Servicios</Link>
+                <Link to="/contacto" className="mobile-menu-link" onClick={toggleMobileMenu}>Contactar</Link>
+              </nav>
+
+              <div className="mobile-menu-footer">
+                <div className="mobile-menu-contact">
+                  <a href="mailto:info@genswave.org">info@genswave.org</a>
+                  <span className="mobile-menu-location">Distrito Nacional, Santo Domingo</span>
+                </div>
+                <div className="mobile-menu-social">
+                  <a href="https://instagram.com/genswave" target="_blank" rel="noopener noreferrer" className="mobile-social-icon" aria-label="Instagram">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                      <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+                      <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+                      <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+                    </svg>
+                  </a>
+                  <a href="#" className="mobile-social-icon" aria-label="Dribbble">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                      <circle cx="12" cy="12" r="10"/>
+                      <path d="M8.56 2.75c4.37 6.03 6.02 9.42 8.03 17.5m2.54-15.38c-3.72 4.35-8.94 5.66-16.88 5.85m19.5 1.9c-3.5-.93-6.63-.82-8.94 0-2.58.92-5.01 2.86-7.44 6.32"/>
+                    </svg>
+                  </a>
+                  <a href="#" className="mobile-social-icon" aria-label="LinkedIn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                      <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/>
+                      <rect x="2" y="9" width="4" height="12"/>
+                      <circle cx="4" cy="4" r="2"/>
+                    </svg>
+                  </a>
+                </div>
+                <Link to="/login" className="mobile-menu-login-btn" onClick={toggleMobileMenu}>
+                  Iniciar Sesión
+                </Link>
+              </div>
             </div>
           </div>
         </nav>
@@ -196,6 +248,17 @@ function ServicesPage() {
 }
 
 function HeroSection() {
+  const [showScrollIndicator, setShowScrollIndicator] = useState(true);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowScrollIndicator(window.scrollY < window.innerHeight * 0.5);
+    };
+    
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   return (
     <section className="services-hero">
       <motion.div
@@ -217,7 +280,7 @@ function HeroSection() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.5 }}
         >
-          Soluciones digitales<br />para cada necesidad
+          Soluciones Digitales<br />Para cada necesidad
         </motion.h1>
         <motion.p
           className="hero-description"
@@ -229,6 +292,34 @@ function HeroSection() {
           para crear experiencias que impulsan tu negocio
         </motion.p>
       </motion.div>
+
+      {showScrollIndicator && (
+        <motion.div
+          className="scroll-indicator"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 1 }}
+          onClick={() => {
+            const servicesGrid = document.querySelector('.services-grid-section');
+            if (servicesGrid) {
+              window.scrollTo({
+                top: servicesGrid.offsetTop,
+                behavior: 'smooth'
+              });
+            }
+          }}
+        >
+          <motion.div
+            className="scroll-arrow"
+            animate={{ y: [0, 8, 0] }}
+            transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+          >
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M12 5v14M19 12l-7 7-7-7" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </motion.div>
+        </motion.div>
+      )}
     </section>
   );
 }

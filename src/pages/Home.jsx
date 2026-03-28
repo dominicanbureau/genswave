@@ -1,26 +1,43 @@
 import { useEffect, useState, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { gsap } from 'gsap';
+import { ScrollToPlugin } from 'gsap/ScrollToPlugin';
 import HeroVisual from '../components/HeroVisual';
 import Footer from '../components/Footer';
 import './Home.css';
 
+// Register GSAP plugin
+gsap.registerPlugin(ScrollToPlugin);
+
 function Home() {
+  const navigate = useNavigate();
   const [scrolled, setScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState('');
-  const [isDarkMode, setIsDarkMode] = useState(true);
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    // Check localStorage first, default to light mode (false)
+    const savedTheme = localStorage.getItem('theme');
+    return savedTheme === 'dark';
+  });
   const [currentSectionIndex, setCurrentSectionIndex] = useState(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [showScrollIndicator, setShowScrollIndicator] = useState(true);
   const isScrollingRef = useRef(false);
   const sectionsRef = useRef([]);
 
   useEffect(() => {
-    // Get all sections
+    // Get all sections including closing section
     sectionsRef.current = [
       document.querySelector('header'),
-      ...document.querySelectorAll('.scroll-section')
+      ...document.querySelectorAll('.scroll-section'),
+      document.querySelector('.closing-section')
     ].filter(Boolean);
 
     const handleScroll = () => {
       setScrolled(window.scrollY > 50);
+      
+      // Hide scroll indicator after scrolling past first section
+      setShowScrollIndicator(window.scrollY < window.innerHeight * 0.5);
 
       const sections = document.querySelectorAll('.scroll-section');
       let current = '';
@@ -87,14 +104,15 @@ function Home() {
           scrollTarget = targetSection.offsetTop;
         }
 
-        window.scrollTo({
-          top: scrollTarget,
-          behavior: 'smooth'
+        // Use GSAP for smoother scroll animation
+        gsap.to(window, {
+          scrollTo: scrollTarget,
+          duration: 1.3,
+          ease: 'power4.out',
+          onComplete: () => {
+            isScrollingRef.current = false;
+          }
         });
-
-        setTimeout(() => {
-          isScrollingRef.current = false;
-        }, 800);
       }
     };
 
@@ -108,11 +126,153 @@ function Home() {
   }, [currentSectionIndex]);
 
   const toggleTheme = () => {
-    setIsDarkMode(!isDarkMode);
+    const newTheme = !isDarkMode;
+    setIsDarkMode(newTheme);
+    localStorage.setItem('theme', newTheme ? 'dark' : 'light');
   };
 
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen);
+  };
+
+  const handleExploreClick = (e) => {
+    e.preventDefault();
+    if (isTransitioning) return;
+    
+    setIsTransitioning(true);
+
+    // Detect if mobile
+    const isMobile = window.innerWidth <= 991;
+    console.log('Is Mobile:', isMobile, 'Width:', window.innerWidth);
+
+    if (isMobile) {
+      // MOBILE: Animate the GENSWAVE text
+      const genswaveText = document.querySelector('header h1');
+      console.log('GENSWAVE text element:', genswaveText);
+      
+      if (!genswaveText) {
+        console.error('GENSWAVE text not found!');
+        navigate('/servicios');
+        return;
+      }
+
+      // Get current position of text
+      const rect = genswaveText.getBoundingClientRect();
+      console.log('Text position:', rect);
+      
+      // Fix text in its current position
+      genswaveText.style.position = 'fixed';
+      genswaveText.style.left = rect.left + 'px';
+      genswaveText.style.top = rect.top + 'px';
+      genswaveText.style.margin = '0';
+      genswaveText.style.zIndex = '10000';
+      genswaveText.style.transformOrigin = 'center center';
+      genswaveText.style.whiteSpace = 'nowrap';
+
+      // Create GSAP timeline
+      const tl = gsap.timeline({
+        onStart: () => console.log('Animation started'),
+        onComplete: () => {
+          console.log('Animation complete, navigating...');
+          navigate('/servicios');
+        }
+      });
+
+      // Phase 1: Fade out everything except GENSWAVE text
+      tl.to('.main-navbar, .title-large, .explore-btn, .scroll-section, .closing-section, .sticky-visual, .desktop-progress, .mobile-progress, footer', {
+        opacity: 0,
+        duration: 0.8,
+        ease: 'power2.out'
+      });
+
+      // Phase 2: Move text to center
+      tl.to(genswaveText, {
+        left: '50%',
+        top: '50%',
+        xPercent: -50,
+        yPercent: -50,
+        duration: 1.2,
+        ease: 'power2.inOut'
+      }, '+=0.2');
+
+      // Phase 3: Scale up
+      tl.to(genswaveText, {
+        scale: 2,
+        duration: 0.4,
+        ease: 'power2.out'
+      });
+
+      // Phase 3: Expand with burst effect
+      tl.to(genswaveText, {
+        scale: 10,
+        opacity: 0,
+        duration: 0.6,
+        ease: 'power4.in'
+      });
+
+    } else {
+      // DESKTOP: Animate the WebGL element
+      const heroVisual = document.querySelector('.hero-visual-container');
+      
+      if (!heroVisual) return;
+
+      // Get current position
+      const rect = heroVisual.getBoundingClientRect();
+      
+      // Remove all CSS animations and transitions
+      heroVisual.style.animation = 'none';
+      heroVisual.style.transition = 'none';
+      heroVisual.style.willChange = 'auto';
+      heroVisual.style.position = 'fixed';
+      heroVisual.style.left = rect.left + 'px';
+      heroVisual.style.top = rect.top + 'px';
+      heroVisual.style.width = rect.width + 'px';
+      heroVisual.style.height = rect.height + 'px';
+      heroVisual.style.margin = '0';
+      heroVisual.style.zIndex = '10000';
+      heroVisual.style.transformOrigin = 'center center';
+
+      // Create GSAP timeline
+      const tl = gsap.timeline({
+        onComplete: () => {
+          navigate('/servicios');
+        }
+      });
+
+      // Phase 1: Fade out everything except hero visual
+      tl.to('.main-navbar, .content, .sticky-visual .shape-container, .desktop-progress, .mobile-progress, footer', {
+        opacity: 0,
+        duration: 0.8,
+        ease: 'power2.out'
+      });
+
+      // Also fade out the sticky visual background
+      tl.to('.sticky-visual', {
+        background: 'transparent',
+        borderLeft: 'none',
+        duration: 0.8,
+        ease: 'power2.out'
+      }, 0);
+
+      // Phase 2: Move to center
+      tl.to(heroVisual, {
+        left: '50%',
+        top: '50%',
+        xPercent: -50,
+        yPercent: -50,
+        scale: 1.3,
+        duration: 1.2,
+        ease: 'power2.inOut'
+      }, '+=0.2');
+
+      // Phase 3: Expand with burst effect
+      tl.to(heroVisual, {
+        scale: 8,
+        opacity: 0,
+        duration: 0.6,
+        ease: 'power4.in'
+      });
+    }
   };
 
   return (
@@ -330,7 +490,33 @@ function Home() {
           <div>
             <h1>GENSWAVE</h1>
             <span className="title-large">Construido para<br />empresas de la<br />era digital.</span>
+            <button onClick={handleExploreClick} className="explore-btn" disabled={isTransitioning}>
+              <span>Explorar</span>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <line x1="5" y1="12" x2="19" y2="12"/>
+                <polyline points="12 5 19 12 12 19"/>
+              </svg>
+            </button>
           </div>
+          
+          {showScrollIndicator && (
+            <div className="scroll-indicator" onClick={() => {
+              const firstSection = document.querySelector('.scroll-section');
+              if (firstSection) {
+                gsap.to(window, {
+                  scrollTo: firstSection.offsetTop,
+                  duration: 1.5,
+                  ease: 'power2.inOut'
+                });
+              }
+            }}>
+              <div className="scroll-arrow">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M12 5v14M19 12l-7 7-7-7" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </div>
+            </div>
+          )}
         </header>
 
         <section className="scroll-section s1" id="s1">

@@ -71,40 +71,86 @@
   margin: 0 auto;
 }
 
+/* Scroll Indicator */
+.scroll-indicator {
+  position: absolute;
+  bottom: 3rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  z-index: 10;
+  transition: opacity 0.3s ease;
+}
+
+.scroll-indicator:hover {
+  opacity: 0.7;
+}
+
+.scroll-arrow {
+  width: 24px;
+  height: 24px;
+  color: var(--text-light);
+}
+
 /* ========================================
    SERVICES GRID
    ======================================== */
 
 .services-grid-section {
-  padding: 4rem 2rem 8rem;
+  padding: 8rem 2rem 12rem;
 }
 
 .services-grid {
   max-width: 1400px;
   margin: 0 auto;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-  gap: 2rem;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 4rem 3rem;
 }
 
 .service-card {
-  padding: 3rem;
+  padding: 4rem 3.5rem;
   background: rgba(255, 255, 255, 0.02);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 16px;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 20px;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   flex-direction: column;
+  position: relative;
+  overflow: hidden;
+  will-change: transform;
+  backface-visibility: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+.service-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  opacity: 0;
+  transition: opacity 0.5s ease;
 }
 
 .service-card:hover {
   background: rgba(255, 255, 255, 0.04);
   border-color: rgba(255, 255, 255, 0.15);
-  transform: translateY(-8px);
+  transform: translateY(-12px);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.service-card:hover::before {
+  opacity: 1;
 }
 
 .service-card-header {
-  margin-bottom: 2rem;
+  margin-bottom: 2.5rem;
 }
 
 .service-number {
@@ -112,47 +158,50 @@
   font-size: 0.875rem;
   font-weight: 500;
   color: var(--text-muted);
-  margin-bottom: 1rem;
-  opacity: 0.6;
+  margin-bottom: 1.5rem;
+  opacity: 0.5;
+  letter-spacing: 0.1em;
 }
 
 .service-card h2 {
-  font-size: 2rem;
+  font-size: 2.25rem;
   font-weight: 600;
-  margin: 0 0 0.5rem;
+  margin: 0 0 0.75rem;
   color: var(--text-light);
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
 }
 
 .service-card h3 {
-  font-size: 1rem;
+  font-size: 1.0625rem;
   font-weight: 400;
   color: var(--text-muted);
   margin: 0;
+  line-height: 1.5;
 }
 
 .service-description {
-  font-size: 0.9375rem;
-  line-height: 1.7;
+  font-size: 1rem;
+  line-height: 1.8;
   color: var(--text-muted);
-  margin: 0 0 2.5rem;
+  margin: 0 0 3rem;
   font-weight: 300;
 }
 
 .service-features {
-  margin-bottom: 2.5rem;
+  margin-bottom: 3rem;
   flex: 1;
 }
 
 .service-features h4,
 .service-tech h4 {
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   font-weight: 500;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--text-muted);
-  margin: 0 0 1.25rem;
-  opacity: 0.8;
+  margin: 0 0 1.5rem;
+  opacity: 0.7;
 }
 
 .service-features ul {
@@ -160,16 +209,20 @@
   padding: 0;
   margin: 0;
   display: grid;
-  gap: 0.75rem;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem 1.5rem;
 }
 
 .service-features li {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.875rem;
   font-size: 0.9375rem;
   color: var(--text-muted);
   transition: all 0.3s ease;
+  will-change: transform;
+  backface-visibility: hidden;
+  -webkit-font-smoothing: antialiased;
 }
 
 .service-features li:hover {
@@ -178,8 +231,8 @@
 }
 
 .feature-dot {
-  width: 5px;
-  height: 5px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
   background: var(--accent);
   flex-shrink: 0;
@@ -188,19 +241,22 @@
 .tech-tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: 0.75rem;
 }
 
 .tech-tag {
   display: inline-block;
-  padding: 0.4rem 0.875rem;
-  font-size: 0.8125rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
   font-weight: 400;
   color: var(--text-light);
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 6px;
+  border-radius: 8px;
   transition: all 0.3s ease;
+  will-change: transform;
+  backface-visibility: hidden;
+  -webkit-font-smoothing: antialiased;
 }
 
 .tech-tag:hover {
@@ -214,7 +270,7 @@
    ======================================== */
 
 .services-cta {
-  padding: 8rem 2rem;
+  padding: 10rem 2rem;
   position: relative;
   overflow: hidden;
 }
@@ -296,6 +352,7 @@
 .light-mode .service-card:hover {
   background: rgba(0, 0, 0, 0.04);
   border-color: rgba(0, 0, 0, 0.15);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
 }
 
 .light-mode .tech-tag {
@@ -317,9 +374,57 @@
     font-size: 3.5rem;
   }
 
+  .services-grid-section {
+    padding: 6rem 2rem 8rem;
+  }
+
   .services-grid {
     grid-template-columns: 1fr;
-    max-width: 600px;
+    gap: 3rem;
+  }
+
+  .service-card {
+    padding: 3rem 2.5rem;
+  }
+
+  .service-card h2 {
+    font-size: 2rem;
+  }
+
+  .service-card h3 {
+    font-size: 1rem;
+  }
+
+  .service-description {
+    font-size: 0.9375rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .service-features {
+    margin-bottom: 2.5rem;
+  }
+
+  .service-features h4,
+  .service-tech h4 {
+    font-size: 0.8125rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .service-features ul {
+    gap: 0.875rem 1.25rem;
+  }
+
+  .service-features li {
+    font-size: 0.875rem;
+  }
+
+  .tech-tag {
+    font-size: 0.8125rem;
+    padding: 0.4rem 0.875rem;
+  }
+
+  .services-cta {
+    padding: 8rem 2rem;
   }
 
   .cta-content h2 {
@@ -329,7 +434,7 @@
 
 @media screen and (max-width: 767px) {
   .services-hero {
-    padding: 6rem 1.5rem 3rem;
+    padding: 6rem 1rem 3rem;
   }
 
   .services-hero h1 {
@@ -340,20 +445,86 @@
     font-size: 1rem;
   }
 
+  .scroll-indicator {
+    bottom: 2rem;
+  }
+
+  .scroll-arrow {
+    width: 20px;
+    height: 20px;
+  }
+
   .services-grid-section {
-    padding: 3rem 1.5rem 6rem;
+    padding: 4rem 1rem 6rem;
+  }
+
+  .services-grid {
+    gap: 2rem;
   }
 
   .service-card {
-    padding: 2rem;
+    padding: 2rem 1.5rem;
+  }
+
+  .service-card-header {
+    margin-bottom: 2rem;
+  }
+
+  .service-number {
+    font-size: 0.8125rem;
+    margin-bottom: 1rem;
   }
 
   .service-card h2 {
-    font-size: 1.75rem;
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .service-card h3 {
+    font-size: 0.9375rem;
+  }
+
+  .service-description {
+    font-size: 0.875rem;
+    margin-bottom: 2rem;
+  }
+
+  .service-features {
+    margin-bottom: 2rem;
+  }
+
+  .service-features h4,
+  .service-tech h4 {
+    font-size: 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  .service-features ul {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .service-features li {
+    font-size: 0.8125rem;
+    gap: 0.75rem;
+  }
+
+  .feature-dot {
+    width: 5px;
+    height: 5px;
+  }
+
+  .tech-tags {
+    gap: 0.5rem;
+  }
+
+  .tech-tag {
+    font-size: 0.75rem;
+    padding: 0.35rem 0.75rem;
   }
 
   .services-cta {
-    padding: 6rem 1.5rem;
+    padding: 6rem 1rem;
   }
 
   .cta-content h2 {

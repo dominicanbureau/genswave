@@ -9,6 +9,19 @@ function HeroVisual({ isDarkMode }) {
   const mouseRef = useRef({ x: 0, y: 0 });
   const targetRef = useRef({ x: 0, y: 0 });
   const isHoveredRef = useRef(false);
+  const textElementsRef = useRef([]);
+  const activeTextsRef = useRef([]);
+
+  const texts = [
+    'INNOVACIÓN',
+    'DISEÑO',
+    'TECNOLOGÍA',
+    'CREATIVIDAD',
+    'EXPERIENCIA',
+    'CALIDAD',
+    'ESTRATEGIA',
+    'DESARROLLO'
+  ];
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -25,10 +38,11 @@ function HeroVisual({ isDarkMode }) {
     const renderer = new THREE.WebGLRenderer({ 
       alpha: true, 
       antialias: true,
-      powerPreference: "high-performance"
+      powerPreference: "high-performance",
+      precision: "lowp"
     });
     renderer.setSize(containerRef.current.clientWidth, containerRef.current.clientHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
     containerRef.current.appendChild(renderer.domElement);
 
     const geometry = new THREE.IcosahedronGeometry(2, 2);
@@ -98,7 +112,6 @@ function HeroVisual({ isDarkMode }) {
           vPosition = position;
           vec3 pos = position;
           
-          // Simplified noise - faster calculation
           float noise1 = snoise(pos * 0.6 + time * 0.4);
           float noise2 = snoise(pos * 1.2 + time * 0.6);
           
@@ -121,34 +134,20 @@ function HeroVisual({ isDarkMode }) {
         
         void main() {
           vec3 viewDirection = normalize(cameraPosition - vPosition);
-          
-          // Simplified lighting - single light source
           vec3 light = normalize(vec3(1.0, 1.0, 1.0));
           float dProd = max(0.0, dot(vNormal, light));
-          
           vec3 baseColor = mix(vec3(1.0), vec3(0.0), isDark);
-          
-          // Base lighting
           float lightIntensity = isDark > 0.5 ? 0.5 : 0.4;
           vec3 color = baseColor * (lightIntensity + dProd * 0.5);
-          
-          // Fresnel for edge glow
           float fresnel = pow(1.0 - abs(dot(vNormal, viewDirection)), 2.5);
           color += fresnel * baseColor * 0.6;
-          
-          // Rim light
           float rim = pow(1.0 - max(0.0, dot(vNormal, viewDirection)), 1.5);
           color += rim * baseColor * 0.5;
-          
-          // Hover glow
           float glow = pow(1.0 - abs(dot(vNormal, vec3(0.0, 0.0, 1.0))), 2.0);
           color += glow * 0.6 * hover * baseColor;
-          
-          // Ambient in dark mode
           if (isDark > 0.5) {
             color += vec3(0.15);
           }
-          
           gl_FragColor = vec4(color, 0.95);
         }
       `,
@@ -217,10 +216,9 @@ function HeroVisual({ isDarkMode }) {
     containerRef.current.addEventListener('mouseleave', handleMouseLeave);
     containerRef.current.addEventListener('click', handleClick);
 
-    const clock = new THREE.Clock();
+    let startTime = Date.now();
     const animate = () => {
-      const elapsedTime = clock.getElapsedTime();
-      // Smooth mouse follow with better interpolation
+      const elapsedTime = (Date.now() - startTime) / 1000;
       targetRef.current.x += (mouseRef.current.x - targetRef.current.x) * 0.08;
       targetRef.current.y += (mouseRef.current.y - targetRef.current.y) * 0.08;
       
@@ -262,7 +260,197 @@ function HeroVisual({ isDarkMode }) {
     };
   }, [isDarkMode]);
 
-  return <div ref={containerRef} className="hero-visual-webgl" />;
+  // Liquid text absorption animation using Blotter.js
+  // DISABLED: Uncomment to reactivate liquid text effect
+  /*
+  useEffect(() => {
+    // Load Blotter.js scripts dynamically
+    const loadBlotter = () => {
+      return new Promise((resolve, reject) => {
+        if (window.Blotter && window.Blotter.LiquidDistortMaterial) {
+          resolve();
+          return;
+        }
+
+        const script1 = document.createElement('script');
+        script1.src = 'https://cdnjs.cloudflare.com/ajax/libs/Blotter/0.1.0/blotter.min.js';
+        script1.onload = () => {
+          const script2 = document.createElement('script');
+          script2.src = 'https://cdnjs.cloudflare.com/ajax/libs/Blotter/0.1.0/materials/liquidDistortMaterial.js';
+          script2.onload = () => resolve();
+          script2.onerror = reject;
+          document.head.appendChild(script2);
+        };
+        script1.onerror = reject;
+        document.head.appendChild(script1);
+      });
+    };
+
+    let isAnimating = false;
+    let currentBlotter = null;
+
+    const createFloatingText = async () => {
+      if (isAnimating || activeTextsRef.current.length > 0) return;
+
+      try {
+        await loadBlotter();
+        
+        if (!window.Blotter || !window.Blotter.LiquidDistortMaterial) {
+          console.error('Blotter.js not loaded properly');
+          return;
+        }
+
+        isAnimating = true;
+        const textContent = texts[Math.floor(Math.random() * texts.length)];
+        
+        const textEl = document.createElement('div');
+        textEl.className = 'floating-text-liquid';
+        
+        // Calculate distance based on container size to keep texts visible
+        const containerWidth = containerRef.current.clientWidth;
+        const containerHeight = containerRef.current.clientHeight;
+        const maxDistance = Math.min(containerWidth, containerHeight) * 0.35;
+        
+        const angle = Math.random() * Math.PI * 2;
+        const distance = maxDistance * 0.7 + Math.random() * maxDistance * 0.3;
+        const x = Math.cos(angle) * distance;
+        const y = Math.sin(angle) * distance;
+
+        textEl.style.left = `calc(50% + ${x}px)`;
+        textEl.style.top = `calc(50% + ${y}px)`;
+
+        if (!containerRef.current) return;
+        
+        containerRef.current.appendChild(textEl);
+        textElementsRef.current.push(textEl);
+        activeTextsRef.current.push(textEl);
+
+        // Create Blotter text with liquid distortion
+        const text = new window.Blotter.Text(textContent, {
+          family: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+          size: 40,
+          fill: isDarkMode ? 'rgba(255, 255, 255, 0.35)' : 'rgba(0, 0, 0, 0.35)',
+          weight: 500,
+          paddingLeft: 15,
+          paddingRight: 15,
+          paddingTop: 15,
+          paddingBottom: 15
+        });
+
+        const material = new window.Blotter.LiquidDistortMaterial();
+        material.uniforms.uSpeed.value = 0.4;
+        material.uniforms.uVolatility.value = 0.1;
+        material.uniforms.uSeed.value = 0.1;
+
+        const blotter = new window.Blotter(material, { texts: text });
+        currentBlotter = blotter;
+        
+        const scope = blotter.forText(text);
+        scope.appendTo(textEl);
+
+        // Ensure only one canvas is visible
+        const canvases = textEl.querySelectorAll('canvas');
+        if (canvases.length > 1) {
+          for (let i = 1; i < canvases.length; i++) {
+            canvases[i].remove();
+          }
+        }
+
+        gsap.fromTo(textEl, 
+          { 
+            opacity: 0, 
+            scale: 0.7
+          },
+          { 
+            opacity: 1, 
+            scale: 1,
+            duration: 1.2,
+            ease: 'power2.out',
+            onComplete: () => {
+              setTimeout(() => {
+                absorbText(textEl);
+              }, 2000);
+            }
+          }
+        );
+      } catch (error) {
+        console.error('Error creating liquid text:', error);
+        isAnimating = false;
+      }
+    };
+
+    const absorbText = (textEl) => {
+      if (!textEl || !containerRef.current) {
+        isAnimating = false;
+        return;
+      }
+
+      const rect = textEl.getBoundingClientRect();
+      const containerRect = containerRef.current.getBoundingClientRect();
+
+      const centerX = containerRect.width / 2;
+      const centerY = containerRect.height / 2;
+      const currentX = rect.left + rect.width / 2 - containerRect.left;
+      const currentY = rect.top + rect.height / 2 - containerRect.top;
+
+      // Calculate direction to center
+      const deltaX = centerX - currentX;
+      const deltaY = centerY - currentY;
+      const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+      
+      // Stop at a proportional distance from center (before reaching the element)
+      const containerSize = Math.min(containerRect.width, containerRect.height);
+      const stopDistance = containerSize * 0.15; // 15% of container size
+      const ratio = stopDistance / distance;
+      const targetX = deltaX * ratio;
+      const targetY = deltaY * ratio;
+
+      gsap.to(textEl, {
+        x: targetX,
+        y: targetY,
+        opacity: 0,
+        duration: 1.8,
+        ease: 'power2.in',
+        onComplete: () => {
+          if (textEl && textEl.parentNode) {
+            textEl.remove();
+          }
+          activeTextsRef.current = activeTextsRef.current.filter(t => t !== textEl);
+          textElementsRef.current = textElementsRef.current.filter(t => t !== textEl);
+          currentBlotter = null;
+          isAnimating = false;
+        }
+      });
+    };
+
+    const initialTimeout = setTimeout(() => {
+      createFloatingText();
+    }, 1000);
+
+    const checkInterval = setInterval(() => {
+      if (!isAnimating && activeTextsRef.current.length === 0) {
+        createFloatingText();
+      }
+    }, 500);
+
+    return () => {
+      clearTimeout(initialTimeout);
+      clearInterval(checkInterval);
+      currentBlotter = null;
+      textElementsRef.current.forEach(el => {
+        if (el && el.parentNode) {
+          el.remove();
+        }
+      });
+      textElementsRef.current = [];
+      activeTextsRef.current = [];
+    };
+  }, [isDarkMode, texts]);
+  */
+
+  return (
+    <div ref={containerRef} className="hero-visual-webgl" />
+  );
 }
 
 export default HeroVisual;

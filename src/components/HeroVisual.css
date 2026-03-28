@@ -10,3 +10,41 @@
   width: 100%;
   height: 100%;
 }
+
+/* Floating text absorption effect - Liquid Glass Style with Blotter.js */
+.floating-text-liquid {
+  position: absolute;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+  will-change: transform, opacity;
+  transform-origin: center center;
+  overflow: visible;
+}
+
+.floating-text-liquid canvas {
+  display: block !important;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+}
+
+/* Ensure Blotter.js container doesn't clip */
+.floating-text-liquid > div {
+  overflow: visible !important;
+}
+
+@media screen and (max-width: 991px) {
+  .floating-text-liquid {
+    transform: translate(-50%, -50%) scale(0.75);
+  }
+}
+
+@media screen and (max-width: 767px) {
+  .floating-text-liquid {
+    transform: translate(-50%, -50%) scale(0.55);
+  }
+}
+
+
+
+

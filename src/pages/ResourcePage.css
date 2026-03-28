@@ -4,13 +4,14 @@
 }
 
 .resource-hero {
-  min-height: 50vh;
+  min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
   background: linear-gradient(180deg, #ffffff 0%, #f5f5f7 100%);
   padding: 8rem 2rem 4rem;
   text-align: center;
+  position: relative;
 }
 
 .resource-hero-content h1 {
@@ -28,6 +29,42 @@
   color: var(--gray-medium);
   max-width: 600px;
   margin: 0 auto;
+}
+
+/* Scroll Indicator */
+.scroll-indicator {
+  position: absolute;
+  bottom: 3rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  z-index: 10;
+  transition: opacity 0.3s ease;
+  cursor: pointer;
+}
+
+.scroll-indicator:hover {
+  opacity: 0.7;
+}
+
+.scroll-arrow {
+  width: 24px;
+  height: 24px;
+  color: var(--black);
+}
+
+@media (max-width: 991px) {
+  .scroll-indicator {
+    bottom: 2rem;
+  }
+
+  .scroll-arrow {
+    width: 20px;
+    height: 20px;
+  }
 }
 
 /* FAQ Styles */
@@ -370,17 +407,38 @@
 .case-image {
   position: relative;
   overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
 }
 
-.case-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.5s ease;
+.case-image-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.1);
+  transition: background 0.5s ease;
 }
 
-.case-card:hover .case-image img {
-  transform: scale(1.05);
+.case-card:hover .case-image-overlay {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.case-number {
+  font-size: 8rem;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.3);
+  font-family: 'Sora', sans-serif;
+  line-height: 1;
+  transition: all 0.5s ease;
+}
+
+.case-card:hover .case-number {
+  transform: scale(1.1);
+  color: rgba(255, 255, 255, 0.5);
 }
 
 .case-category {

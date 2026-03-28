@@ -1,9 +1,21 @@
 import { motion } from 'framer-motion';
+import { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import './ResourcePage.css';
 
 function CasesPage() {
+  const [showScrollIndicator, setShowScrollIndicator] = useState(true);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowScrollIndicator(window.scrollY < window.innerHeight * 0.5);
+    };
+    
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   const cases = [
     {
       id: 1,
@@ -16,7 +28,7 @@ function CasesPage() {
         '50% reducción en tiempo de carga',
         '95% satisfacción del cliente'
       ],
-      image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80'
+      gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
     },
     {
       id: 2,
@@ -29,7 +41,7 @@ function CasesPage() {
         '4.8 estrellas en App Store',
         '70% retención de usuarios'
       ],
-      image: 'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=800&q=80'
+      gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)'
     },
     {
       id: 3,
@@ -42,7 +54,7 @@ function CasesPage() {
         '60% reducción en costos operativos',
         'ROI positivo en 6 meses'
       ],
-      image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&q=80'
+      gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)'
     }
   ];
 
@@ -60,6 +72,34 @@ function CasesPage() {
           <h1>PROYECTOS</h1>
           <p>Proyectos que transformaron negocios y superaron expectativas</p>
         </motion.div>
+
+        {showScrollIndicator && (
+          <motion.div
+            className="scroll-indicator"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 1 }}
+            onClick={() => {
+              const casesContent = document.querySelector('.cases-content');
+              if (casesContent) {
+                window.scrollTo({
+                  top: casesContent.offsetTop,
+                  behavior: 'smooth'
+                });
+              }
+            }}
+          >
+            <motion.div
+              className="scroll-arrow"
+              animate={{ y: [0, 8, 0] }}
+              transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M12 5v14M19 12l-7 7-7-7" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </motion.div>
+          </motion.div>
+        )}
       </section>
 
       <section className="cases-content">
@@ -73,8 +113,10 @@ function CasesPage() {
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: index * 0.2 }}
             >
-              <div className="case-image">
-                <img src={caseItem.image} alt={caseItem.title} />
+              <div className="case-image" style={{ background: caseItem.gradient }}>
+                <div className="case-image-overlay">
+                  <div className="case-number">0{caseItem.id}</div>
+                </div>
                 <span className="case-category">{caseItem.category}</span>
               </div>
               <div className="case-content">

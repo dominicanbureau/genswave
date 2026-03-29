@@ -702,6 +702,8 @@ function Overview({ projects, appointments, messages, requests, setActiveTab }) 
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.5 + index * 0.1 }}
                 whileHover={{ x: 4 }}
+                onClick={() => navigate(`/project/${project.id}`)}
+                style={{ cursor: 'pointer' }}
               >
                 <div className="project-info">
                   <h4>{project.title}</h4>
@@ -908,6 +910,8 @@ function Projects({ projects, setActiveTab }) {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 * index }}
               whileHover={{ y: -8, boxShadow: '0 20px 60px rgba(0, 0, 0, 0.15)' }}
+              onClick={() => navigate(`/project/${project.id}`)}
+              style={{ cursor: 'pointer' }}
             >
               <div className="project-header-new">
                 <div className="project-title-section">

@@ -58,7 +58,7 @@
 }
 
 .light-mode .description {
-  border-left-color: #000000;
+  border-left-color: #000000 !important;
   color: #555;
 }
 
@@ -931,15 +931,6 @@ h1 {
   animation-timeline: view();
   animation-range: cover 0% cover 100%;
   will-change: transform, opacity, filter;
-}
-
-/* Theme-aware border for description */
-[data-theme="light"] .description {
-  border-left-color: #000000;
-}
-
-[data-theme="dark"] .description {
-  border-left-color: #ffffff;
 }
 
 .closer {

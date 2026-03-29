@@ -629,14 +629,14 @@ function Home() {
 
         <div className="closing-section">
           <div className="closer">
-            <strong>Comienza tu proyecto hoy.</strong>
+            <strong>Comienza tu proyecto hoy.</strong><br />
             info@genswave.org<br />
             Distrito Nacional, Santo Domingo
-            
-            <Link to="/login" className="start-project-btn">
-              Comenzar
-            </Link>
           </div>
+          
+          <Link to="/login" className="start-project-btn">
+            Comenzar
+          </Link>
         </div>
       </div>
 

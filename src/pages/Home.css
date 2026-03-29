@@ -877,10 +877,12 @@ html {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  align-items: flex-start;
   padding-left: 10vw;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   margin-top: 0;
   padding-bottom: 0;
+  gap: 2rem;
 }
 
 h1 {

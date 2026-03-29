@@ -35,36 +35,6 @@
   --project-shadow: rgba(0, 0, 0, 0.06);
 }
 
-/* Theme Toggle Button */
-.theme-toggle-btn {
-  position: fixed;
-  top: 2rem;
-  right: 2rem;
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  border: 1px solid var(--project-border);
-  background: var(--project-card-bg);
-  color: var(--project-text);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 100;
-  box-shadow: 0 4px 20px var(--project-shadow);
-  transition: all 0.3s ease;
-}
-
-.theme-toggle-btn:hover {
-  background: var(--project-hover-bg);
-  border-color: var(--project-border);
-}
-
-.theme-toggle-btn svg {
-  width: 20px;
-  height: 20px;
-}
-
 .project-detail-page {
   min-height: 100vh;
   background: var(--project-bg);

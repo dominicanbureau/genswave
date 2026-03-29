@@ -202,7 +202,7 @@ router.post('/', requireAuth, async (req, res) => {
             RETURNING *`,
             [
                 userId, title, description, projectType, budgetRange,
-                timeline, budget, attachments || [], preferredStartDate,
+                timeline, budget, Array.isArray(attachments) ? attachments : (attachments || []), preferredStartDate,
                 technicalRequirements, targetAudience, additionalNotes, uniqueId
             ]
         );

@@ -2142,6 +2142,74 @@ body {
   margin: 0 auto;
 }
 
+/* Analytics Content Wrapper */
+.analytics-content {
+  position: relative;
+}
+
+.analytics-content.has-empty-state .analytics-main-grid {
+  filter: blur(4px);
+  opacity: 0.3;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Analytics Empty State */
+.analytics-empty-state {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  z-index: 10;
+  background: var(--bg-secondary);
+  padding: 3rem 2.5rem;
+  border-radius: 16px;
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-hover);
+  backdrop-filter: blur(20px) saturate(180%);
+  max-width: 500px;
+  width: 90%;
+}
+
+.empty-state-icon {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 1.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border-subtle);
+}
+
+.empty-state-icon svg {
+  width: 28px;
+  height: 28px;
+  color: var(--text-muted);
+  stroke-width: 1.5;
+}
+
+.analytics-empty-state h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0 0 1rem 0;
+  color: var(--text-light);
+  letter-spacing: -0.01em;
+}
+
+.analytics-empty-state p {
+  font-size: 0.9375rem;
+  color: var(--text-muted);
+  margin: 0 0 0.75rem 0;
+  line-height: 1.6;
+}
+
+.analytics-empty-state p:last-child {
+  margin-bottom: 0;
+}
+
 /* Analytics Header */
 .analytics-header {
   display: flex;
@@ -2779,6 +2847,30 @@ body {
   .metric-circle {
     width: 60px;
     height: 60px;
+  }
+
+  .analytics-empty-state {
+    padding: 2rem 1.5rem;
+    width: 95%;
+  }
+
+  .analytics-empty-state h3 {
+    font-size: 1.125rem;
+  }
+
+  .analytics-empty-state p {
+    font-size: 0.875rem;
+  }
+
+  .empty-state-icon {
+    width: 48px;
+    height: 48px;
+    margin-bottom: 1rem;
+  }
+
+  .empty-state-icon svg {
+    width: 20px;
+    height: 20px;
   }
 }
 /* Account Form Styles */

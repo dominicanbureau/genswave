@@ -1852,6 +1852,9 @@ function Analytics({ projects, appointments }) {
   const confirmedAppointments = appointments.filter(a => a.status === 'confirmed').length;
   const completedAppointments = appointments.filter(a => a.status === 'completed').length;
 
+  // Check if user has sufficient data for meaningful analytics
+  const hasInsufficientData = projects.length < 2 && appointments.length < 2;
+
   // Generate real timeline data based on creation dates
   const generateTimelineData = (items, months = 6) => {
     const now = new Date();
@@ -1927,6 +1930,23 @@ function Analytics({ projects, appointments }) {
           </div>
         </div>
       </div>
+
+      {/* Analytics Content with Empty State */}
+      <div className={`analytics-content ${hasInsufficientData ? 'has-empty-state' : ''}`}>
+        {hasInsufficientData && (
+          <div className="analytics-empty-state">
+            <div className="empty-state-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <line x1="18" y1="20" x2="18" y2="10"/>
+                <line x1="12" y1="20" x2="12" y2="4"/>
+                <line x1="6" y1="20" x2="6" y2="14"/>
+              </svg>
+            </div>
+            <h3>Datos Insuficientes para Analíticas</h3>
+            <p>Necesitas al menos 2 proyectos o solicitudes para generar analíticas significativas.</p>
+            <p>Crea más proyectos para desbloquear visualizaciones detalladas de tu progreso.</p>
+          </div>
+        )}
 
       {/* Main Analytics Grid */}
       <div className="analytics-main-grid">
@@ -2234,6 +2254,7 @@ function Analytics({ projects, appointments }) {
             </div>
           </div>
         </motion.div>
+      </div>
       </div>
     </motion.div>
   );

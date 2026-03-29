@@ -104,7 +104,7 @@ router.post('/', requireAdmin, async (req, res) => {
         const result = await db.query(
             `INSERT INTO projects (user_id, title, description, budget, start_date, end_date, cover_image, tags, unique_id) 
              VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *`,
-            [user_id, title, description, budget, start_date, end_date, cover_image, tags || [], uniqueId]
+            [user_id, title, description, budget, start_date, end_date, cover_image, Array.isArray(tags) ? tags : (tags || []), uniqueId]
         );
 
         const project = result.rows[0];

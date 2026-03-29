@@ -1025,8 +1025,8 @@ function Appointments({ appointments, requests, fetchData, setActiveTab }) {
       newErrors.projectType = 'Selecciona un tipo de proyecto';
     }
     
-    if (!formData.budget || parseFloat(formData.budget) < 300) {
-      newErrors.budget = 'El presupuesto mínimo es $300';
+    if (!formData.budgetRange) {
+      newErrors.budgetRange = 'Selecciona un rango de presupuesto';
     }
     
     setErrors(newErrors);
@@ -1040,11 +1040,26 @@ function Appointments({ appointments, requests, fetchData, setActiveTab }) {
       return;
     }
     
+    // Calculate budget based on budget range
+    let calculatedBudget = 0;
+    if (formData.budgetRange) {
+      const rangeMap = {
+        '1000-5000': 1000,
+        '5000-10000': 5000,
+        '10000-25000': 10000,
+        '25000+': 25000
+      };
+      calculatedBudget = rangeMap[formData.budgetRange] || 0;
+    }
+    
     try {
       const response = await fetch('/api/requests', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
+        body: JSON.stringify({
+          ...formData,
+          budget: calculatedBudget
+        })
       });
 
       if (response.ok) {
@@ -1371,21 +1386,6 @@ function Appointments({ appointments, requests, fetchData, setActiveTab }) {
               </div>
 
               <div className="form-row-new">
-                <div className="form-group-new">
-                  <label>Presupuesto (USD) *</label>
-                  <input
-                    type="number"
-                    value={formData.budget}
-                    onChange={(e) => setFormData({...formData, budget: e.target.value})}
-                    min="300"
-                    step="50"
-                    required
-                    placeholder="Mínimo $300"
-                    className={errors.budget ? 'error' : ''}
-                  />
-                  {errors.budget && <span className="error-message">{errors.budget}</span>}
-                </div>
-
                 <div className="form-group-new">
                   <label>Fecha de Inicio Preferida</label>
                   <input

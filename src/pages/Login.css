@@ -308,11 +308,12 @@
   outline: none;
   border-color: var(--auth-black);
   box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.05);
+  background: var(--auth-white);
 }
 
 .form-group input::placeholder {
   color: var(--auth-gray-medium);
-  opacity: 0.5;
+  opacity: 0.6;
 }
 
 .submit-btn {

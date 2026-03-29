@@ -378,6 +378,11 @@
   border-radius: 50%;
 }
 
+/* Mobile back button - Hidden by default, shown on mobile */
+.mobile-back-btn {
+  display: none;
+}
+
 /* Responsive */
 @media (max-width: 1024px) {
   .auth-container {
@@ -395,6 +400,7 @@
 
   /* Mobile back button */
   .mobile-back-btn {
+    display: flex;
     position: absolute;
     top: 1rem;
     left: 1rem;
@@ -404,11 +410,12 @@
     background: rgba(0, 0, 0, 0.05);
     border: none;
     cursor: pointer;
-    display: flex;
     align-items: center;
     justify-content: center;
     transition: all 0.3s ease;
     z-index: 10;
+    text-decoration: none;
+    color: var(--auth-gray-dark);
   }
 
   .mobile-back-btn:hover {
@@ -425,6 +432,7 @@
 @media (max-width: 768px) {
   .auth-right {
     padding: 2rem 1.5rem;
+    padding-top: 4rem; /* Espacio extra para el botón de volver */
   }
   
   .auth-tabs {

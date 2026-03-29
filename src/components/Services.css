@@ -94,6 +94,16 @@
   transition: transform 0.4s ease;
 }
 
+/* Light theme - black line */
+[data-theme="light"] .service-card::before {
+  background: #000000;
+}
+
+/* Dark theme - white line */
+[data-theme="dark"] .service-card::before {
+  background: #ffffff;
+}
+
 .service-card:hover::before {
   transform: scaleY(1);
 }

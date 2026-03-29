@@ -1052,13 +1052,22 @@ function Appointments({ appointments, requests, fetchData, setActiveTab }) {
       calculatedBudget = rangeMap[formData.budgetRange] || 0;
     }
     
+    // Set default date if not provided (3 days from now)
+    let preferredStartDate = formData.preferredStartDate;
+    if (!preferredStartDate) {
+      const defaultDate = new Date();
+      defaultDate.setDate(defaultDate.getDate() + 3);
+      preferredStartDate = defaultDate.toISOString().split('T')[0];
+    }
+    
     try {
       const response = await fetch('/api/requests', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...formData,
-          budget: calculatedBudget
+          budget: calculatedBudget,
+          preferredStartDate: preferredStartDate
         })
       });
 

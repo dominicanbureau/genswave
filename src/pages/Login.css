@@ -300,19 +300,20 @@
   font-size: 1rem;
   font-family: inherit;
   transition: all 0.3s ease;
-  background: var(--auth-white);
-  color: var(--auth-black);
+  background: #ffffff !important;
+  color: #000000 !important;
 }
 
 .form-group input:focus {
   outline: none;
   border-color: var(--auth-black);
   box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.05);
-  background: var(--auth-white);
+  background: #ffffff !important;
+  color: #000000 !important;
 }
 
 .form-group input::placeholder {
-  color: var(--auth-gray-medium);
+  color: #666666 !important;
   opacity: 0.6;
 }
 

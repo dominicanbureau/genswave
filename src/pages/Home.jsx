@@ -179,7 +179,7 @@ function Home() {
       });
 
       // Phase 1: Fade out everything except GENSWAVE text
-      tl.to('.main-navbar, .title-large, .explore-btn, .scroll-section, .closing-section, .sticky-visual, .desktop-progress, .mobile-progress, footer', {
+      tl.to('.main-navbar, .title-large, .explore-btn, .scroll-section, .closing-section, .sticky-visual, .mobile-progress, footer', {
         opacity: 0,
         duration: 0.8,
         ease: 'power2.out'
@@ -240,7 +240,7 @@ function Home() {
       });
 
       // Phase 1: Fade out everything except hero visual
-      tl.to('.main-navbar, .content, .sticky-visual .shape-container, .desktop-progress, .mobile-progress, footer', {
+      tl.to('.main-navbar, .content, .sticky-visual .shape-container, .mobile-progress, footer', {
         opacity: 0,
         duration: 0.8,
         ease: 'power2.out'
@@ -391,8 +391,6 @@ function Home() {
         </div>
 
         <div className="sticky-visual">
-            <div className="desktop-progress"></div>
-
             {/* Hero Visual - WebGL Component */}
             <div className="hero-visual-container">
               <HeroVisual isDarkMode={isDarkMode} />

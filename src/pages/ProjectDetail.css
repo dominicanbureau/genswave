@@ -1,7 +1,76 @@
+/* ========================================
+   THEME SYSTEM - Dark/Light Mode
+   ======================================== */
+
+:root {
+  --project-bg: #f5f5f7;
+  --project-card-bg: #ffffff;
+  --project-text: #1d1d1f;
+  --project-text-muted: #6e6e73;
+  --project-border: rgba(0, 0, 0, 0.1);
+  --project-border-subtle: rgba(0, 0, 0, 0.06);
+  --project-hover-bg: rgba(0, 0, 0, 0.02);
+  --project-shadow: rgba(0, 0, 0, 0.06);
+}
+
+.project-detail-page.dark {
+  --project-bg: #1a1a1a;
+  --project-card-bg: #2a2a2a;
+  --project-text: #ffffff;
+  --project-text-muted: #a1a1aa;
+  --project-border: rgba(255, 255, 255, 0.1);
+  --project-border-subtle: rgba(255, 255, 255, 0.06);
+  --project-hover-bg: rgba(255, 255, 255, 0.02);
+  --project-shadow: rgba(0, 0, 0, 0.3);
+}
+
+.project-detail-page.light {
+  --project-bg: #f5f5f7;
+  --project-card-bg: #ffffff;
+  --project-text: #1d1d1f;
+  --project-text-muted: #6e6e73;
+  --project-border: rgba(0, 0, 0, 0.1);
+  --project-border-subtle: rgba(0, 0, 0, 0.06);
+  --project-hover-bg: rgba(0, 0, 0, 0.02);
+  --project-shadow: rgba(0, 0, 0, 0.06);
+}
+
+/* Theme Toggle Button */
+.theme-toggle-btn {
+  position: fixed;
+  top: 2rem;
+  right: 2rem;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 1px solid var(--project-border);
+  background: var(--project-card-bg);
+  color: var(--project-text);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  box-shadow: 0 4px 20px var(--project-shadow);
+  transition: all 0.3s ease;
+}
+
+.theme-toggle-btn:hover {
+  background: var(--project-hover-bg);
+  border-color: var(--project-border);
+}
+
+.theme-toggle-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
 .project-detail-page {
   min-height: 100vh;
-  background: #f5f5f7;
+  background: var(--project-bg);
   padding: 3rem 4rem;
+  color: var(--project-text);
+  transition: all 0.3s ease;
 }
 
 .back-btn {
@@ -9,8 +78,8 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.75rem 1.5rem;
-  background: var(--white);
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  background: var(--project-card-bg);
+  border: 1px solid var(--project-border);
   border-radius: 50px;
   font-family: inherit;
   font-size: 0.95rem;
@@ -18,13 +87,13 @@
   cursor: pointer;
   transition: all 0.3s ease;
   margin-bottom: 2rem;
-  color: var(--gray-dark);
+  color: var(--project-text);
 }
 
 .back-btn:hover {
-  background: var(--black);
-  color: var(--white);
-  border-color: var(--black);
+  background: var(--project-text);
+  color: var(--project-card-bg);
+  border-color: var(--project-text);
 }
 
 .back-btn svg {
@@ -40,18 +109,19 @@
 
 /* Project Header */
 .project-detail-header {
-  background: var(--white);
+  background: var(--project-card-bg);
   border-radius: 24px;
   overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 20px var(--project-shadow);
   margin-bottom: 3rem;
+  border: 1px solid var(--project-border-subtle);
 }
 
 .project-cover {
   width: 100%;
   height: 400px;
   overflow: hidden;
-  background: linear-gradient(135deg, #f5f5f7, #e5e5e7);
+  background: linear-gradient(135deg, var(--project-hover-bg), var(--project-border-subtle));
 }
 
 .project-cover img {
@@ -103,11 +173,12 @@
 
 .tag {
   padding: 0.4rem 1rem;
-  background: rgba(0, 0, 0, 0.05);
+  background: var(--project-hover-bg);
   border-radius: 50px;
   font-size: 0.8rem;
-  color: var(--gray-dark);
+  color: var(--project-text);
   font-weight: 500;
+  border: 1px solid var(--project-border-subtle);
 }
 
 .project-info h1 {
@@ -116,11 +187,12 @@
   margin-bottom: 1rem;
   font-family: 'Sora', sans-serif;
   line-height: 1.2;
+  color: var(--project-text);
 }
 
 .project-description {
   font-size: 1.1rem;
-  color: var(--gray-medium);
+  color: var(--project-text-muted);
   line-height: 1.8;
   margin-bottom: 2.5rem;
 }
@@ -137,14 +209,15 @@
   align-items: center;
   gap: 1rem;
   padding: 1.5rem;
-  background: rgba(0, 0, 0, 0.02);
+  background: var(--project-hover-bg);
   border-radius: 16px;
+  border: 1px solid var(--project-border-subtle);
 }
 
 .stat-item svg {
   width: 32px;
   height: 32px;
-  color: var(--gray-medium);
+  color: var(--project-text-muted);
   flex-shrink: 0;
 }
 
@@ -155,28 +228,28 @@
 
 .stat-label {
   font-size: 0.85rem;
-  color: var(--gray-medium);
+  color: var(--project-text-muted);
   margin-bottom: 0.3rem;
 }
 
 .stat-value {
   font-size: 1.3rem;
   font-weight: 600;
-  color: var(--black);
+  color: var(--project-text);
   font-family: 'Sora', sans-serif;
 }
 
 .progress-bar-large {
   width: 100%;
   height: 12px;
-  background: rgba(0, 0, 0, 0.06);
+  background: var(--project-border-subtle);
   border-radius: 50px;
   overflow: hidden;
 }
 
 .progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, #000000, #333333);
+  background: linear-gradient(90deg, var(--project-text), var(--project-text-muted));
   border-radius: 50px;
 }
 

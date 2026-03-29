@@ -2652,6 +2652,56 @@ body {
   stroke-width: 1.5;
 }
 
+/* Configuration Modal Styles */
+.config-modal {
+  max-width: 700px;
+  width: 100%;
+}
+
+.config-form {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.config-section {
+  padding: 1.5rem;
+  background: rgba(0, 0, 0, 0.02);
+  border-radius: 6px;
+  border: 1px solid var(--border-subtle);
+}
+
+.config-section h4 {
+  font-size: 1rem;
+  font-weight: 500;
+  margin: 0 0 1rem 0;
+  color: var(--text-light);
+  letter-spacing: -0.01em;
+}
+
+.checkbox-group {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.checkbox-group label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--text-light);
+  cursor: pointer;
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+.checkbox-group input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--accent);
+}
+
 /* Final responsive adjustments */
 @media (max-width: 480px) {
   .admin-content {
@@ -2665,6 +2715,19 @@ body {
   
   .account-form {
     padding: 1.5rem;
+  }
+  
+  .config-modal {
+    max-width: 100%;
+    margin: 1rem;
+  }
+  
+  .config-form {
+    gap: 1.5rem;
+  }
+  
+  .config-section {
+    padding: 1rem;
   }
 }
 /* ========================================
@@ -3505,48 +3568,66 @@ body {
 /* Enhanced Charts Section - Better Grid */
 .charts-section {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
   gap: 1.5rem;
   margin-bottom: 2rem;
 }
 
 .chart-container {
   background: var(--bg-secondary);
-  padding: 1.5rem;
+  padding: 2rem;
   border-radius: 8px;
   border: 1px solid var(--border-subtle);
   transition: all 0.2s ease;
   overflow: hidden;
-  min-height: 300px;
+  min-height: 320px;
   display: flex;
   flex-direction: column;
 }
 
 .chart-container:hover {
   border-color: var(--border-hover);
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-subtle);
 }
 
 .chart-container h3 {
-  font-size: 1.125rem;
+  font-size: 1rem;
   font-weight: 500;
-  margin: 0 0 1.5rem 0;
+  margin: 0 0 2rem 0;
   color: var(--text-light);
   letter-spacing: -0.01em;
   flex-shrink: 0;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  letter-spacing: 0.02em;
 }
 
-/* Line Chart - Fixed Container */
+/* Line Chart - Redesigned for Better Visual Appeal */
 .line-chart {
   display: flex;
   align-items: end;
-  gap: 0.75rem;
+  justify-content: space-between;
+  gap: 1rem;
   height: 180px;
-  padding: 1rem 0;
-  border-bottom: 1px solid var(--border-subtle);
+  padding: 1.5rem 0;
   position: relative;
   flex: 1;
   overflow: hidden;
+  background: rgba(0, 0, 0, 0.01);
+  border-radius: 6px;
+  border: 1px solid var(--border-subtle);
+}
+
+.line-chart::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--border-subtle);
 }
 
 .chart-bar {
@@ -3554,31 +3635,26 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.75rem;
   height: 100%;
   position: relative;
   min-width: 0;
+  max-width: 50px;
+  padding: 0 0.5rem;
 }
 
 .bar-fill {
-  width: 100%;
-  max-width: 40px;
-  background: linear-gradient(180deg, var(--text-light) 0%, rgba(0, 0, 0, 0.7) 100%);
-  border-radius: 4px 4px 0 0;
-  min-height: 8px;
-  transition: height 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+  width: 20px;
+  background: var(--accent);
+  border-radius: 2px 2px 0 0;
+  min-height: 3px;
+  transition: height 1s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
+  opacity: 0.8;
 }
 
-.bar-fill::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: var(--accent);
-  border-radius: 4px 4px 0 0;
+.bar-fill:hover {
+  opacity: 1;
 }
 
 .bar-label {
@@ -3586,18 +3662,18 @@ body {
   color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.02em;
-  font-weight: 500;
-  margin-top: 0.5rem;
+  font-weight: 400;
   text-align: center;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   max-width: 100%;
+  margin-top: auto;
 }
 
 .bar-value {
   font-size: 0.75rem;
-  font-weight: 600;
+  font-weight: 500;
   color: var(--text-light);
   position: absolute;
   top: -1.5rem;
@@ -3605,28 +3681,34 @@ body {
   transform: translateX(-50%);
   background: var(--bg-secondary);
   padding: 0.125rem 0.375rem;
-  border-radius: 4px;
-  border: 1px solid var(--border-subtle);
+  border-radius: 3px;
   white-space: nowrap;
-  z-index: 1;
+  z-index: 2;
+  opacity: 0;
+  transition: opacity 0.2s ease;
 }
 
-/* Donut Chart - Better Layout */
+.chart-bar:hover .bar-value {
+  opacity: 1;
+}
+
+/* Donut Chart - Completely Redesigned */
 .donut-chart {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 1.5rem;
   flex: 1;
-  padding: 1rem 0;
+  padding: 1rem;
 }
 
 .donut-center {
   text-align: center;
   padding: 1.5rem;
   background: rgba(0, 0, 0, 0.02);
-  border-radius: 50%;
-  width: 100px;
+  border-radius: 8px;
+  width: 100%;
+  max-width: 140px;
   height: 100px;
   display: flex;
   flex-direction: column;
@@ -3634,15 +3716,16 @@ body {
   justify-content: center;
   border: 1px solid var(--border-subtle);
   flex-shrink: 0;
+  position: relative;
 }
 
 .donut-total {
   display: block;
   font-size: 1.5rem;
-  font-weight: 600;
+  font-weight: 500;
   color: var(--text-light);
   margin-bottom: 0.25rem;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.01em;
   overflow: hidden;
   text-overflow: ellipsis;
 }
@@ -3652,13 +3735,13 @@ body {
   color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.02em;
-  font-weight: 500;
+  font-weight: 400;
   text-align: center;
 }
 
 .donut-segments {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  display: flex;
+  flex-direction: column;
   gap: 0.75rem;
   width: 100%;
   max-width: 100%;
@@ -3667,7 +3750,7 @@ body {
 .status-item {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.75rem;
   padding: 0.75rem;
   background: rgba(0, 0, 0, 0.02);
   border-radius: 6px;
@@ -3678,28 +3761,16 @@ body {
 }
 
 .status-item:hover {
-  background: rgba(0, 0, 0, 0.05);
+  background: rgba(0, 0, 0, 0.04);
   border-color: var(--border-hover);
 }
 
 .status-dot {
-  width: 10px;
-  height: 10px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
   flex-shrink: 0;
   position: relative;
-}
-
-.status-dot::after {
-  content: '';
-  position: absolute;
-  top: -2px;
-  left: -2px;
-  right: -2px;
-  bottom: -2px;
-  border-radius: 50%;
-  background: inherit;
-  opacity: 0.2;
 }
 
 .status-dot.status-active {
@@ -3715,10 +3786,10 @@ body {
 }
 
 .status-name {
-  font-size: 0.75rem;
+  font-size: 0.8125rem;
   color: var(--text-light);
   text-transform: capitalize;
-  font-weight: 500;
+  font-weight: 400;
   flex: 1;
   min-width: 0;
   overflow: hidden;
@@ -3727,13 +3798,13 @@ body {
 }
 
 .status-count {
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: var(--text-light);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--text-muted);
   background: rgba(0, 0, 0, 0.05);
   padding: 0.25rem 0.5rem;
   border-radius: 4px;
-  min-width: 20px;
+  min-width: 24px;
   text-align: center;
   flex-shrink: 0;
 }
@@ -3750,26 +3821,29 @@ body {
 
 .progress-section:hover {
   border-color: var(--border-hover);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-subtle);
 }
 
 .progress-section h3 {
-  font-size: 1.125rem;
-  font-weight: 500;
+  font-size: 0.75rem;
+  font-weight: 400;
   margin: 0 0 1.5rem 0;
-  color: var(--text-light);
-  letter-spacing: -0.01em;
+  color: var(--text-muted);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
 }
 
 .progress-list {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1rem;
 }
 
 .progress-item {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0.5rem;
   padding: 1rem;
   background: rgba(0, 0, 0, 0.02);
   border-radius: 6px;
@@ -3792,7 +3866,7 @@ body {
 .progress-item-title {
   font-size: 0.875rem;
   color: var(--text-light);
-  font-weight: 500;
+  font-weight: 400;
   flex: 1;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -3800,69 +3874,54 @@ body {
 }
 
 .progress-item-percentage {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: var(--text-light);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text-muted);
   background: rgba(0, 0, 0, 0.05);
   padding: 0.25rem 0.5rem;
-  border-radius: 4px;
-  min-width: 48px;
+  border-radius: 3px;
+  min-width: 40px;
   text-align: center;
 }
 
 .progress-bar-container {
-  height: 8px;
+  height: 4px;
   background: rgba(0, 0, 0, 0.05);
-  border-radius: 4px;
+  border-radius: 2px;
   overflow: hidden;
   position: relative;
 }
 
 .progress-bar-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--text-light) 0%, rgba(0, 0, 0, 0.7) 100%);
-  border-radius: 4px;
-  transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+  background: var(--accent);
+  border-radius: 2px;
+  transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
 }
 
-.progress-bar-fill::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 2px;
-  height: 100%;
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 0 4px 4px 0;
-}
-
 .progress-status {
-  font-size: 0.75rem;
-  padding: 0.25rem 0.75rem;
-  border-radius: 4px;
+  font-size: 0.6875rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 3px;
   text-transform: capitalize;
   align-self: flex-start;
-  font-weight: 500;
-  border: 1px solid;
+  font-weight: 400;
 }
 
 .progress-status.status-active {
   background: rgba(16, 185, 129, 0.1);
   color: #10b981;
-  border-color: rgba(16, 185, 129, 0.2);
 }
 
 .progress-status.status-paused {
   background: rgba(251, 191, 36, 0.1);
   color: #f59e0b;
-  border-color: rgba(251, 191, 36, 0.2);
 }
 
 .progress-status.status-completed {
   background: rgba(99, 102, 241, 0.1);
   color: #6366f1;
-  border-color: rgba(99, 102, 241, 0.2);
 }
 
 /* Enhanced Quick Actions */
@@ -3876,19 +3935,22 @@ body {
 
 .quick-actions:hover {
   border-color: var(--border-hover);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-subtle);
 }
 
 .quick-actions h3 {
-  font-size: 1.125rem;
-  font-weight: 500;
+  font-size: 0.75rem;
+  font-weight: 400;
   margin: 0 0 1.5rem 0;
-  color: var(--text-light);
-  letter-spacing: -0.01em;
+  color: var(--text-muted);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
 }
 
 .actions-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
   gap: 1rem;
 }
 
@@ -3897,29 +3959,28 @@ body {
   flex-direction: column;
   align-items: center;
   gap: 0.75rem;
-  padding: 1.5rem 1rem;
+  padding: 1.25rem 1rem;
   background: rgba(0, 0, 0, 0.02);
   border: 1px solid var(--border-subtle);
-  border-radius: 8px;
+  border-radius: 6px;
   font-family: inherit;
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   color: var(--text-light);
   cursor: pointer;
   transition: all 0.2s ease;
   text-align: center;
-  font-weight: 500;
+  font-weight: 400;
 }
 
 .action-btn:hover {
   background: rgba(0, 0, 0, 0.05);
   border-color: var(--border-hover);
   transform: translateY(-2px);
-  box-shadow: var(--shadow-subtle);
 }
 
 .action-btn svg {
-  width: 28px;
-  height: 28px;
+  width: 20px;
+  height: 20px;
   color: var(--text-muted);
   stroke-width: 1.5;
   transition: all 0.2s ease;
@@ -3927,7 +3988,6 @@ body {
 
 .action-btn:hover svg {
   color: var(--text-light);
-  transform: scale(1.1);
 }
 
 /* Responsive adjustments for stats */
@@ -3940,8 +4000,13 @@ body {
     grid-template-columns: 1fr;
   }
   
+  .chart-container {
+    min-height: 280px;
+    padding: 1.5rem;
+  }
+  
   .donut-segments {
-    grid-template-columns: 1fr;
+    gap: 0.5rem;
   }
   
   .actions-grid {
@@ -3949,15 +4014,33 @@ body {
   }
   
   .line-chart {
-    height: 150px;
+    height: 140px;
+    gap: 0.5rem;
+  }
+  
+  .chart-bar {
+    max-width: 40px;
+  }
+  
+  .bar-fill {
+    width: 16px;
   }
   
   .donut-center {
-    width: 100px;
-    height: 100px;
+    width: 100%;
+    max-width: 120px;
+    height: 80px;
   }
   
   .donut-total {
-    font-size: 1.5rem;
+    font-size: 1.25rem;
+  }
+  
+  .progress-list {
+    gap: 0.75rem;
+  }
+  
+  .progress-item {
+    padding: 0.75rem;
   }
 }

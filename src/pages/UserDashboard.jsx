@@ -595,13 +595,14 @@ function Overview({ projects, appointments, messages, requests, setActiveTab }) 
   const activeProjects = projects.filter(p => p.status === 'active');
   const pendingAppointments = appointments.filter(a => a.status === 'pending');
   const completedProjects = projects.filter(p => p.status === 'completed');
+  const unreadMessages = messages.filter(m => m.sender_role === 'admin' && !m.is_read);
 
   const stats = [
     {
       title: 'Proyectos Activos',
       value: activeProjects.length,
-      change: '+12%',
-      trend: 'up',
+      change: null,
+      trend: 'neutral',
       icon: (
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
           <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
@@ -611,8 +612,8 @@ function Overview({ projects, appointments, messages, requests, setActiveTab }) 
     {
       title: 'Solicitudes Pendientes',
       value: pendingAppointments.length,
-      change: '-5%',
-      trend: 'down',
+      change: null,
+      trend: 'neutral',
       icon: (
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
           <circle cx="12" cy="12" r="10"/>
@@ -623,8 +624,8 @@ function Overview({ projects, appointments, messages, requests, setActiveTab }) 
     {
       title: 'Proyectos Completados',
       value: completedProjects.length,
-      change: '+8%',
-      trend: 'up',
+      change: null,
+      trend: 'neutral',
       icon: (
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
           <polyline points="20 6 9 17 4 12"/>
@@ -633,9 +634,9 @@ function Overview({ projects, appointments, messages, requests, setActiveTab }) 
     },
     {
       title: 'Mensajes Sin Leer',
-      value: messages.filter(m => m.sender_role === 'admin' && !m.is_read).length,
-      change: 'Nuevo',
-      trend: 'neutral',
+      value: unreadMessages.length,
+      change: unreadMessages.length > 0 ? 'Nuevo' : null,
+      trend: unreadMessages.length > 0 ? 'up' : 'neutral',
       icon: (
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
           <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
@@ -666,7 +667,7 @@ function Overview({ projects, appointments, messages, requests, setActiveTab }) 
             <div className="stat-content">
               <p className="stat-title">{stat.title}</p>
               <h3 className="stat-value">{stat.value}</h3>
-              <span className={`stat-change ${stat.trend}`}>{stat.change}</span>
+              {stat.change && <span className={`stat-change ${stat.trend}`}>{stat.change}</span>}
             </div>
           </motion.div>
         ))}
@@ -1844,22 +1845,43 @@ function Chat({ messages, newMessage, setNewMessage, onSend }) {
 function Analytics({ projects, appointments }) {
   const activeProjects = projects.filter(p => p.status === 'active').length;
   const completedProjects = projects.filter(p => p.status === 'completed').length;
+  const pendingProjects = projects.filter(p => p.status === 'pending').length;
+  const pausedProjects = projects.filter(p => p.status === 'paused').length;
+  
   const pendingAppointments = appointments.filter(a => a.status === 'pending').length;
-  const approvedAppointments = appointments.filter(a => a.status === 'approved').length;
+  const confirmedAppointments = appointments.filter(a => a.status === 'confirmed').length;
+  const completedAppointments = appointments.filter(a => a.status === 'completed').length;
 
-  const projectsByStatus = [
-    { status: 'Activos', count: activeProjects, color: '#10b981' },
-    { status: 'Completados', count: completedProjects, color: '#6366f1' },
-    { status: 'Pendientes', count: projects.filter(p => p.status === 'pending').length, color: '#f59e0b' }
-  ];
+  // Generate real timeline data based on creation dates
+  const generateTimelineData = (items, months = 6) => {
+    const now = new Date();
+    const data = [];
+    
+    for (let i = months - 1; i >= 0; i--) {
+      const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const monthStart = new Date(date.getFullYear(), date.getMonth(), 1);
+      const monthEnd = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+      
+      const count = items.filter(item => {
+        const itemDate = new Date(item.created_at);
+        return itemDate >= monthStart && itemDate <= monthEnd;
+      }).length;
+      
+      data.push({
+        month: date.toLocaleDateString('es-ES', { month: 'short' }),
+        value: count,
+        date: date
+      });
+    }
+    
+    return data;
+  };
 
-  const appointmentsByStatus = [
-    { status: 'Pendientes', count: pendingAppointments, color: '#f59e0b' },
-    { status: 'Aprobadas', count: approvedAppointments, color: '#10b981' },
-    { status: 'Rechazadas', count: appointments.filter(a => a.status === 'rejected').length, color: '#ef4444' }
-  ];
+  const projectTimeline = generateTimelineData(projects);
+  const appointmentTimeline = generateTimelineData(appointments);
 
-  const maxValue = Math.max(...projectsByStatus.map(p => p.count), ...appointmentsByStatus.map(a => a.count), 1);
+  const maxProjectValue = Math.max(...projectTimeline.map(d => d.value), 1);
+  const maxAppointmentValue = Math.max(...appointmentTimeline.map(d => d.value), 1);
 
   return (
     <motion.div
@@ -1869,111 +1891,153 @@ function Analytics({ projects, appointments }) {
       exit={{ opacity: 0, y: -20 }}
     >
       <div className="analytics-grid">
+        {/* Project Timeline Chart */}
         <motion.div
-          className="analytics-card"
+          className="analytics-card timeline-card"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
         >
-          <h3>Proyectos por Estado</h3>
-          <div className="chart-container">
-            {projectsByStatus.map((item, index) => (
-              <div key={index} className="chart-bar-group">
-                <div className="chart-label">{item.status}</div>
-                <div className="chart-bar-wrapper">
+          <h3>Proyectos por Mes</h3>
+          <div className="line-chart-container">
+            <div className="chart-grid">
+              {projectTimeline.map((point, index) => (
+                <div key={index} className="chart-point-container">
                   <motion.div
-                    className="chart-bar"
-                    style={{ backgroundColor: item.color }}
-                    initial={{ width: 0 }}
-                    animate={{ width: `${(item.count / maxValue) * 100}%` }}
-                    transition={{ duration: 1, delay: 0.2 + index * 0.1 }}
-                  />
-                  <span className="chart-value">{item.count}</span>
+                    className="chart-line-point"
+                    initial={{ scale: 0, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ delay: 0.2 + index * 0.1 }}
+                    style={{
+                      bottom: `${(point.value / maxProjectValue) * 80}%`
+                    }}
+                  >
+                    <div className="point-tooltip">{point.value}</div>
+                  </motion.div>
+                  <div className="chart-label">{point.month}</div>
                 </div>
-              </div>
-            ))}
+              ))}
+              <svg className="chart-line-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
+                <motion.polyline
+                  fill="none"
+                  stroke="var(--accent)"
+                  strokeWidth="2"
+                  points={projectTimeline.map((point, index) => 
+                    `${(index / (projectTimeline.length - 1)) * 100},${100 - (point.value / maxProjectValue) * 80}`
+                  ).join(' ')}
+                  initial={{ pathLength: 0 }}
+                  animate={{ pathLength: 1 }}
+                  transition={{ duration: 2, delay: 0.5 }}
+                />
+              </svg>
+            </div>
           </div>
         </motion.div>
 
+        {/* Appointment Timeline Chart */}
         <motion.div
-          className="analytics-card"
+          className="analytics-card timeline-card"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
         >
-          <h3>Solicitudes por Estado</h3>
-          <div className="chart-container">
-            {appointmentsByStatus.map((item, index) => (
-              <div key={index} className="chart-bar-group">
-                <div className="chart-label">{item.status}</div>
-                <div className="chart-bar-wrapper">
+          <h3>Solicitudes por Mes</h3>
+          <div className="line-chart-container">
+            <div className="chart-grid">
+              {appointmentTimeline.map((point, index) => (
+                <div key={index} className="chart-point-container">
                   <motion.div
-                    className="chart-bar"
-                    style={{ backgroundColor: item.color }}
-                    initial={{ width: 0 }}
-                    animate={{ width: `${(item.count / maxValue) * 100}%` }}
-                    transition={{ duration: 1, delay: 0.3 + index * 0.1 }}
-                  />
-                  <span className="chart-value">{item.count}</span>
+                    className="chart-line-point appointment-point"
+                    initial={{ scale: 0, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ delay: 0.3 + index * 0.1 }}
+                    style={{
+                      bottom: `${(point.value / maxAppointmentValue) * 80}%`
+                    }}
+                  >
+                    <div className="point-tooltip">{point.value}</div>
+                  </motion.div>
+                  <div className="chart-label">{point.month}</div>
                 </div>
-              </div>
-            ))}
+              ))}
+              <svg className="chart-line-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
+                <motion.polyline
+                  fill="none"
+                  stroke="#10b981"
+                  strokeWidth="2"
+                  points={appointmentTimeline.map((point, index) => 
+                    `${(index / (appointmentTimeline.length - 1)) * 100},${100 - (point.value / maxAppointmentValue) * 80}`
+                  ).join(' ')}
+                  initial={{ pathLength: 0 }}
+                  animate={{ pathLength: 1 }}
+                  transition={{ duration: 2, delay: 0.6 }}
+                />
+              </svg>
+            </div>
           </div>
         </motion.div>
 
+        {/* Project Status Summary */}
         <motion.div
-          className="analytics-card summary-card"
+          className="analytics-card status-card"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
         >
-          <h3>Resumen General</h3>
-          <div className="summary-grid">
-            <div className="summary-item">
-              <span className="summary-label">Total Proyectos</span>
-              <span className="summary-value">{projects.length}</span>
+          <h3>Estado de Proyectos</h3>
+          <div className="status-grid">
+            <div className="status-item">
+              <div className="status-indicator active"></div>
+              <span className="status-label">Activos</span>
+              <span className="status-value">{activeProjects}</span>
             </div>
-            <div className="summary-item">
-              <span className="summary-label">Total Solicitudes</span>
-              <span className="summary-value">{appointments.length}</span>
+            <div className="status-item">
+              <div className="status-indicator completed"></div>
+              <span className="status-label">Completados</span>
+              <span className="status-value">{completedProjects}</span>
             </div>
-            <div className="summary-item">
-              <span className="summary-label">Tasa de Éxito</span>
-              <span className="summary-value">
-                {projects.length > 0 ? Math.round((completedProjects / projects.length) * 100) : 0}%
-              </span>
+            <div className="status-item">
+              <div className="status-indicator pending"></div>
+              <span className="status-label">Pendientes</span>
+              <span className="status-value">{pendingProjects}</span>
             </div>
-            <div className="summary-item">
-              <span className="summary-label">Proyectos en Progreso</span>
-              <span className="summary-value">{activeProjects}</span>
+            <div className="status-item">
+              <div className="status-indicator paused"></div>
+              <span className="status-label">Pausados</span>
+              <span className="status-value">{pausedProjects}</span>
             </div>
           </div>
         </motion.div>
 
+        {/* Appointment Status Summary */}
         <motion.div
-          className="analytics-card progress-card"
+          className="analytics-card status-card"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
         >
-          <h3>Progreso de Proyectos Activos</h3>
-          <div className="progress-list">
-            {projects.filter(p => p.status === 'active').slice(0, 5).map((project, index) => (
-              <div key={project.id} className="progress-item">
-                <div className="progress-item-header">
-                  <span className="progress-item-title">{project.title}</span>
-                  <span className="progress-item-percentage">{project.progress || 0}%</span>
-                </div>
-                <div className="progress-item-bar">
-                  <motion.div
-                    className="progress-item-fill"
-                    initial={{ width: 0 }}
-                    animate={{ width: `${project.progress || 0}%` }}
-                    transition={{ duration: 1, delay: 0.5 + index * 0.1 }}
-                  />
-                </div>
-              </div>
-            ))}
+          <h3>Estado de Solicitudes</h3>
+          <div className="status-grid">
+            <div className="status-item">
+              <div className="status-indicator pending"></div>
+              <span className="status-label">Pendientes</span>
+              <span className="status-value">{pendingAppointments}</span>
+            </div>
+            <div className="status-item">
+              <div className="status-indicator confirmed"></div>
+              <span className="status-label">Confirmadas</span>
+              <span className="status-value">{confirmedAppointments}</span>
+            </div>
+            <div className="status-item">
+              <div className="status-indicator completed"></div>
+              <span className="status-label">Completadas</span>
+              <span className="status-value">{completedAppointments}</span>
+            </div>
+            <div className="status-item">
+              <div className="status-indicator total"></div>
+              <span className="status-label">Total</span>
+              <span className="status-value">{appointments.length}</span>
+            </div>
           </div>
         </motion.div>
       </div>

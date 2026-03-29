@@ -2393,6 +2393,17 @@ function StatsSection() {
     pendingRequests: 0
   });
 
+  const [showConfigModal, setShowConfigModal] = useState(false);
+  const [configSettings, setConfigSettings] = useState({
+    siteName: 'Genswave',
+    adminEmail: 'admin@genswave.com',
+    maxFileSize: '10MB',
+    allowRegistration: true,
+    maintenanceMode: false,
+    emailNotifications: true,
+    backupFrequency: 'daily'
+  });
+
   useEffect(() => {
     loadStats();
   }, []);
@@ -2426,12 +2437,6 @@ function StatsSection() {
         .filter(p => p.status === 'completed' && p.budget)
         .reduce((sum, p) => sum + parseFloat(p.budget || 0), 0);
 
-      // Generate mock user growth data (last 6 months)
-      const userGrowth = Array.from({ length: 6 }, (_, i) => ({
-        month: new Date(Date.now() - (5 - i) * 30 * 24 * 60 * 60 * 1000).toLocaleDateString('es', { month: 'short' }),
-        users: Math.floor(users.length * (0.6 + i * 0.08))
-      }));
-
       // Project progress data
       const projectProgress = projects.map(p => ({
         name: p.title?.substring(0, 20) + '...',
@@ -2445,7 +2450,6 @@ function StatsSection() {
         totalAppointments: appointments.length,
         totalRequests: requests.length,
         projectsByStatus,
-        userGrowth,
         projectProgress,
         monthlyRevenue,
         completedProjects,
@@ -2455,6 +2459,158 @@ function StatsSection() {
     } catch (error) {
       console.error('Error al cargar estadísticas:', error);
     }
+  };
+
+  const generateReport = async () => {
+    try {
+      const reportData = {
+        generatedAt: new Date().toISOString(),
+        summary: {
+          totalUsers: stats.totalUsers,
+          totalProjects: stats.totalProjects,
+          activeProjects: stats.activeProjects,
+          completedProjects: stats.completedProjects,
+          totalAppointments: stats.totalAppointments,
+          pendingRequests: stats.pendingRequests,
+          monthlyRevenue: stats.monthlyRevenue
+        },
+        projectsByStatus: stats.projectsByStatus,
+        projectProgress: stats.projectProgress
+      };
+
+      // Create and download PDF report
+      const reportContent = `
+REPORTE ADMINISTRATIVO - GENSWAVE
+Generado: ${new Date().toLocaleDateString('es-ES')}
+
+=== RESUMEN EJECUTIVO ===
+Total de Usuarios: ${stats.totalUsers}
+Total de Proyectos: ${stats.totalProjects}
+Proyectos Activos: ${stats.activeProjects}
+Proyectos Completados: ${stats.completedProjects}
+Solicitudes Pendientes: ${stats.pendingRequests}
+Ingresos del Mes: $${stats.monthlyRevenue.toLocaleString()}
+
+=== ESTADO DE PROYECTOS ===
+${Object.entries(stats.projectsByStatus).map(([status, count]) => 
+  `${status.toUpperCase()}: ${count} proyectos`
+).join('\n')}
+
+=== PROGRESO DE PROYECTOS RECIENTES ===
+${stats.projectProgress.map(p => 
+  `${p.name}: ${p.progress}% (${p.status})`
+).join('\n')}
+
+Reporte generado automáticamente por el sistema Genswave.
+      `;
+
+      const blob = new Blob([reportContent], { type: 'text/plain' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `reporte-genswave-${new Date().toISOString().split('T')[0]}.txt`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+
+      alert('Reporte generado y descargado exitosamente');
+    } catch (error) {
+      console.error('Error al generar reporte:', error);
+      alert('Error al generar el reporte');
+    }
+  };
+
+  const exportData = async () => {
+    try {
+      const [usersRes, projectsRes, appointmentsRes, requestsRes] = await Promise.all([
+        fetch('/api/users'),
+        fetch('/api/projects'),
+        fetch('/api/appointments'),
+        fetch('/api/requests/admin/requests')
+      ]);
+
+      const users = await usersRes.json();
+      const projects = await projectsRes.json();
+      const appointments = await appointmentsRes.json();
+      const requests = await requestsRes.json();
+
+      const exportData = {
+        exportDate: new Date().toISOString(),
+        users: users.map(u => ({
+          id: u.id,
+          name: u.name,
+          email: u.email,
+          role: u.role,
+          createdAt: u.created_at
+        })),
+        projects: projects.map(p => ({
+          id: p.id,
+          title: p.title,
+          status: p.status,
+          progress: p.progress,
+          budget: p.budget,
+          clientName: p.client_name,
+          createdAt: p.created_at
+        })),
+        appointments: appointments.map(a => ({
+          id: a.id,
+          name: a.name,
+          email: a.email,
+          status: a.status,
+          preferredDate: a.preferred_date,
+          createdAt: a.created_at
+        })),
+        requests: requests.map(r => ({
+          id: r.id,
+          title: r.title,
+          status: r.status,
+          projectType: r.project_type,
+          budget: r.budget,
+          createdAt: r.created_at
+        }))
+      };
+
+      const jsonString = JSON.stringify(exportData, null, 2);
+      const blob = new Blob([jsonString], { type: 'application/json' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `datos-genswave-${new Date().toISOString().split('T')[0]}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+
+      alert('Datos exportados exitosamente');
+    } catch (error) {
+      console.error('Error al exportar datos:', error);
+      alert('Error al exportar los datos');
+    }
+  };
+
+  const openConfiguration = () => {
+    setShowConfigModal(true);
+  };
+
+  const saveConfiguration = async () => {
+    try {
+      // Here you would typically save to a backend endpoint
+      // For now, we'll just save to localStorage
+      localStorage.setItem('adminConfig', JSON.stringify(configSettings));
+      alert('Configuración guardada exitosamente');
+      setShowConfigModal(false);
+    } catch (error) {
+      console.error('Error al guardar configuración:', error);
+      alert('Error al guardar la configuración');
+    }
+  };
+
+  const handleConfigChange = (key, value) => {
+    setConfigSettings(prev => ({
+      ...prev,
+      [key]: value
+    }));
   };
 
   return (
@@ -2519,43 +2675,7 @@ function StatsSection() {
         />
       </div>
 
-      {/* Charts Section */}
-      <div className="charts-section">
-        <div className="chart-container">
-          <h3>Crecimiento de Usuarios</h3>
-          <div className="line-chart">
-            {stats.userGrowth.map((data, index) => (
-              <div key={index} className="chart-bar">
-                <div 
-                  className="bar-fill"
-                  style={{ height: `${(data.users / stats.totalUsers) * 100}%` }}
-                />
-                <span className="bar-label">{data.month}</span>
-                <span className="bar-value">{data.users}</span>
-              </div>
-            ))}
-          </div>
-        </div>
 
-        <div className="chart-container">
-          <h3>Estado de Proyectos</h3>
-          <div className="donut-chart">
-            <div className="donut-center">
-              <span className="donut-total">{stats.totalProjects}</span>
-              <span className="donut-label">Proyectos</span>
-            </div>
-            <div className="donut-segments">
-              {Object.entries(stats.projectsByStatus).map(([status, count], index) => (
-                <div key={status} className="status-item">
-                  <div className={`status-dot status-${status}`}></div>
-                  <span className="status-name">{status}</span>
-                  <span className="status-count">{count}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
 
       {/* Project Progress */}
       <div className="progress-section">
@@ -2597,6 +2717,7 @@ function StatsSection() {
             className="action-btn"
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
+            onClick={generateReport}
           >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
@@ -2608,6 +2729,7 @@ function StatsSection() {
             className="action-btn"
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
+            onClick={exportData}
           >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
@@ -2620,6 +2742,7 @@ function StatsSection() {
             className="action-btn"
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
+            onClick={openConfiguration}
           >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <circle cx="12" cy="12" r="3"/>
@@ -2629,6 +2752,128 @@ function StatsSection() {
           </motion.button>
         </div>
       </div>
+
+      {/* Configuration Modal */}
+      {showConfigModal && (
+        <motion.div
+          className="modal-overlay"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          onClick={() => setShowConfigModal(false)}
+        >
+          <motion.div
+            className="modal-content config-modal"
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="modal-header">
+              <h3>Configuración del Sistema</h3>
+              <button 
+                className="close-modal-btn"
+                onClick={() => setShowConfigModal(false)}
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <line x1="18" y1="6" x2="6" y2="18"/>
+                  <line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+              </button>
+            </div>
+
+            <div className="config-form">
+              <div className="config-section">
+                <h4>Configuración General</h4>
+                <div className="form-group">
+                  <label>Nombre del Sitio</label>
+                  <input
+                    type="text"
+                    value={configSettings.siteName}
+                    onChange={(e) => handleConfigChange('siteName', e.target.value)}
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Email del Administrador</label>
+                  <input
+                    type="email"
+                    value={configSettings.adminEmail}
+                    onChange={(e) => handleConfigChange('adminEmail', e.target.value)}
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Tamaño Máximo de Archivo</label>
+                  <select
+                    value={configSettings.maxFileSize}
+                    onChange={(e) => handleConfigChange('maxFileSize', e.target.value)}
+                  >
+                    <option value="5MB">5MB</option>
+                    <option value="10MB">10MB</option>
+                    <option value="25MB">25MB</option>
+                    <option value="50MB">50MB</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="config-section">
+                <h4>Configuración de Usuarios</h4>
+                <div className="form-group checkbox-group">
+                  <label>
+                    <input
+                      type="checkbox"
+                      checked={configSettings.allowRegistration}
+                      onChange={(e) => handleConfigChange('allowRegistration', e.target.checked)}
+                    />
+                    Permitir registro de nuevos usuarios
+                  </label>
+                </div>
+                <div className="form-group checkbox-group">
+                  <label>
+                    <input
+                      type="checkbox"
+                      checked={configSettings.emailNotifications}
+                      onChange={(e) => handleConfigChange('emailNotifications', e.target.checked)}
+                    />
+                    Enviar notificaciones por email
+                  </label>
+                </div>
+              </div>
+
+              <div className="config-section">
+                <h4>Mantenimiento y Respaldos</h4>
+                <div className="form-group checkbox-group">
+                  <label>
+                    <input
+                      type="checkbox"
+                      checked={configSettings.maintenanceMode}
+                      onChange={(e) => handleConfigChange('maintenanceMode', e.target.checked)}
+                    />
+                    Modo de mantenimiento
+                  </label>
+                </div>
+                <div className="form-group">
+                  <label>Frecuencia de Respaldos</label>
+                  <select
+                    value={configSettings.backupFrequency}
+                    onChange={(e) => handleConfigChange('backupFrequency', e.target.value)}
+                  >
+                    <option value="daily">Diario</option>
+                    <option value="weekly">Semanal</option>
+                    <option value="monthly">Mensual</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div className="modal-actions">
+              <button className="btn-cancel" onClick={() => setShowConfigModal(false)}>
+                Cancelar
+              </button>
+              <button className="btn-confirm" onClick={saveConfiguration}>
+                Guardar Configuración
+              </button>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
     </motion.div>
   );
 }

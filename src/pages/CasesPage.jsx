@@ -19,42 +19,45 @@ function CasesPage() {
   const cases = [
     {
       id: 1,
-      title: 'E-Commerce Innovador',
-      client: 'TechRetail Co.',
-      category: 'Desarrollo Web',
-      description: 'Plataforma de comercio electrónico completa con integración de pagos y gestión de inventario en tiempo real.',
+      title: 'Trading Collectives DQ',
+      client: 'Trading Collectives',
+      category: 'Plataforma de Trading',
+      description: 'Plataforma completa de trading con sistema de gestión de cuentas, análisis en tiempo real y herramientas avanzadas para traders profesionales.',
       results: [
-        '300% aumento en ventas online',
-        '50% reducción en tiempo de carga',
-        '95% satisfacción del cliente'
+        'Sistema de gestión de cuentas',
+        'Dashboard de análisis en tiempo real',
+        'Integración con APIs de trading'
       ],
-      gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+      gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      url: 'https://tradingcollectivesdq.com'
     },
     {
       id: 2,
-      title: 'App de Fitness Personalizada',
-      client: 'FitLife App',
-      category: 'Aplicación Móvil',
-      description: 'Aplicación móvil con planes de entrenamiento personalizados, seguimiento de progreso y comunidad integrada.',
+      title: 'Hazzlo',
+      client: 'Hazzlo',
+      category: 'Plataforma de Servicios',
+      description: 'Plataforma digital innovadora que conecta profesionales con clientes, facilitando la contratación de servicios de manera eficiente y segura.',
       results: [
-        '100K+ descargas en 3 meses',
-        '4.8 estrellas en App Store',
-        '70% retención de usuarios'
+        'Sistema de matching inteligente',
+        'Gestión de pagos integrada',
+        'Panel de control para profesionales'
       ],
-      gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)'
+      gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+      url: 'https://hazzlo.com'
     },
     {
       id: 3,
-      title: 'Sistema de Gestión Empresarial',
-      client: 'GlobalCorp Inc.',
-      category: 'Solución a Medida',
-      description: 'Sistema ERP personalizado para gestión de recursos, proyectos y análisis de datos empresariales.',
+      title: 'Trade Array',
+      client: 'Trade Array',
+      category: 'Solución Financiera',
+      description: 'Sistema avanzado de análisis y gestión de operaciones financieras con herramientas de automatización y reportes detallados para traders institucionales.',
       results: [
-        '40% mejora en eficiencia',
-        '60% reducción en costos operativos',
-        'ROI positivo en 6 meses'
+        'Automatización de operaciones',
+        'Reportes y análisis avanzados',
+        'Integración multi-exchange'
       ],
-      gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)'
+      gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+      url: 'https://tradearray.org'
     }
   ];
 
@@ -124,7 +127,7 @@ function CasesPage() {
                 <p className="case-client">{caseItem.client}</p>
                 <p className="case-description">{caseItem.description}</p>
                 <div className="case-results">
-                  <h3>Resultados</h3>
+                  <h3>Características</h3>
                   <ul>
                     {caseItem.results.map((result, idx) => (
                       <li key={idx}>
@@ -136,6 +139,19 @@ function CasesPage() {
                     ))}
                   </ul>
                 </div>
+                <a 
+                  href={caseItem.url} 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="case-link"
+                >
+                  Visitar sitio
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                    <polyline points="15 3 21 3 21 9"/>
+                    <line x1="10" y1="14" x2="21" y2="3"/>
+                  </svg>
+                </a>
               </div>
             </motion.div>
           ))}

@@ -427,6 +427,17 @@ function Home() {
             </div>
 
             <div className="shape-container shape-3">
+              <div className="automation-icon">
+                <div className="automation-orb">
+                  <div className="orb-core"></div>
+                  <div className="pulse-ring ring-1"></div>
+                  <div className="pulse-ring ring-2"></div>
+                  <div className="pulse-ring ring-3"></div>
+                </div>
+              </div>
+            </div>
+
+            <div className="shape-container shape-4">
               <div className="ecommerce-icon">
                 <div className="cart-container">
                   <div className="cart-body">
@@ -441,7 +452,7 @@ function Home() {
               </div>
             </div>
 
-            <div className="shape-container shape-4">
+            <div className="shape-container shape-5">
               <div className="custom-icon">
                 <div className="puzzle-grid">
                   <div className="puzzle-piece p1"></div>
@@ -452,7 +463,7 @@ function Home() {
               </div>
             </div>
 
-            <div className="shape-container shape-5">
+            <div className="shape-container shape-6">
               <div className="cloud-icon">
                 <div className="cloud-shape">
                   <div className="cloud-circle c1"></div>
@@ -468,7 +479,7 @@ function Home() {
               </div>
             </div>
 
-            <div className="shape-container shape-6">
+            <div className="shape-container shape-7">
               <div className="consulting-icon">
                 <div className="chart-container">
                   <div className="chart-bars">
@@ -557,6 +568,29 @@ function Home() {
           <div className="mobile-icon-container">
             <div className="mobile-service-icon">
               <svg viewBox="0 0 100 100" className="mobile-icon-svg">
+                <circle cx="50" cy="30" r="15" fill="none" stroke="currentColor" strokeWidth="2"/>
+                <circle cx="50" cy="30" r="8" fill="none" stroke="currentColor" strokeWidth="1.5" opacity="0.6"/>
+                <circle cx="50" cy="30" r="3" fill="currentColor"/>
+                <path d="M 35 45 Q 50 35 65 45" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                <path d="M 30 55 Q 50 45 70 55" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                <path d="M 25 65 Q 50 55 75 65" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                <circle cx="35" cy="45" r="2" fill="currentColor"/>
+                <circle cx="65" cy="45" r="2" fill="currentColor"/>
+                <circle cx="30" cy="55" r="2" fill="currentColor"/>
+                <circle cx="70" cy="55" r="2" fill="currentColor"/>
+                <circle cx="25" cy="65" r="2" fill="currentColor"/>
+                <circle cx="75" cy="65" r="2" fill="currentColor"/>
+              </svg>
+            </div>
+          </div>
+          <p className="focus-text">Automatización e IA que transforman tu negocio.</p>
+          <p className="description">Chatbots inteligentes y sistemas automatizados que operan 24/7. Agentes de IA personalizados, automatización de procesos y redes sociales que trabajan mientras duermes.</p>
+        </section>
+
+        <section className="scroll-section s4" id="s4">
+          <div className="mobile-icon-container">
+            <div className="mobile-service-icon">
+              <svg viewBox="0 0 100 100" className="mobile-icon-svg">
                 <path d="M 30 40 L 40 30 L 60 30 L 70 40 L 70 55 L 60 65 L 40 65 L 30 55 Z" fill="none" stroke="currentColor" strokeWidth="2"/>
                 <circle cx="50" cy="47.5" r="12" fill="none" stroke="currentColor" strokeWidth="2"/>
                 <line x1="50" y1="35.5" x2="50" y2="40" stroke="currentColor" strokeWidth="2"/>
@@ -570,7 +604,7 @@ function Home() {
           <p className="description">Tiendas digitales completas con sistemas de pago seguros y gestión avanzada. Plataformas de comercio diseñadas para maximizar conversiones y facilitar operaciones.</p>
         </section>
 
-        <section className="scroll-section s4" id="s4">
+        <section className="scroll-section s5" id="s5">
           <div className="mobile-icon-container">
             <div className="mobile-service-icon">
               <svg viewBox="0 0 100 100" className="mobile-icon-svg">
@@ -589,7 +623,7 @@ function Home() {
           <p className="description">Desarrollo a medida que se adapta exactamente a tus necesidades. Tecnología personalizada que resuelve problemas específicos de tu industria y negocio.</p>
         </section>
 
-        <section className="scroll-section s5" id="s5">
+        <section className="scroll-section s6" id="s6">
           <div className="mobile-icon-container">
             <div className="mobile-service-icon">
               <svg viewBox="0 0 100 100" className="mobile-icon-svg">
@@ -607,7 +641,7 @@ function Home() {
           <p className="description">Arquitectura moderna en la nube que crece contigo. Sistemas robustos con alta disponibilidad, seguridad empresarial y rendimiento garantizado.</p>
         </section>
 
-        <section className="scroll-section s6" id="s6">
+        <section className="scroll-section s7" id="s7">
           <div className="mobile-icon-container">
             <div className="mobile-service-icon">
               <svg viewBox="0 0 100 100" className="mobile-icon-svg">

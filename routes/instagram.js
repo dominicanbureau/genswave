@@ -164,27 +164,27 @@ async function handleTextMessage(senderId, text, senderInfo) {
         if (lowerText.includes('hola') || lowerText.includes('hello') || lowerText.includes('hi')) {
           await sendInstagramMessage(senderId,
             `¡Hola! 👋 Bienvenido/a a *Genswave*\n\n` +
-            `Somos especialistas en desarrollo de software y soluciones tecnológicas.\n\n` +
-            `*NUESTROS SERVICIOS:*\n` +
-            `🌐 Desarrollo web profesional\n` +
+            `Somos especialistas en desarrollo de negocios y soluciones tecnológicas.\n\n` +
+            `*Ofrecemos Servicios de:*\n` +
+            `🌐 Desarrollo web\n` +
             `📱 Aplicaciones móviles\n` +
-            `🤖 Automatización de procesos\n` +
+            `🤖 Automation/IA en redes\n` +
+            `🧑🏻‍💼 Soporte Automatizado\n` +
             `☁️ Soluciones en la nube\n` +
             `🛡️ Ciberseguridad\n\n` +
             `*¿CÓMO PODEMOS AYUDARTE?*\n` +
-            `Puedes realizar acciones rapidas.\n\n` +
-            `🎫 Escriba "código" para crear acceso rápido\n` +
-            `📋 Escriba "consulta" para verificar estado\n` +
-            `🔐 Escriba "/reset email" para restablecer contraseña\n` +
-            `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+            `Puedes realizar acciones rapidas:\n\n` +
+            `🎫 Escriba "código" para crear cuenta\n` +
+            `📋 Escriba "consulta" estado de servicios\n` +
+            `━━━━━━━━━━━━━━━━━━━━━━━\n` +
             `¡Estamos aquí para impulsar tu negocio! 🚀`
           );
         } else if (lowerText.includes('código') || lowerText.includes('codigo') || lowerText.includes('acceso')) {
           await sendInstagramMessage(senderId,
             `🎫 *GENERACIÓN DE CÓDIGO DE ACCESO*\n\n` +
             `Estimado/a cliente, procederemos a generar su código de acceso rápido, para cancelar escriba "salir".\n\n` +
-            `*BENEFICIOS:*\n` +
-            `✅ Acceso exclusivo a su dashboard\n` +
+            `*PARA QUE?:*\n` +
+            `✅ Acceso inmediato a su dashboard\n` +
             `✅ Seguimiento de proyectos en tiempo real\n` +
             `✅ Comunicación directa con nuestro equipo\n\n` +
             `*PRIMERA PREGUNTA:*\n\n` +
@@ -194,7 +194,7 @@ async function handleTextMessage(senderId, text, senderInfo) {
         } else if (lowerText.includes('consulta') || lowerText.includes('estado') || lowerText.includes('proyecto')) {
           await sendInstagramMessage(senderId,
             `🔍 *CONSULTA DE ESTADO*\n\n` +
-            `Para verificar el estado de su proyecto o solicitud, necesito su ID único.\n\n` +
+            `Para verificar el estado de su proyecto o solicitud, necesito su ID único visible en la dashboard.\n\n` +
             `*FORMATO DE ID:*\n` +
             `• P123456 (Proyectos)\n` +
             `• S123456 (Solicitudes)\n\n` +
@@ -203,19 +203,21 @@ async function handleTextMessage(senderId, text, senderInfo) {
           await updateConversationState(senderId, 'awaiting_consultation_id', {});
         } else if (lowerText.includes('ayuda') || lowerText.includes('help') || lowerText.includes('comandos')) {
           await sendInstagramMessage(senderId,
-            `🆘 *MENÚ DE AYUDA*\n\n` +
+            `🆘 MENÚ DE AYUDA\n\n` +
             `*COMANDOS DISPONIBLES:*\n\n` +
-            `🎫 *"código"* - Generar acceso rápido al portal\n` +
-            `📋 *"consulta"* - Verificar estado de proyectos/solicitudes\n` +
-            `🔐 *"/reset email"* - Restablecer contraseña\n` +
-            `👋 *"hola"* - Ver mensaje de bienvenida\n` +
-            `❌ *"salir"* - Cancelar proceso actual\n\n` +
-            `*SERVICIOS:*\n` +
-            `🌐 Desarrollo web y aplicaciones\n` +
-            `🤖 Automatización de procesos\n` +
+            `🎫 "código" - Generar acceso rápido al portal\n` +
+            `📋 "consulta" - Verificar estado de proyectos/solicitudes\n` +
+            `🔐 "/reset" - Restablecer contraseña\n` +
+            `❌ "salir" - Cancelar proceso actual\n\n` +
+            `SERVICIOS:\n` +
+            `🌐 Desarrollo web\n` +
+            `📱 Aplicaciones móviles\n` +
+            `🤖 Automation/IA en redes\n` +
+            `🧑🏻‍💼 Soporte Automatizado\n` +
             `☁️ Soluciones en la nube\n` +
             `🛡️ Ciberseguridad\n\n` +
-            `*CONTACTO DIRECTO:*\n` +
+            `¿Necesita más información?\n\n` +
+            `CONTACTO DIRECTO:\n` +
             `📧 support@genswave.org\n` +
             `🌐 https://genswave.org\n\n` +
             `¿En qué más podemos asistirle?`
@@ -227,7 +229,6 @@ async function handleTextMessage(senderId, text, senderInfo) {
             `*MIENTRAS TANTO:*\n` +
             `🎫 Escriba "código" para generar acceso rápido\n` +
             `📋 Escriba "consulta" para verificar estado\n` +
-            `🔐 Escriba "/reset email" para restablecer contraseña\n` +
             `🆘 Escriba "ayuda" para ver opciones\n\n` +
             `¡Gracias por contactar a *Genswave*! 🚀`
           );

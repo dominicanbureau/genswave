@@ -1869,6 +1869,7 @@ function Analytics({ projects, appointments }) {
       
       data.push({
         month: date.toLocaleDateString('es-ES', { month: 'short' }),
+        fullMonth: date.toLocaleDateString('es-ES', { month: 'long' }),
         value: count,
         date: date
       });
@@ -1883,160 +1884,353 @@ function Analytics({ projects, appointments }) {
   const maxProjectValue = Math.max(...projectTimeline.map(d => d.value), 1);
   const maxAppointmentValue = Math.max(...appointmentTimeline.map(d => d.value), 1);
 
+  // Calculate success rate
+  const successRate = projects.length > 0 ? Math.round((completedProjects / projects.length) * 100) : 0;
+  const appointmentSuccessRate = appointments.length > 0 ? Math.round((completedAppointments / appointments.length) * 100) : 0;
+
   return (
     <motion.div
-      className="dashboard-content-new"
+      className="dashboard-content-new analytics-dashboard"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
     >
-      <div className="analytics-grid">
+      {/* Header Section */}
+      <div className="analytics-header">
+        <div className="analytics-title-section">
+          <h1>Analíticas y Métricas</h1>
+          <p>Visualiza el progreso y rendimiento de tus proyectos</p>
+        </div>
+        <div className="analytics-summary-cards">
+          <div className="summary-metric-card">
+            <div className="metric-icon projects-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+              </svg>
+            </div>
+            <div className="metric-content">
+              <span className="metric-value">{projects.length}</span>
+              <span className="metric-label">Total Proyectos</span>
+            </div>
+          </div>
+          <div className="summary-metric-card">
+            <div className="metric-icon success-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                <polyline points="22 4 12 14.01 9 11.01"/>
+              </svg>
+            </div>
+            <div className="metric-content">
+              <span className="metric-value">{successRate}%</span>
+              <span className="metric-label">Tasa de Éxito</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Analytics Grid */}
+      <div className="analytics-main-grid">
         {/* Project Timeline Chart */}
         <motion.div
-          className="analytics-card timeline-card"
+          className="analytics-card-large timeline-chart-card"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
         >
-          <h3>Proyectos por Mes</h3>
-          <div className="line-chart-container">
-            <div className="chart-grid">
-              {projectTimeline.map((point, index) => (
-                <div key={index} className="chart-point-container">
-                  <motion.div
-                    className="chart-line-point"
-                    initial={{ scale: 0, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{ delay: 0.2 + index * 0.1 }}
-                    style={{
-                      bottom: `${(point.value / maxProjectValue) * 80}%`
-                    }}
-                  >
-                    <div className="point-tooltip">{point.value}</div>
-                  </motion.div>
-                  <div className="chart-label">{point.month}</div>
+          <div className="chart-header">
+            <div className="chart-title-section">
+              <h3>Evolución de Proyectos</h3>
+              <p>Proyectos creados en los últimos 6 meses</p>
+            </div>
+            <div className="chart-legend">
+              <div className="legend-item">
+                <div className="legend-color projects-color"></div>
+                <span>Proyectos</span>
+              </div>
+            </div>
+          </div>
+          <div className="advanced-line-chart">
+            <div className="chart-y-axis">
+              {[...Array(5)].map((_, i) => (
+                <div key={i} className="y-axis-label">
+                  {Math.round((maxProjectValue / 4) * (4 - i))}
                 </div>
               ))}
-              <svg className="chart-line-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
-                <motion.polyline
-                  fill="none"
-                  stroke="var(--accent)"
-                  strokeWidth="2"
-                  points={projectTimeline.map((point, index) => 
-                    `${(index / (projectTimeline.length - 1)) * 100},${100 - (point.value / maxProjectValue) * 80}`
-                  ).join(' ')}
-                  initial={{ pathLength: 0 }}
-                  animate={{ pathLength: 1 }}
-                  transition={{ duration: 2, delay: 0.5 }}
-                />
-              </svg>
+            </div>
+            <div className="chart-area">
+              <div className="chart-grid-lines">
+                {[...Array(5)].map((_, i) => (
+                  <div key={i} className="grid-line" style={{ bottom: `${i * 25}%` }}></div>
+                ))}
+              </div>
+              <div className="chart-points-container">
+                {projectTimeline.map((point, index) => (
+                  <div key={index} className="chart-point-wrapper">
+                    <motion.div
+                      className="chart-point projects-point"
+                      initial={{ scale: 0, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ delay: 0.3 + index * 0.1 }}
+                      style={{
+                        bottom: `${(point.value / maxProjectValue) * 100}%`
+                      }}
+                    >
+                      <div className="point-tooltip-advanced">
+                        <div className="tooltip-title">{point.fullMonth}</div>
+                        <div className="tooltip-value">{point.value} proyectos</div>
+                      </div>
+                    </motion.div>
+                    <div className="x-axis-label">{point.month}</div>
+                  </div>
+                ))}
+                <svg className="chart-line-svg-advanced" viewBox="0 0 100 100" preserveAspectRatio="none">
+                  <defs>
+                    <linearGradient id="projectGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                      <stop offset="0%" stopColor="var(--accent)" stopOpacity="0.3"/>
+                      <stop offset="100%" stopColor="var(--accent)" stopOpacity="0"/>
+                    </linearGradient>
+                  </defs>
+                  <motion.path
+                    d={`M 0,${100 - (projectTimeline[0]?.value / maxProjectValue) * 100} ${projectTimeline.map((point, index) => 
+                      `L ${(index / (projectTimeline.length - 1)) * 100},${100 - (point.value / maxProjectValue) * 100}`
+                    ).join(' ')} L 100,100 L 0,100 Z`}
+                    fill="url(#projectGradient)"
+                    initial={{ pathLength: 0, opacity: 0 }}
+                    animate={{ pathLength: 1, opacity: 1 }}
+                    transition={{ duration: 2, delay: 0.5 }}
+                  />
+                  <motion.polyline
+                    fill="none"
+                    stroke="var(--accent)"
+                    strokeWidth="3"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    points={projectTimeline.map((point, index) => 
+                      `${(index / (projectTimeline.length - 1)) * 100},${100 - (point.value / maxProjectValue) * 100}`
+                    ).join(' ')}
+                    initial={{ pathLength: 0 }}
+                    animate={{ pathLength: 1 }}
+                    transition={{ duration: 2, delay: 0.7 }}
+                  />
+                </svg>
+              </div>
             </div>
           </div>
         </motion.div>
 
         {/* Appointment Timeline Chart */}
         <motion.div
-          className="analytics-card timeline-card"
+          className="analytics-card-large timeline-chart-card"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
         >
-          <h3>Solicitudes por Mes</h3>
-          <div className="line-chart-container">
-            <div className="chart-grid">
-              {appointmentTimeline.map((point, index) => (
-                <div key={index} className="chart-point-container">
-                  <motion.div
-                    className="chart-line-point appointment-point"
-                    initial={{ scale: 0, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{ delay: 0.3 + index * 0.1 }}
-                    style={{
-                      bottom: `${(point.value / maxAppointmentValue) * 80}%`
-                    }}
-                  >
-                    <div className="point-tooltip">{point.value}</div>
-                  </motion.div>
-                  <div className="chart-label">{point.month}</div>
+          <div className="chart-header">
+            <div className="chart-title-section">
+              <h3>Evolución de Solicitudes</h3>
+              <p>Solicitudes recibidas en los últimos 6 meses</p>
+            </div>
+            <div className="chart-legend">
+              <div className="legend-item">
+                <div className="legend-color appointments-color"></div>
+                <span>Solicitudes</span>
+              </div>
+            </div>
+          </div>
+          <div className="advanced-line-chart">
+            <div className="chart-y-axis">
+              {[...Array(5)].map((_, i) => (
+                <div key={i} className="y-axis-label">
+                  {Math.round((maxAppointmentValue / 4) * (4 - i))}
                 </div>
               ))}
-              <svg className="chart-line-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
-                <motion.polyline
-                  fill="none"
-                  stroke="#10b981"
-                  strokeWidth="2"
-                  points={appointmentTimeline.map((point, index) => 
-                    `${(index / (appointmentTimeline.length - 1)) * 100},${100 - (point.value / maxAppointmentValue) * 80}`
-                  ).join(' ')}
-                  initial={{ pathLength: 0 }}
-                  animate={{ pathLength: 1 }}
-                  transition={{ duration: 2, delay: 0.6 }}
-                />
-              </svg>
+            </div>
+            <div className="chart-area">
+              <div className="chart-grid-lines">
+                {[...Array(5)].map((_, i) => (
+                  <div key={i} className="grid-line" style={{ bottom: `${i * 25}%` }}></div>
+                ))}
+              </div>
+              <div className="chart-points-container">
+                {appointmentTimeline.map((point, index) => (
+                  <div key={index} className="chart-point-wrapper">
+                    <motion.div
+                      className="chart-point appointments-point"
+                      initial={{ scale: 0, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ delay: 0.4 + index * 0.1 }}
+                      style={{
+                        bottom: `${(point.value / maxAppointmentValue) * 100}%`
+                      }}
+                    >
+                      <div className="point-tooltip-advanced">
+                        <div className="tooltip-title">{point.fullMonth}</div>
+                        <div className="tooltip-value">{point.value} solicitudes</div>
+                      </div>
+                    </motion.div>
+                    <div className="x-axis-label">{point.month}</div>
+                  </div>
+                ))}
+                <svg className="chart-line-svg-advanced" viewBox="0 0 100 100" preserveAspectRatio="none">
+                  <defs>
+                    <linearGradient id="appointmentGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                      <stop offset="0%" stopColor="#10b981" stopOpacity="0.3"/>
+                      <stop offset="100%" stopColor="#10b981" stopOpacity="0"/>
+                    </linearGradient>
+                  </defs>
+                  <motion.path
+                    d={`M 0,${100 - (appointmentTimeline[0]?.value / maxAppointmentValue) * 100} ${appointmentTimeline.map((point, index) => 
+                      `L ${(index / (appointmentTimeline.length - 1)) * 100},${100 - (point.value / maxAppointmentValue) * 100}`
+                    ).join(' ')} L 100,100 L 0,100 Z`}
+                    fill="url(#appointmentGradient)"
+                    initial={{ pathLength: 0, opacity: 0 }}
+                    animate={{ pathLength: 1, opacity: 1 }}
+                    transition={{ duration: 2, delay: 0.6 }}
+                  />
+                  <motion.polyline
+                    fill="none"
+                    stroke="#10b981"
+                    strokeWidth="3"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    points={appointmentTimeline.map((point, index) => 
+                      `${(index / (appointmentTimeline.length - 1)) * 100},${100 - (point.value / maxAppointmentValue) * 100}`
+                    ).join(' ')}
+                    initial={{ pathLength: 0 }}
+                    animate={{ pathLength: 1 }}
+                    transition={{ duration: 2, delay: 0.8 }}
+                  />
+                </svg>
+              </div>
             </div>
           </div>
         </motion.div>
 
-        {/* Project Status Summary */}
+        {/* Project Status Distribution */}
         <motion.div
-          className="analytics-card status-card"
+          className="analytics-card status-distribution-card"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
         >
-          <h3>Estado de Proyectos</h3>
-          <div className="status-grid">
-            <div className="status-item">
-              <div className="status-indicator active"></div>
-              <span className="status-label">Activos</span>
-              <span className="status-value">{activeProjects}</span>
+          <div className="card-header">
+            <h3>Distribución de Proyectos</h3>
+            <p>Estado actual de todos los proyectos</p>
+          </div>
+          <div className="status-distribution">
+            <div className="distribution-chart">
+              <div className="center-metric">
+                <span className="center-value">{projects.length}</span>
+                <span className="center-label">Total</span>
+              </div>
+              <div className="distribution-segments">
+                <motion.div 
+                  className="segment active-segment"
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ delay: 0.5 }}
+                  style={{ '--percentage': `${projects.length > 0 ? (activeProjects / projects.length) * 100 : 0}%` }}
+                />
+                <motion.div 
+                  className="segment completed-segment"
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ delay: 0.6 }}
+                  style={{ '--percentage': `${projects.length > 0 ? (completedProjects / projects.length) * 100 : 0}%` }}
+                />
+                <motion.div 
+                  className="segment pending-segment"
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ delay: 0.7 }}
+                  style={{ '--percentage': `${projects.length > 0 ? (pendingProjects / projects.length) * 100 : 0}%` }}
+                />
+              </div>
             </div>
-            <div className="status-item">
-              <div className="status-indicator completed"></div>
-              <span className="status-label">Completados</span>
-              <span className="status-value">{completedProjects}</span>
-            </div>
-            <div className="status-item">
-              <div className="status-indicator pending"></div>
-              <span className="status-label">Pendientes</span>
-              <span className="status-value">{pendingProjects}</span>
-            </div>
-            <div className="status-item">
-              <div className="status-indicator paused"></div>
-              <span className="status-label">Pausados</span>
-              <span className="status-value">{pausedProjects}</span>
+            <div className="status-legend">
+              <div className="legend-item">
+                <div className="legend-dot active-dot"></div>
+                <span className="legend-text">Activos ({activeProjects})</span>
+              </div>
+              <div className="legend-item">
+                <div className="legend-dot completed-dot"></div>
+                <span className="legend-text">Completados ({completedProjects})</span>
+              </div>
+              <div className="legend-item">
+                <div className="legend-dot pending-dot"></div>
+                <span className="legend-text">Pendientes ({pendingProjects})</span>
+              </div>
+              {pausedProjects > 0 && (
+                <div className="legend-item">
+                  <div className="legend-dot paused-dot"></div>
+                  <span className="legend-text">Pausados ({pausedProjects})</span>
+                </div>
+              )}
             </div>
           </div>
         </motion.div>
 
-        {/* Appointment Status Summary */}
+        {/* Performance Metrics */}
         <motion.div
-          className="analytics-card status-card"
+          className="analytics-card performance-card"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
         >
-          <h3>Estado de Solicitudes</h3>
-          <div className="status-grid">
-            <div className="status-item">
-              <div className="status-indicator pending"></div>
-              <span className="status-label">Pendientes</span>
-              <span className="status-value">{pendingAppointments}</span>
+          <div className="card-header">
+            <h3>Métricas de Rendimiento</h3>
+            <p>Indicadores clave de desempeño</p>
+          </div>
+          <div className="performance-metrics">
+            <div className="metric-item">
+              <div className="metric-circle">
+                <svg viewBox="0 0 36 36" className="circular-chart">
+                  <path className="circle-bg"
+                    d="M18 2.0845
+                      a 15.9155 15.9155 0 0 1 0 31.831
+                      a 15.9155 15.9155 0 0 1 0 -31.831"
+                  />
+                  <motion.path className="circle projects-circle"
+                    strokeDasharray={`${successRate}, 100`}
+                    d="M18 2.0845
+                      a 15.9155 15.9155 0 0 1 0 31.831
+                      a 15.9155 15.9155 0 0 1 0 -31.831"
+                    initial={{ strokeDasharray: "0, 100" }}
+                    animate={{ strokeDasharray: `${successRate}, 100` }}
+                    transition={{ duration: 2, delay: 0.5 }}
+                  />
+                </svg>
+                <div className="metric-percentage">{successRate}%</div>
+              </div>
+              <div className="metric-info">
+                <span className="metric-title">Proyectos Completados</span>
+                <span className="metric-subtitle">{completedProjects} de {projects.length}</span>
+              </div>
             </div>
-            <div className="status-item">
-              <div className="status-indicator confirmed"></div>
-              <span className="status-label">Confirmadas</span>
-              <span className="status-value">{confirmedAppointments}</span>
-            </div>
-            <div className="status-item">
-              <div className="status-indicator completed"></div>
-              <span className="status-label">Completadas</span>
-              <span className="status-value">{completedAppointments}</span>
-            </div>
-            <div className="status-item">
-              <div className="status-indicator total"></div>
-              <span className="status-label">Total</span>
-              <span className="status-value">{appointments.length}</span>
+            <div className="metric-item">
+              <div className="metric-circle">
+                <svg viewBox="0 0 36 36" className="circular-chart">
+                  <path className="circle-bg"
+                    d="M18 2.0845
+                      a 15.9155 15.9155 0 0 1 0 31.831
+                      a 15.9155 15.9155 0 0 1 0 -31.831"
+                  />
+                  <motion.path className="circle appointments-circle"
+                    strokeDasharray={`${appointmentSuccessRate}, 100`}
+                    d="M18 2.0845
+                      a 15.9155 15.9155 0 0 1 0 31.831
+                      a 15.9155 15.9155 0 0 1 0 -31.831"
+                    initial={{ strokeDasharray: "0, 100" }}
+                    animate={{ strokeDasharray: `${appointmentSuccessRate}, 100` }}
+                    transition={{ duration: 2, delay: 0.7 }}
+                  />
+                </svg>
+                <div className="metric-percentage">{appointmentSuccessRate}%</div>
+              </div>
+              <div className="metric-info">
+                <span className="metric-title">Solicitudes Completadas</span>
+                <span className="metric-subtitle">{completedAppointments} de {appointments.length}</span>
+              </div>
             </div>
           </div>
         </motion.div>

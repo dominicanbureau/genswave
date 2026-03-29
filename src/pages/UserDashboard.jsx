@@ -704,7 +704,7 @@ function Overview({ projects, appointments, messages, requests, setActiveTab }) 
                 whileHover={{ x: 4 }}
                 onClick={() => {
                   console.log('Clicking mini project card:', project.id, project);
-                  navigate(`/project/${project.id}`);
+                  window.location.href = `/project/${project.id}`;
                 }}
                 style={{ cursor: 'pointer' }}
               >
@@ -915,7 +915,7 @@ function Projects({ projects, setActiveTab }) {
               whileHover={{ y: -8, boxShadow: '0 20px 60px rgba(0, 0, 0, 0.15)' }}
               onClick={() => {
                 console.log('Clicking full project card:', project.id, project);
-                navigate(`/project/${project.id}`);
+                window.location.href = `/project/${project.id}`;
               }}
               style={{ cursor: 'pointer' }}
             >

@@ -710,33 +710,7 @@
   }
 }
 
-/* Mobile Logo/Branding for when left side is hidden */
-@media (max-width: 1024px) {
-  .auth-right::before {
-    content: '';
-    position: absolute;
-    top: 2rem;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 60px;
-    height: 60px;
-    background: var(--auth-black);
-    border-radius: 12px;
-    z-index: 1;
-  }
-  
-  .auth-right::after {
-    content: 'Genswave';
-    position: absolute;
-    top: 4.5rem;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 1.2rem;
-    font-weight: 700;
-    color: var(--auth-black);
-    z-index: 1;
-  }
-}
+
 
 /* Form Improvements */
 @media (max-width: 480px) {

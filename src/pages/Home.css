@@ -933,6 +933,15 @@ h1 {
   will-change: transform, opacity, filter;
 }
 
+/* Theme-aware border for description */
+[data-theme="light"] .description {
+  border-left-color: #000000;
+}
+
+[data-theme="dark"] .description {
+  border-left-color: #ffffff;
+}
+
 .closer {
   font-size: 1.3rem;
   font-weight: 300;

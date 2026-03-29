@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { gsap } from 'gsap';
 import { ScrollToPlugin } from 'gsap/ScrollToPlugin';
 import HeroVisual from '../components/HeroVisual';
@@ -632,6 +632,10 @@ function Home() {
             <strong>Comienza tu proyecto hoy.</strong>
             info@genswave.org<br />
             Distrito Nacional, Santo Domingo
+            
+            <Link to="/login" className="start-project-btn">
+              Comenzar
+            </Link>
           </div>
         </div>
       </div>

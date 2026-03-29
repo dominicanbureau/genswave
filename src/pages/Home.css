@@ -939,6 +939,39 @@ h1 {
   color: var(--text-muted);
 }
 
+.start-project-btn {
+  display: inline-block;
+  margin-top: 2rem;
+  padding: 1rem 2rem;
+  background: transparent;
+  color: var(--text-light);
+  border: 2px solid var(--text-light);
+  border-radius: 8px;
+  text-decoration: none;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  letter-spacing: 0.02em;
+}
+
+.start-project-btn:hover {
+  background: var(--text-light);
+  color: var(--bg);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(255, 255, 255, 0.2);
+}
+
+.light-mode .start-project-btn {
+  color: #000000;
+  border-color: #000000;
+}
+
+.light-mode .start-project-btn:hover {
+  background: #000000;
+  color: #ffffff;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
 .closer strong {
   display: block;
   font-size: 2.5rem;

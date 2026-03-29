@@ -737,6 +737,18 @@ function ChatsSection() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
+  const loadInstagramBotUsers = async () => {
+    try {
+      const response = await fetch('/api/instagram/bot-users');
+      if (response.ok) {
+        const data = await response.json();
+        setInstagramBotUsers(data.users || []);
+      }
+    } catch (error) {
+      console.error('Error loading Instagram bot users:', error);
+    }
+  };
+
   const loadConversations = async () => {
     try {
       const response = await fetch('/api/messages/admin/conversations');
@@ -744,16 +756,6 @@ function ChatsSection() {
       setConversations(data);
     } catch (error) {
       console.error('Error al cargar conversaciones:', error);
-    }
-  };
-
-  const loadInstagramConversations = async () => {
-    try {
-      const response = await fetch('/api/instagram/conversations');
-      const data = await response.json();
-      setInstagramConversations(data);
-    } catch (error) {
-      console.error('Error al cargar conversaciones de Instagram:', error);
     }
   };
 
@@ -1000,7 +1002,10 @@ function ChatsSection() {
             setInstagramMessages([]);
           }}
         >
-          💬 Chat Web
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+          </svg>
+          Chat Web
         </button>
         <button 
           className={`toggle-btn ${chatType === 'instagram' ? 'active' : ''}`}
@@ -1012,7 +1017,12 @@ function ChatsSection() {
             setInstagramMessages([]);
           }}
         >
-          📱 Instagram
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+          </svg>
+          Instagram
         </button>
       </div>
       
@@ -1079,12 +1089,12 @@ function ChatsSection() {
               ))
             )
           ) : (
-            filteredInstagramConversations.length === 0 ? (
+            filteredInstagramBotUsers.length === 0 ? (
               <p className="empty-state">
                 {searchQuery ? 'No se encontraron conversaciones de Instagram' : 'No hay conversaciones de Instagram'}
               </p>
             ) : (
-              filteredInstagramConversations.map((conv) => (
+              filteredInstagramBotUsers.map((conv) => (
                 <motion.div
                   key={conv.instagram_user_id}
                   className={`conversation-item ${selectedInstagramConversation?.instagram_user_id === conv.instagram_user_id ? 'active' : ''}`}
@@ -1093,7 +1103,11 @@ function ChatsSection() {
                   whileTap={{ scale: 0.98 }}
                 >
                   <div className="conversation-avatar instagram">
-                    📱
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+                      <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+                      <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+                    </svg>
                   </div>
                   <div className="conversation-info">
                     <h4>{conv.sender_name}</h4>
@@ -1246,7 +1260,17 @@ function ChatsSection() {
                         <div className="message-header">
                           <p>{message.message_text}</p>
                           <div className="message-type-indicator">
-                            {message.is_from_user ? '📱' : '🤖'}
+                            {message.is_from_user ? (
+                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                                <circle cx="12" cy="7" r="4"/>
+                              </svg>
+                            ) : (
+                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                <path d="M12 2v20"/>
+                                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                              </svg>
+                            )}
                           </div>
                         </div>
                         <span className="message-time">
@@ -1807,7 +1831,12 @@ function InstagramSection() {
       case 'checking':
         return (
           <div className="instagram-status checking">
-            <div className="status-icon">⏳</div>
+            <div className="status-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12 6 12 12 16 14"/>
+              </svg>
+            </div>
             <div className="status-text">
               <h3>Verificando conexión...</h3>
               <p>Comprobando el estado de Instagram</p>
@@ -1818,7 +1847,11 @@ function InstagramSection() {
       case 'connected':
         return (
           <div className="instagram-status connected">
-            <div className="status-icon">✅</div>
+            <div className="status-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+            </div>
             <div className="status-text">
               <h3>Instagram Conectado</h3>
               <p>El bot está funcionando correctamente</p>
@@ -1829,7 +1862,13 @@ function InstagramSection() {
       case 'disconnected':
         return (
           <div className="instagram-status disconnected">
-            <div className="status-icon">⚠️</div>
+            <div className="status-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="15" y1="9" x2="9" y2="15"/>
+                <line x1="9" y1="9" x2="15" y2="15"/>
+              </svg>
+            </div>
             <div className="status-text">
               <h3>Instagram Desconectado</h3>
               <p>Necesitas autorizar la aplicación</p>
@@ -1840,7 +1879,13 @@ function InstagramSection() {
       case 'not_configured':
         return (
           <div className="instagram-status not-configured">
-            <div className="status-icon">❌</div>
+            <div className="status-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="15" y1="9" x2="9" y2="15"/>
+                <line x1="9" y1="9" x2="15" y2="15"/>
+              </svg>
+            </div>
             <div className="status-text">
               <h3>Instagram No Configurado</h3>
               <p>Faltan las variables de entorno</p>
@@ -1851,7 +1896,13 @@ function InstagramSection() {
       default:
         return (
           <div className="instagram-status error">
-            <div className="status-icon">❌</div>
+            <div className="status-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="15" y1="9" x2="9" y2="15"/>
+                <line x1="9" y1="9" x2="15" y2="15"/>
+              </svg>
+            </div>
             <div className="status-text">
               <h3>Error de Conexión</h3>
               <p>No se pudo verificar el estado</p>
@@ -1883,7 +1934,13 @@ function InstagramSection() {
 
       {/* Configuration Guide */}
       <div className="instagram-config-card">
-        <h3>📋 Configuración</h3>
+        <div className="config-header">
+          <svg className="config-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M9 12l2 2 4-4"/>
+            <path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"/>
+          </svg>
+          <h3>Configuración</h3>
+        </div>
         <div className="config-info">
           <h4>URLs para Meta for Developers:</h4>
           <div className="url-list">
@@ -1915,7 +1972,13 @@ function InstagramSection() {
       {/* Test Message */}
       {connectionStatus === 'connected' && (
         <div className="instagram-test-card">
-          <h3>🧪 Enviar Mensaje de Prueba</h3>
+          <div className="test-header">
+            <svg className="test-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M9 12l2 2 4-4"/>
+              <circle cx="12" cy="12" r="10"/>
+            </svg>
+            <h3>Enviar Mensaje de Prueba</h3>
+          </div>
           <div className="test-form">
             <div className="form-group">
               <label>ID del Destinatario:</label>
@@ -1946,7 +2009,14 @@ function InstagramSection() {
 
       {/* Bot Commands */}
       <div className="instagram-commands-card">
-        <h3>🤖 Comandos del Bot</h3>
+        <div className="commands-header">
+          <svg className="commands-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M9 12l2 2 4-4"/>
+            <path d="M12 2v20"/>
+            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+          </svg>
+          <h3>Comandos del Bot</h3>
+        </div>
         <div className="commands-grid">
           <div className="command-item">
             <strong>"Hola" / "Hello" / "Hi"</strong>
@@ -1977,7 +2047,15 @@ function InstagramSection() {
 
       {/* Bot Users Management */}
       <div className="instagram-users-card">
-        <h3>👥 Usuarios del Bot</h3>
+        <div className="users-header">
+          <svg className="users-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+          <h3>Usuarios del Bot</h3>
+        </div>
         {botUsers.length === 0 ? (
           <div className="no-users">
             <p>No hay usuarios que hayan interactuado con el bot aún.</p>
@@ -2013,12 +2091,22 @@ function InstagramSection() {
                     className={`bot-toggle-btn ${user.bot_enabled ? 'enabled' : 'disabled'}`}
                     onClick={() => toggleBotForUser(user.instagram_user_id, user.bot_enabled)}
                   >
-                    {user.bot_enabled ? '🤖 Habilitado' : '🔇 Deshabilitado'}
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      {user.bot_enabled ? (
+                        <path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h4a2 2 0 0 1 2 2v1a1 1 0 0 1-1 1h-1v3a7 7 0 0 1-7 7 7 7 0 0 1-7-7v-3H2a1 1 0 0 1-1-1V9a2 2 0 0 1 2-2h4V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 2-2z"/>
+                      ) : (
+                        <path d="M9.5 11a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zM17.5 11a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>
+                      )}
+                    </svg>
+                    {user.bot_enabled ? 'Habilitado' : 'Deshabilitado'}
                   </button>
                   <button
                     className="view-messages-btn"
                     onClick={() => selectUser(user)}
                   >
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                    </svg>
                     Ver Mensajes
                   </button>
                 </div>
@@ -2038,7 +2126,10 @@ function InstagramSection() {
                 className="close-modal-btn"
                 onClick={() => setSelectedUser(null)}
               >
-                ✕
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <line x1="18" y1="6" x2="6" y2="18"/>
+                  <line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
               </button>
             </div>
             <div className="messages-container">
@@ -2067,6 +2158,10 @@ function InstagramSection() {
                 rows="3"
               />
               <button onClick={sendMessage} className="send-message-btn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <line x1="22" y1="2" x2="11" y2="13"/>
+                  <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                </svg>
                 Enviar
               </button>
             </div>
@@ -2579,10 +2674,22 @@ function Admin() {
     }
   }, []);
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    navigate('/login');
+  const handleLogout = async () => {
+    try {
+      // Llamar al endpoint de logout en el servidor
+      await fetch('/api/auth/logout', { 
+        method: 'POST',
+        credentials: 'include' // Importante para enviar cookies
+      });
+    } catch (error) {
+      console.error('Error al cerrar sesión:', error);
+    } finally {
+      // Limpiar localStorage de todas formas
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      // Redirigir al login
+      navigate('/login');
+    }
   };
 
   const renderContent = () => {

@@ -1,5 +1,6 @@
 import express from 'express';
 import db from '../database.js';
+import { createNotification } from './notifications.js';
 
 const router = express.Router();
 
@@ -61,14 +62,42 @@ router.patch('/:id/status', requireAuth, async (req, res) => {
     try {
         const { id } = req.params;
         const { status } = req.body;
+        const isAdmin = req.session.user?.role === 'admin';
+
+        if (!isAdmin) {
+            return res.status(403).json({ error: 'No autorizado' });
+        }
+
+        // Get current appointment data
+        const currentAppointment = await db.query('SELECT * FROM appointments WHERE id = $1', [id]);
+        if (currentAppointment.rows.length === 0) {
+            return res.status(404).json({ error: 'Cita no encontrada' });
+        }
 
         const result = await db.query(
             'UPDATE appointments SET status = $1 WHERE id = $2 RETURNING *',
             [status, id]
         );
 
-        if (result.rows.length === 0) {
-            return res.status(404).json({ error: 'Cita no encontrada' });
+        // Create notification if status changed and appointment has user_id
+        const appointment = result.rows[0];
+        if (appointment.user_id && status !== currentAppointment.rows[0].status) {
+            const statusLabels = {
+                'pending': 'Pendiente',
+                'approved': 'Aprobada',
+                'rejected': 'Rechazada',
+                'completed': 'Completada',
+                'confirmed': 'Confirmada'
+            };
+
+            await createNotification(
+                appointment.user_id,
+                'appointment_status_change',
+                'Estado de Solicitud Actualizado',
+                `El estado de tu solicitud "${appointment.service}" ha cambiado a: ${statusLabels[status] || status}`,
+                id,
+                'appointment'
+            );
         }
 
         res.json({ success: true, appointment: result.rows[0] });

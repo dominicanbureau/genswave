@@ -1,6 +1,7 @@
 import express from 'express';
 import db from '../database.js';
 import { sendProjectCreatedEmail } from '../utils/emailService.js';
+import { createNotification } from './notifications.js';
 
 const router = express.Router();
 
@@ -117,6 +118,16 @@ router.post('/', requireAdmin, async (req, res) => {
         if (userResult.rows.length > 0) {
             const user = userResult.rows[0];
             
+            // Create notification for user
+            await createNotification(
+                user_id,
+                'project_created',
+                'Nuevo Proyecto Creado',
+                `Se ha creado el proyecto "${title}" para ti.`,
+                project.id,
+                'project'
+            );
+            
             // Send project creation email
             try {
                 await sendProjectCreatedEmail(user.email, user.name, project);
@@ -147,6 +158,22 @@ router.post('/:id/updates', requireAdmin, async (req, res) => {
             [id, title, description, update_type || 'general', images || [], attachments || [], createdBy]
         );
 
+        // Get project info for notification
+        const projectResult = await db.query('SELECT user_id, title as project_title FROM projects WHERE id = $1', [id]);
+        if (projectResult.rows.length > 0) {
+            const project = projectResult.rows[0];
+            
+            // Create notification for project owner
+            await createNotification(
+                project.user_id,
+                'project_update',
+                'Actualización de Proyecto',
+                `Tu proyecto "${project.project_title}" ha recibido una nueva actualización: ${title}`,
+                id,
+                'project'
+            );
+        }
+
         // Update project's updated_at
         await db.query('UPDATE projects SET updated_at = CURRENT_TIMESTAMP WHERE id = $1', [id]);
 
@@ -162,6 +189,13 @@ router.patch('/:id', requireAuth, async (req, res) => {
     try {
         const { id } = req.params;
         const updates = req.body;
+        const isAdmin = req.session.user.role === 'admin';
+
+        // Get current project data for comparison
+        const currentProject = await db.query('SELECT * FROM projects WHERE id = $1', [id]);
+        if (currentProject.rows.length === 0) {
+            return res.status(404).json({ error: 'Proyecto no encontrado' });
+        }
 
         const fields = [];
         const values = [];
@@ -182,6 +216,25 @@ router.patch('/:id', requireAuth, async (req, res) => {
             `UPDATE projects SET ${fields.join(', ')} WHERE id = $${paramCount} RETURNING *`,
             values
         );
+
+        // If admin updated status, create notification
+        if (isAdmin && updates.status && updates.status !== currentProject.rows[0].status) {
+            const statusLabels = {
+                'active': 'Activo',
+                'pending': 'Pendiente',
+                'completed': 'Completado',
+                'archived': 'Archivado'
+            };
+
+            await createNotification(
+                currentProject.rows[0].user_id,
+                'project_status_change',
+                'Estado de Proyecto Actualizado',
+                `El estado de tu proyecto "${currentProject.rows[0].title}" ha cambiado a: ${statusLabels[updates.status] || updates.status}`,
+                id,
+                'project'
+            );
+        }
 
         res.json(result.rows[0]);
     } catch (error) {

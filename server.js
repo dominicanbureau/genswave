@@ -17,6 +17,7 @@ import uploadRoutes from './routes/upload.js';
 import instagramRoutes from './routes/instagram.js';
 import passwordResetRoutes from './routes/passwordReset.js';
 import dataDeletionRoutes from './routes/dataDeletion.js';
+import notificationRoutes from './routes/notifications.js';
 import migrateRoutes from './routes/migrate.js';
 
 dotenv.config();
@@ -96,6 +97,7 @@ app.use('/api/upload', uploadRoutes);
 app.use('/api/instagram', instagramRoutes);
 app.use('/api/password-reset', passwordResetRoutes);
 app.use('/api/data-deletion', dataDeletionRoutes);
+app.use('/api/notifications', notificationRoutes);
 app.use('/api/migrate', migrateRoutes);
 app.use('/api', quickCodeRoutes);
 

@@ -72,30 +72,29 @@ function UserDashboard() {
 
   const fetchData = async () => {
     try {
-      const [projectsRes, appointmentsRes, messagesRes, requestsRes, notificationsRes] = await Promise.all([
+      const [projectsRes, appointmentsRes, messagesRes, requestsRes] = await Promise.all([
         fetch('/api/projects').catch(() => ({ ok: false, json: () => [] })),
         fetch('/api/appointments').catch(() => ({ ok: false, json: () => [] })),
         fetch('/api/messages').catch(() => ({ ok: false, json: () => [] })),
-        fetch('/api/requests').catch(() => ({ ok: false, json: () => [] })),
-        fetch('/api/notifications').catch(() => ({ ok: false, json: () => [] }))
+        fetch('/api/requests').catch(() => ({ ok: false, json: () => [] }))
       ]);
 
       const projectsData = projectsRes.ok ? await projectsRes.json() : [];
       const appointmentsData = appointmentsRes.ok ? await appointmentsRes.json() : [];
       const messagesData = messagesRes.ok ? await messagesRes.json() : [];
       const requestsData = requestsRes.ok ? await requestsRes.json() : [];
-      const notificationsData = notificationsRes.ok ? await notificationsRes.json() : [];
 
       setProjects(projectsData);
       setAppointments(appointmentsData);
       setMessages(messagesData);
       setRequests(requestsData);
-      setNotifications(notificationsData);
 
       const unreadCount = messagesData.filter(msg => 
         msg.sender_role === 'admin' && !msg.is_read
       ).length;
       setUnreadMessages(unreadCount);
+      
+      generateNotifications(projectsData, appointmentsData, messagesData);
       
       setLoading(false);
     } catch (error) {
@@ -104,6 +103,45 @@ function UserDashboard() {
     }
   };
 
+  const generateNotifications = (projects, appointments, messages) => {
+    const notifs = [];
+    
+    projects.forEach(project => {
+      if (project.status === 'active' && project.progress > 75) {
+        notifs.push({
+          id: `project-${project.id}`,
+          type: 'success',
+          title: 'Proyecto casi completado',
+          message: `${project.title} está al ${project.progress}%`,
+          time: new Date(project.updated_at)
+        });
+      }
+    });
+    
+    const pending = appointments.filter(a => a.status === 'pending');
+    if (pending.length > 0) {
+      notifs.push({
+        id: 'pending-appointments',
+        type: 'warning',
+        title: 'Solicitudes pendientes',
+        message: `Tienes ${pending.length} solicitud(es) esperando respuesta`,
+        time: new Date()
+      });
+    }
+    
+    const unread = messages.filter(m => m.sender_role === 'admin' && !m.is_read);
+    if (unread.length > 0) {
+      notifs.push({
+        id: 'unread-messages',
+        type: 'info',
+        title: 'Nuevos mensajes',
+        message: `${unread.length} mensaje(s) sin leer`,
+        time: new Date()
+      });
+    }
+    
+    setNotifications(notifs.slice(0, 5));
+  };
 
   const handleLogout = async () => {
     await fetch('/api/auth/logout', { method: 'POST' });
@@ -522,8 +560,8 @@ function DashboardHeader({ user, activeTab, notifications, showNotifications, se
               <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
               <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
             </svg>
-            {notifications.filter(n => !n.is_read).length > 0 && (
-              <span className="notifications-count">{notifications.filter(n => !n.is_read).length}</span>
+            {notifications.length > 0 && (
+              <span className="notifications-count">{notifications.length}</span>
             )}
           </motion.button>
 
@@ -538,7 +576,7 @@ function DashboardHeader({ user, activeTab, notifications, showNotifications, se
               >
                 <div className="notifications-header">
                   <h3>Notificaciones</h3>
-                  <span className="notifications-badge">{notifications.filter(n => !n.is_read).length}</span>
+                  <span className="notifications-badge">{notifications.length}</span>
                 </div>
                 <div className="notifications-list">
                   {notifications.length === 0 ? (
@@ -551,19 +589,19 @@ function DashboardHeader({ user, activeTab, notifications, showNotifications, se
                         whileHover={{ x: 4 }}
                       >
                         <div className="notification-icon">
-                          {(notif.type === 'project_created' || notif.type === 'project_update' || notif.type === 'project_status_change') && (
+                          {notif.type === 'success' && (
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                               <polyline points="20 6 9 17 4 12"/>
                             </svg>
                           )}
-                          {(notif.type === 'appointment_status_change') && (
+                          {notif.type === 'warning' && (
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                               <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
                               <line x1="12" y1="9" x2="12" y2="13"/>
                               <line x1="12" y1="17" x2="12.01" y2="17"/>
                             </svg>
                           )}
-                          {!['project_created', 'project_update', 'project_status_change', 'appointment_status_change'].includes(notif.type) && (
+                          {notif.type === 'info' && (
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                               <circle cx="12" cy="12" r="10"/>
                               <line x1="12" y1="16" x2="12" y2="12"/>
@@ -732,7 +770,7 @@ function Overview({ projects, appointments, messages, requests, setActiveTab }) 
             <h2>Actividad Reciente</h2>
           </div>
           <div className="activity-list">
-            {messages.filter(msg => msg.sender_role === 'admin').slice(0, 5).map((msg, index) => (
+            {messages.slice(0, 5).map((msg, index) => (
               <motion.div
                 key={msg.id}
                 className="activity-item"
@@ -746,7 +784,7 @@ function Overview({ projects, appointments, messages, requests, setActiveTab }) 
                   </svg>
                 </div>
                 <div className="activity-content">
-                  <p><strong>Agente</strong> te envió un mensaje</p>
+                  <p><strong>{msg.sender_role === 'admin' ? 'Agente' : 'Tú'}</strong> envió un mensaje</p>
                   <span>{new Date(msg.created_at).toLocaleDateString()}</span>
                 </div>
               </motion.div>
@@ -1765,77 +1803,79 @@ function Chat({ messages, newMessage, setNewMessage, onSend }) {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
     >
-      <div className="chat-header-new">
-        <div className="chat-header-content-new">
-          <h2>Chat con Agente</h2>
-          <p>Se te fue asignado un agente personal con el cual puedes conversar</p>
-        </div>
-      </div>
-    
-      <div className="messages-container-new" ref={messagesContainerRef}>
-        {localMessages.length === 0 ? (
-          <div className="empty-state-new">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-            </svg>
-            <p>No hay mensajes. ¡Inicia la conversación!</p>
+      <div className="chat-container-new">
+        <div className="chat-header-new">
+          <div className="chat-header-content-new">
+            <h2>Chat con Agente</h2>
+            <p>Se te fue asignado un agente personal con el cual puedes conversar</p>
           </div>
-        ) : (
-          localMessages.map((msg, index) => (
-            <motion.div
-              key={msg.id}
-              className={`message-new ${msg.sender_role === 'admin' ? 'admin' : 'user'}`}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.05 * index }}
-            >
-              {msg.sender_role === 'admin' && (
-                <div className="message-sender-new">
-                  <div className="sender-avatar-new">
-                    {msg.sender_photo ? (
-                      <img src={msg.sender_photo} alt={msg.sender_name} />
-                    ) : (
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                        <circle cx="12" cy="7" r="4"/>
-                      </svg>
-                    )}
+        </div>
+      
+        <div className="messages-container-new" ref={messagesContainerRef}>
+          {localMessages.length === 0 ? (
+            <div className="empty-state-new">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+              </svg>
+              <p>No hay mensajes. ¡Inicia la conversación!</p>
+            </div>
+          ) : (
+            localMessages.map((msg, index) => (
+              <motion.div
+                key={msg.id}
+                className={`message-new ${msg.sender_role === 'admin' ? 'admin' : 'user'}`}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.05 * index }}
+              >
+                {msg.sender_role === 'admin' && (
+                  <div className="message-sender-new">
+                    <div className="sender-avatar-new">
+                      {msg.sender_photo ? (
+                        <img src={msg.sender_photo} alt={msg.sender_name} />
+                      ) : (
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                          <circle cx="12" cy="7" r="4"/>
+                        </svg>
+                      )}
+                    </div>
+                    <span className="sender-name-new">{msg.sender_name || 'Agente'}</span>
                   </div>
-                  <span className="sender-name-new">{msg.sender_name || 'Agente'}</span>
+                )}
+                <div className="message-content-new">
+                  <p>{msg.message}</p>
+                  <span className="message-time-new">
+                    {new Date(msg.created_at).toLocaleString()}
+                  </span>
                 </div>
-              )}
-              <div className="message-content-new">
-                <p>{msg.message}</p>
-                <span className="message-time-new">
-                  {new Date(msg.created_at).toLocaleString()}
-                </span>
-              </div>
-            </motion.div>
-          ))
-        )}
-        <div ref={messagesEndRef} />
-      </div>
+              </motion.div>
+            ))
+          )}
+          <div ref={messagesEndRef} />
+        </div>
 
-      <form className="message-form-new" onSubmit={onSend}>
-        <input
-          type="text"
-          value={newMessage}
-          onChange={(e) => setNewMessage(e.target.value)}
-          placeholder="Escribe tu mensaje..."
-        />
-        
-        <motion.button 
-          type="submit"
-          className="send-btn-new"
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-        >
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <line x1="22" y1="2" x2="11" y2="13"/>
-            <polygon points="22 2 15 22 11 13 2 9 22 2"/>
-          </svg>
-        </motion.button>
-      </form>
+        <form className="message-form-new" onSubmit={onSend}>
+          <input
+            type="text"
+            value={newMessage}
+            onChange={(e) => setNewMessage(e.target.value)}
+            placeholder="Escribe tu mensaje..."
+          />
+          
+          <motion.button 
+            type="submit"
+            className="send-btn-new"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <line x1="22" y1="2" x2="11" y2="13"/>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+            </svg>
+          </motion.button>
+        </form>
+      </div>
     </motion.div>
   );
 }

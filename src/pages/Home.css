@@ -814,7 +814,7 @@ html {
   background: var(--bg);
 }
 
-header {
+.scroll-landing header {
   height: 100vh;
   display: flex;
   align-items: center;
@@ -1532,7 +1532,7 @@ h1 {
     padding-right: 1.5rem;
   }
 
-  header {
+  .scroll-landing header {
     padding-left: 3rem;
     padding-right: 1.5rem;
     align-items: center;
@@ -1618,7 +1618,7 @@ h1 {
     height: 16px;
   }
 
-  header {
+  .scroll-landing header {
     padding-left: 2rem;
     padding-right: 1rem;
     align-items: center;

@@ -185,8 +185,16 @@
   border-radius: 12px;
 }
 
+@media (max-width: 1024px) {
+  .auth-tabs {
+    margin-top: 3rem; /* Espacio para el botón de volver */
+    margin-bottom: 2rem;
+  }
+}
+
 @media (max-width: 480px) {
   .auth-tabs {
+    margin-top: 2.5rem; /* Espacio para el botón de volver */
     margin-bottom: 2rem;
   }
 }
@@ -240,6 +248,15 @@
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
   transform: translateZ(0);
+}
+
+/* Mobile improvements for form carousel */
+@media (max-width: 768px) {
+  .form-carousel {
+    min-height: auto;
+    max-height: none;
+    overflow: visible;
+  }
 }
 
 .form-wrapper {
@@ -407,8 +424,8 @@
     width: 44px;
     height: 44px;
     border-radius: 12px;
-    background: rgba(0, 0, 0, 0.05);
-    border: none;
+    background: transparent;
+    border: 1px solid rgba(0, 0, 0, 0.1);
     cursor: pointer;
     align-items: center;
     justify-content: center;
@@ -419,7 +436,8 @@
   }
 
   .mobile-back-btn:hover {
-    background: rgba(0, 0, 0, 0.1);
+    background: rgba(0, 0, 0, 0.05);
+    border-color: rgba(0, 0, 0, 0.2);
   }
 
   .mobile-back-btn svg {
@@ -432,7 +450,9 @@
 @media (max-width: 768px) {
   .auth-right {
     padding: 2rem 1.5rem;
-    padding-top: 4rem; /* Espacio extra para el botón de volver */
+    padding-top: 1rem; /* Reducido porque los tabs ya tienen margen */
+    min-height: 100vh;
+    overflow-y: auto;
   }
   
   .auth-tabs {
@@ -449,13 +469,20 @@
   }
   
   .form-carousel {
-    min-height: 550px;
+    min-height: auto; /* Permitir altura automática */
+    max-height: none;
+  }
+  
+  .form-wrapper {
+    position: relative !important; /* Evitar posicionamiento absoluto en móvil */
   }
 }
 
 @media (max-width: 480px) {
   .auth-right {
     padding: 1.5rem 1rem;
+    min-height: 100vh;
+    overflow-y: auto;
   }
   
   .form-group input {
@@ -464,6 +491,11 @@
   
   .submit-btn {
     padding: 1rem 1.5rem;
+    margin-bottom: 2rem; /* Espacio extra en la parte inferior */
+  }
+  
+  .auth-form {
+    padding-bottom: 2rem; /* Espacio extra para scroll */
   }
 }
 /* Auth Links - Move below submit button */

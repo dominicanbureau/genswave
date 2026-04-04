@@ -51,7 +51,7 @@ const services = [
       'Automatización de workflows',
       'Asistentes virtuales personalizados'
     ],
-    technologies: ['OpenAI', 'ChatGPT', 'Python', 'TensorFlow']
+    technologies: ['OpenAI', 'OwnAI', 'Python', 'TensorFlow']
   },
   {
     id: 'comercio-electronico',
@@ -104,7 +104,7 @@ const services = [
   {
     id: 'social-media-tools',
     number: '07',
-    title: 'Social Media Tools',
+    title: 'Social Media',
     subtitle: 'Gestión de redes sociales',
     description: 'Herramientas avanzadas para gestionar presencia digital y maximizar engagement.',
     features: [
@@ -168,7 +168,7 @@ const services = [
   {
     id: 'inmobiliaria-tech',
     number: '11',
-    title: 'InmobiliariaTech',
+    title: 'Inmobiliaria',
     subtitle: 'PropTech avanzado',
     description: 'Tecnología para el sector inmobiliario que revoluciona la compra, venta y gestión de propiedades.',
     features: [
@@ -200,7 +200,7 @@ const services = [
   {
     id: 'agricultura-tech',
     number: '13',
-    title: 'AgriTech',
+    title: 'Agrotecnología',
     subtitle: 'Agricultura inteligente',
     description: 'Tecnología para optimizar la producción agrícola con soluciones IoT y análisis de datos.',
     features: [
@@ -963,7 +963,7 @@ function HeroSection() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.5 }}
         >
-          Catálogo Completo<br />Servicios Digitales
+          Catálogo Completo<br />Servicios Empresariales
         </motion.h1>
         <motion.p
           className="hero-description"

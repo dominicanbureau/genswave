@@ -130,30 +130,7 @@ function UserDashboard() {
     }
   };
 
-  // Función temporal para probar el email de bienvenida
-  const sendTestWelcomeEmail = async () => {
-    if (!user) return;
-    
-    try {
-      const response = await fetch('/api/auth/send-welcome-email', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          email: user.email, 
-          name: user.name 
-        })
-      });
 
-      if (response.ok) {
-        alert('✅ Email de bienvenida enviado correctamente a ' + user.email);
-      } else {
-        alert('❌ Error al enviar el email');
-      }
-    } catch (error) {
-      console.error('Error sending test email:', error);
-      alert('❌ Error al enviar el email');
-    }
-  };
 
   const handleTabChange = (tabId) => {
     setActiveTab(tabId);
@@ -267,32 +244,6 @@ function UserDashboard() {
             )}
           </AnimatePresence>
         </main>
-
-        {/* Botón temporal de prueba de email */}
-        <motion.button
-          className="test-email-button"
-          onClick={sendTestWelcomeEmail}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          style={{
-            position: 'fixed',
-            bottom: '20px',
-            right: '20px',
-            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-            color: 'white',
-            border: 'none',
-            borderRadius: '50px',
-            padding: '12px 24px',
-            fontSize: '14px',
-            fontWeight: '600',
-            cursor: 'pointer',
-            boxShadow: '0 8px 20px rgba(102, 126, 234, 0.3)',
-            zIndex: 1000,
-            fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", sans-serif'
-          }}
-        >
-          📧 Probar Email
-        </motion.button>
       </div>
     </div>
   );

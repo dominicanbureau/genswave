@@ -7,339 +7,477 @@ if (!resendApiKey) {
 }
 const resend = new Resend(resendApiKey || 're_X3jJKunz_Q9mhaz7QGsfksisiUzxqLUZE');
 
-// Enterprise-level email templates with inline styles for maximum compatibility
+// Website-identical email templates with exact design matching
 const getEmailTemplate = (type, data) => {
 
   switch (type) {
     case 'welcome':
       return `
-        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin: 0; padding: 0; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh;">
-          <tr>
-            <td style="padding: 60px 20px;">
-              <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="650" style="margin: 0 auto; background: #ffffff; border-radius: 24px; box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25); overflow: hidden;">
-                <!-- Header -->
-                <tr>
-                  <td style="background: linear-gradient(135deg, #000000 0%, #2d3748 50%, #1a202c 100%); padding: 50px 40px 70px; text-align: center; position: relative;">
-                    <h1 style="font-size: 36px; font-weight: 800; color: #ffffff; letter-spacing: -1px; margin: 0 0 10px 0; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;">GENSWAVE</h1>
-                    <p style="color: rgba(255, 255, 255, 0.8); font-size: 15px; font-weight: 500; text-transform: uppercase; letter-spacing: 2px; margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;">Desarrollo Digital de Próxima Generación</p>
-                    <div style="position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%); width: 80px; height: 4px; background: linear-gradient(90deg, transparent, #ffffff, transparent); border-radius: 2px;"></div>
-                  </td>
-                </tr>
+        <!DOCTYPE html>
+        <html lang="es" style="margin: 0; padding: 0;">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Bienvenido a Genswave</title>
+          <!--[if mso]>
+          <noscript>
+            <xml>
+              <o:OfficeDocumentSettings>
+                <o:PixelsPerInch>96</o:PixelsPerInch>
+              </o:OfficeDocumentSettings>
+            </xml>
+          </noscript>
+          <![endif]-->
+        </head>
+        <body style="margin: 0; padding: 0; background-color: #080808; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif; color: #ffffff; line-height: 1.6;">
+          
+          <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin: 0; padding: 0; background-color: #080808; min-height: 100vh;">
+            <tr>
+              <td style="padding: 40px 20px;">
                 
-                <!-- Content -->
-                <tr>
-                  <td style="padding: 60px 50px;">
-                    <h2 style="font-size: 28px; font-weight: 700; color: #1a202c; margin: 0 0 20px 0; letter-spacing: -0.5px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif; line-height: 1.2;">¡Bienvenido a bordo, ${data.name}! 🚀</h2>
-                    
-                    <p style="font-size: 17px; color: #4a5568; margin: 0 0 40px 0; line-height: 1.7; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;">
-                      Nos emociona tenerte como parte de la familia Genswave. Tu cuenta ha sido creada exitosamente y ya puedes comenzar a explorar todas nuestras capacidades de desarrollo digital.
-                    </p>
-                    
-                    <!-- Feature Card -->
-                    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%); border: 1px solid #e2e8f0; border-radius: 16px; margin: 32px 0; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); position: relative;">
-                      <tr>
-                        <td style="height: 4px; background: linear-gradient(90deg, #667eea, #764ba2); border-radius: 16px 16px 0 0;"></td>
-                      </tr>
-                      <tr>
-                        <td style="padding: 32px;">
-                          <h3 style="font-size: 20px; font-weight: 700; color: #1a202c; margin: 0 0 20px 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif; display: flex; align-items: center;">
-                            <span style="background: linear-gradient(135deg, #667eea, #764ba2); width: 24px; height: 24px; border-radius: 6px; display: inline-block; margin-right: 12px; text-align: center; line-height: 24px;">⭐</span>
-                            Tu viaje digital comienza aquí
-                          </h3>
-                          
-                          <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
-                            <tr><td style="padding: 6px 0; color: #4a5568; font-size: 15px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;">✅ Acceso completo a nuestro dashboard personalizado</td></tr>
-                            <tr><td style="padding: 6px 0; color: #4a5568; font-size: 15px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;">✅ Creación de solicitudes de proyectos detalladas</td></tr>
-                            <tr><td style="padding: 6px 0; color: #4a5568; font-size: 15px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;">✅ Seguimiento en tiempo real del progreso</td></tr>
-                            <tr><td style="padding: 6px 0; color: #4a5568; font-size: 15px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;">✅ Comunicación directa con nuestro equipo experto</td></tr>
-                            <tr><td style="padding: 6px 0; color: #4a5568; font-size: 15px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;">✅ Gestión completa de tus proyectos digitales</td></tr>
-                            <tr><td style="padding: 6px 0; color: #4a5568; font-size: 15px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;">✅ Soporte técnico prioritario 24/7</td></tr>
-                          </table>
-                        </td>
-                      </tr>
-                    </table>
-                    
-                    <!-- Highlight Box -->
-                    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background: linear-gradient(135deg, #ebf8ff 0%, #bee3f8 100%); border-left: 6px solid #3182ce; border-radius: 12px; margin: 32px 0; box-shadow: 0 4px 12px rgba(49, 130, 206, 0.1);">
-                      <tr>
-                        <td style="padding: 24px;">
-                          <p style="margin: 0; color: #2d3748; font-weight: 500; font-size: 15px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;">
-                            💡 <strong>Consejo Pro:</strong> Completa tu perfil para recibir recomendaciones personalizadas y acelerar el proceso de desarrollo de tus proyectos.
-                          </p>
-                        </td>
-                      </tr>
-                    </table>
-                    
-                    <!-- CTA Button -->
-                    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
-                      <tr>
-                        <td style="text-align: center; margin: 40px 0;">
-                          <a href="https://genswave.org/dashboard" style="display: inline-block; background: linear-gradient(135deg, #000000 0%, #2d3748 100%); color: #ffffff; padding: 18px 40px; text-decoration: none; border-radius: 12px; font-weight: 600; font-size: 16px; text-transform: uppercase; letter-spacing: 1px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);">EXPLORAR DASHBOARD</a>
-                        </td>
-                      </tr>
-                    </table>
-                    
-                    <!-- Divider -->
-                    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
-                      <tr>
-                        <td style="height: 2px; background: linear-gradient(90deg, transparent, #e2e8f0, transparent); margin: 40px 0; border-radius: 1px;"></td>
-                      </tr>
-                    </table>
-                    
-                    <p style="font-size: 17px; color: #4a5568; margin: 0; line-height: 1.7; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;">
-                      ¿Tienes preguntas? Nuestro equipo está aquí para ayudarte en cada paso del camino. No dudes en contactarnos.
-                    </p>
-                  </td>
-                </tr>
+                <!-- Main Container -->
+                <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" style="margin: 0 auto; background-color: #080808; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; overflow: hidden;">
+                  
+                  <!-- Header with Logo -->
+                  <tr>
+                    <td style="padding: 60px 50px 40px; text-align: center; border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
+                      <img src="https://genswave.org/genswave.png" alt="Genswave" style="height: 48px; width: auto; margin-bottom: 24px; filter: brightness(0) invert(1);">
+                      <h1 style="font-size: 24px; font-weight: 300; color: #ffffff; letter-spacing: 0.2em; text-transform: uppercase; margin: 0; opacity: 0.8; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;">GENSWAVE</h1>
+                    </td>
+                  </tr>
+                  
+                  <!-- Main Content -->
+                  <tr>
+                    <td style="padding: 50px;">
+                      
+                      <!-- Welcome Title -->
+                      <h2 style="font-size: 48px; font-weight: 800; color: #ffffff; margin: 0 0 24px 0; line-height: 0.95; letter-spacing: -0.02em; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;">Bienvenido a bordo, ${data.name}</h2>
+                      
+                      <!-- Welcome Message -->
+                      <p style="font-size: 18px; color: #888888; margin: 0 0 40px 0; line-height: 1.8; font-weight: 300; border-left: 3px solid #ffffff; padding-left: 32px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;">
+                        Nos emociona tenerte como parte de la familia Genswave. Tu cuenta ha sido creada exitosamente y ya puedes comenzar a explorar todas nuestras capacidades de desarrollo digital.
+                      </p>
+                      
+                      <!-- Features Section -->
+                      <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin: 40px 0; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; background-color: rgba(255, 255, 255, 0.02);">
+                        <tr>
+                          <td style="padding: 40px;">
+                            <h3 style="font-size: 20px; font-weight: 600; color: #ffffff; margin: 0 0 24px 0; display: flex; align-items: center; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;">
+                              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" style="margin-right: 12px; vertical-align: middle;">
+                                <polyline points="20 6 9 17 4 12"/>
+                              </svg>
+                              Tu viaje digital comienza aquí
+                            </h3>
+                            
+                            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                              <tr><td style="padding: 8px 0; color: #888888; font-size: 15px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif; display: flex; align-items: center;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" style="margin-right: 12px; flex-shrink: 0;">
+                                  <polyline points="20 6 9 17 4 12"/>
+                                </svg>
+                                Acceso completo a nuestro dashboard personalizado
+                              </td></tr>
+                              <tr><td style="padding: 8px 0; color: #888888; font-size: 15px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif; display: flex; align-items: center;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" style="margin-right: 12px; flex-shrink: 0;">
+                                  <polyline points="20 6 9 17 4 12"/>
+                                </svg>
+                                Creación de solicitudes de proyectos detalladas
+                              </td></tr>
+                              <tr><td style="padding: 8px 0; color: #888888; font-size: 15px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif; display: flex; align-items: center;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" style="margin-right: 12px; flex-shrink: 0;">
+                                  <polyline points="20 6 9 17 4 12"/>
+                                </svg>
+                                Seguimiento en tiempo real del progreso
+                              </td></tr>
+                              <tr><td style="padding: 8px 0; color: #888888; font-size: 15px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif; display: flex; align-items: center;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" style="margin-right: 12px; flex-shrink: 0;">
+                                  <polyline points="20 6 9 17 4 12"/>
+                                </svg>
+                                Comunicación directa con nuestro equipo experto
+                              </td></tr>
+                              <tr><td style="padding: 8px 0; color: #888888; font-size: 15px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif; display: flex; align-items: center;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" style="margin-right: 12px; flex-shrink: 0;">
+                                  <polyline points="20 6 9 17 4 12"/>
+                                </svg>
+                                Gestión completa de tus proyectos digitales
+                              </td></tr>
+                              <tr><td style="padding: 8px 0; color: #888888; font-size: 15px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif; display: flex; align-items: center;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" style="margin-right: 12px; flex-shrink: 0;">
+                                  <polyline points="20 6 9 17 4 12"/>
+                                </svg>
+                                Soporte técnico prioritario 24/7
+                              </td></tr>
+                            </table>
+                          </td>
+                        </tr>
+                      </table>
+                      
+                      <!-- Pro Tip -->
+                      <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin: 32px 0; border-left: 3px solid #ffffff; background-color: rgba(255, 255, 255, 0.02);">
+                        <tr>
+                          <td style="padding: 24px 32px;">
+                            <p style="margin: 0; color: #888888; font-weight: 300; font-size: 15px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif; display: flex; align-items: flex-start;">
+                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" style="margin-right: 12px; margin-top: 2px; flex-shrink: 0;">
+                                <circle cx="12" cy="12" r="10"/>
+                                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+                                <line x1="12" y1="17" x2="12.01" y2="17"/>
+                              </svg>
+                              <span><strong style="color: #ffffff;">Consejo Pro:</strong> Completa tu perfil para recibir recomendaciones personalizadas y acelerar el proceso de desarrollo de tus proyectos.</span>
+                            </p>
+                          </td>
+                        </tr>
+                      </table>
+                      
+                      <!-- CTA Button -->
+                      <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                        <tr>
+                          <td style="text-align: center; padding: 40px 0;">
+                            <a href="https://genswave.org/dashboard" style="display: inline-block; background-color: transparent; color: #ffffff; padding: 16px 32px; text-decoration: none; border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 50px; font-weight: 500; font-size: 15px; letter-spacing: 0.08em; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif; transition: all 0.3s ease;">EXPLORAR DASHBOARD</a>
+                          </td>
+                        </tr>
+                      </table>
+                      
+                      <!-- Divider -->
+                      <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                        <tr>
+                          <td style="height: 1px; background-color: rgba(255, 255, 255, 0.1); margin: 40px 0;"></td>
+                        </tr>
+                      </table>
+                      
+                      <!-- Final Message -->
+                      <p style="font-size: 16px; color: #888888; margin: 0; line-height: 1.8; font-weight: 300; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;">
+                        ¿Tienes preguntas? Nuestro equipo está aquí para ayudarte en cada paso del camino. No dudes en contactarnos.
+                      </p>
+                      
+                    </td>
+                  </tr>
+                  
+                  <!-- Footer -->
+                  <tr>
+                    <td style="padding: 40px 50px; text-align: center; border-top: 1px solid rgba(255, 255, 255, 0.1);">
+                      
+                      <h4 style="color: #ffffff; font-weight: 300; font-size: 16px; margin: 0 0 16px 0; letter-spacing: 0.2em; text-transform: uppercase; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;">GENSWAVE</h4>
+                      
+                      <p style="color: #666666; font-size: 14px; line-height: 1.6; margin: 0 0 24px 0; font-weight: 300; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;">
+                        Construido para empresas de la era digital.
+                      </p>
+                      
+                      <!-- Footer Links -->
+                      <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                        <tr>
+                          <td style="text-align: center;">
+                            <a href="https://genswave.org" style="color: rgba(255, 255, 255, 0.6); text-decoration: none; font-size: 14px; font-weight: 500; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif; margin: 0 16px;">Sitio Web</a>
+                            <a href="https://genswave.org/servicios" style="color: rgba(255, 255, 255, 0.6); text-decoration: none; font-size: 14px; font-weight: 500; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif; margin: 0 16px;">Servicios</a>
+                            <a href="mailto:support@genswave.org" style="color: rgba(255, 255, 255, 0.6); text-decoration: none; font-size: 14px; font-weight: 500; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif; margin: 0 16px;">Soporte</a>
+                          </td>
+                        </tr>
+                      </table>
+                      
+                      <!-- Copyright -->
+                      <p style="color: rgba(255, 255, 255, 0.4); font-size: 12px; margin: 24px 0 0 0; font-weight: 300; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;">
+                        © 2024 Genswave. Todos los derechos reservados.
+                      </p>
+                      
+                    </td>
+                  </tr>
+                  
+                </table>
                 
-                <!-- Footer -->
-                <tr>
-                  <td style="background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%); padding: 40px 50px; text-align: center; position: relative;">
-                    <div style="position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 100px; height: 2px; background: linear-gradient(90deg, transparent, #4a5568, transparent);"></div>
-                    
-                    <h4 style="color: #ffffff; font-weight: 700; font-size: 16px; margin: 0 0 8px 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;">GENSWAVE</h4>
-                    <p style="color: #a0aec0; font-size: 14px; line-height: 1.6; margin: 0 0 20px 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;">
-                      Transformando ideas en experiencias digitales excepcionales
-                    </p>
-                    
-                    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
-                      <tr>
-                        <td style="text-align: center;">
-                          <a href="https://genswave.org" style="color: #cbd5e0; text-decoration: none; font-size: 14px; font-weight: 500; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif; padding: 8px 16px; border-radius: 8px; background: rgba(255, 255, 255, 0.05); margin: 0 8px;">Sitio Web</a>
-                          <a href="https://genswave.org/services" style="color: #cbd5e0; text-decoration: none; font-size: 14px; font-weight: 500; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif; padding: 8px 16px; border-radius: 8px; background: rgba(255, 255, 255, 0.05); margin: 0 8px;">Servicios</a>
-                          <a href="mailto:support@genswave.org" style="color: #cbd5e0; text-decoration: none; font-size: 14px; font-weight: 500; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif; padding: 8px 16px; border-radius: 8px; background: rgba(255, 255, 255, 0.05); margin: 0 8px;">Soporte</a>
-                        </td>
-                      </tr>
-                    </table>
-                    
-                    <p style="color: #a0aec0; font-size: 12px; margin: 16px 0 0 0; opacity: 0.7; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;">
-                      © 2024 Genswave. Todos los derechos reservados.
-                    </p>
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
-        </table>
+              </td>
+            </tr>
+          </table>
+          
+        </body>
+        </html>
       `;
 
     case 'request_approved':
       return `
-        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin: 0; padding: 0; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh;">
-          <tr>
-            <td style="padding: 60px 20px;">
-              <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="650" style="margin: 0 auto; background: #ffffff; border-radius: 24px; box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25); overflow: hidden;">
-                <!-- Header -->
-                <tr>
-                  <td style="background: linear-gradient(135deg, #000000 0%, #2d3748 50%, #1a202c 100%); padding: 50px 40px 70px; text-align: center; position: relative;">
-                    <h1 style="font-size: 36px; font-weight: 800; color: #ffffff; letter-spacing: -1px; margin: 0 0 10px 0; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;">GENSWAVE</h1>
-                    <p style="color: rgba(255, 255, 255, 0.8); font-size: 15px; font-weight: 500; text-transform: uppercase; letter-spacing: 2px; margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;">Actualización de Solicitud</p>
-                  </td>
-                </tr>
+        <!DOCTYPE html>
+        <html lang="es" style="margin: 0; padding: 0;">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Solicitud Aprobada - Genswave</title>
+        </head>
+        <body style="margin: 0; padding: 0; background-color: #080808; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif; color: #ffffff; line-height: 1.6;">
+          
+          <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin: 0; padding: 0; background-color: #080808; min-height: 100vh;">
+            <tr>
+              <td style="padding: 40px 20px;">
                 
-                <!-- Content -->
-                <tr>
-                  <td style="padding: 60px 50px;">
-                    <h2 style="font-size: 28px; font-weight: 700; color: #1a202c; margin: 0 0 20px 0; letter-spacing: -0.5px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif; line-height: 1.2;">¡Excelentes noticias, ${data.userName}! 🎉</h2>
-                    
-                    <p style="font-size: 17px; color: #4a5568; margin: 0 0 40px 0; line-height: 1.7; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;">
-                      Tu solicitud ha sido <strong>aprobada</strong> por nuestro equipo. Estamos emocionados de trabajar contigo en este proyecto y convertir tu visión en realidad.
-                    </p>
-                    
-                    <!-- Details Card -->
-                    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%); border: 1px solid #e2e8f0; border-radius: 16px; margin: 32px 0; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);">
-                      <tr>
-                        <td style="height: 4px; background: linear-gradient(90deg, #48bb78, #38a169); border-radius: 16px 16px 0 0;"></td>
-                      </tr>
-                      <tr>
-                        <td style="padding: 32px;">
-                          <h3 style="font-size: 20px; font-weight: 700; color: #1a202c; margin: 0 0 20px 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;">
-                            ✅ Detalles de tu Solicitud Aprobada
-                          </h3>
-                          
-                          <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);">
-                            <tr style="border-bottom: 1px solid #e2e8f0;">
-                              <td style="padding: 16px 20px; font-weight: 600; color: #4a5568; font-size: 14px; width: 40%; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif; background: #f7fafc;">ID de Solicitud</td>
-                              <td style="padding: 16px 20px; font-weight: 500; color: #1a202c; font-size: 15px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;">${data.request.unique_id}</td>
-                            </tr>
-                            <tr style="border-bottom: 1px solid #e2e8f0;">
-                              <td style="padding: 16px 20px; font-weight: 600; color: #4a5568; font-size: 14px; width: 40%; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif; background: #f7fafc;">Proyecto</td>
-                              <td style="padding: 16px 20px; font-weight: 500; color: #1a202c; font-size: 15px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;">${data.request.title}</td>
-                            </tr>
-                            <tr style="border-bottom: 1px solid #e2e8f0;">
-                              <td style="padding: 16px 20px; font-weight: 600; color: #4a5568; font-size: 14px; width: 40%; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif; background: #f7fafc;">Tipo</td>
-                              <td style="padding: 16px 20px; font-weight: 500; color: #1a202c; font-size: 15px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;">${data.request.project_type}</td>
-                            </tr>
-                            <tr>
-                              <td style="padding: 16px 20px; font-weight: 600; color: #4a5568; font-size: 14px; width: 40%; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif; background: #f7fafc;">Estado</td>
-                              <td style="padding: 16px 20px; font-weight: 500; color: #1a202c; font-size: 15px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;">
-                                <span style="display: inline-flex; align-items: center; padding: 8px 16px; border-radius: 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; background: linear-gradient(135deg, #48bb78, #38a169); color: #ffffff; box-shadow: 0 2px 4px rgba(72, 187, 120, 0.3);">✓ APROBADA</span>
-                              </td>
-                            </tr>
-                            ${data.request.budget_range ? `
-                            <tr>
-                              <td style="padding: 16px 20px; font-weight: 600; color: #4a5568; font-size: 14px; width: 40%; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif; background: #f7fafc;">Presupuesto</td>
-                              <td style="padding: 16px 20px; font-weight: 500; color: #1a202c; font-size: 15px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;">${data.request.budget_range}</td>
-                            </tr>
-                            ` : ''}
-                          </table>
-                        </td>
-                      </tr>
-                    </table>
-                    
-                    <!-- Next Steps -->
-                    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background: linear-gradient(135deg, #ebf8ff 0%, #bee3f8 100%); border-left: 6px solid #3182ce; border-radius: 12px; margin: 32px 0; box-shadow: 0 4px 12px rgba(49, 130, 206, 0.1);">
-                      <tr>
-                        <td style="padding: 24px;">
-                          <p style="margin: 0; color: #2d3748; font-weight: 500; font-size: 15px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;">
-                            🎯 <strong>Próximos pasos:</strong><br>
-                            • Nuestro equipo se pondrá en contacto contigo en las próximas 24 horas<br>
-                            • Recibirás una propuesta detallada y cronograma del proyecto<br>
-                            • Programaremos una reunión para discutir los detalles específicos
-                          </p>
-                        </td>
-                      </tr>
-                    </table>
-                    
-                    <!-- CTA Button -->
-                    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
-                      <tr>
-                        <td style="text-align: center; margin: 40px 0;">
-                          <a href="https://genswave.org/dashboard" style="display: inline-block; background: linear-gradient(135deg, #000000 0%, #2d3748 100%); color: #ffffff; padding: 18px 40px; text-decoration: none; border-radius: 12px; font-weight: 600; font-size: 16px; text-transform: uppercase; letter-spacing: 1px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);">VER DETALLES COMPLETOS</a>
-                        </td>
-                      </tr>
-                    </table>
-                  </td>
-                </tr>
+                <!-- Main Container -->
+                <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" style="margin: 0 auto; background-color: #080808; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; overflow: hidden;">
+                  
+                  <!-- Header with Logo -->
+                  <tr>
+                    <td style="padding: 60px 50px 40px; text-align: center; border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
+                      <img src="https://genswave.org/genswave.png" alt="Genswave" style="height: 48px; width: auto; margin-bottom: 24px; filter: brightness(0) invert(1);">
+                      <h1 style="font-size: 24px; font-weight: 300; color: #ffffff; letter-spacing: 0.2em; text-transform: uppercase; margin: 0; opacity: 0.8; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;">GENSWAVE</h1>
+                      <p style="color: rgba(255, 255, 255, 0.6); font-size: 14px; font-weight: 300; margin: 8px 0 0 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;">Actualización de Solicitud</p>
+                    </td>
+                  </tr>
+                  
+                  <!-- Main Content -->
+                  <tr>
+                    <td style="padding: 50px;">
+                      
+                      <!-- Success Title -->
+                      <h2 style="font-size: 48px; font-weight: 800; color: #ffffff; margin: 0 0 24px 0; line-height: 0.95; letter-spacing: -0.02em; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;">Excelentes noticias, ${data.userName}</h2>
+                      
+                      <!-- Success Message -->
+                      <p style="font-size: 18px; color: #888888; margin: 0 0 40px 0; line-height: 1.8; font-weight: 300; border-left: 3px solid #ffffff; padding-left: 32px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;">
+                        Tu solicitud ha sido <strong style="color: #ffffff;">aprobada</strong> por nuestro equipo. Estamos emocionados de trabajar contigo en este proyecto y convertir tu visión en realidad.
+                      </p>
+                      
+                      <!-- Request Details -->
+                      <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin: 40px 0; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; background-color: rgba(255, 255, 255, 0.02);">
+                        <tr>
+                          <td style="padding: 40px;">
+                            <h3 style="font-size: 20px; font-weight: 600; color: #ffffff; margin: 0 0 24px 0; display: flex; align-items: center; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;">
+                              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" style="margin-right: 12px; vertical-align: middle;">
+                                <polyline points="20 6 9 17 4 12"/>
+                              </svg>
+                              Detalles de tu Solicitud Aprobada
+                            </h3>
+                            
+                            <!-- Details Table -->
+                            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; overflow: hidden;">
+                              <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
+                                <td style="padding: 16px 20px; font-weight: 500; color: #888888; font-size: 14px; width: 40%; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif; background-color: rgba(255, 255, 255, 0.02);">ID de Solicitud</td>
+                                <td style="padding: 16px 20px; font-weight: 400; color: #ffffff; font-size: 15px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;">${data.request.unique_id}</td>
+                              </tr>
+                              <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
+                                <td style="padding: 16px 20px; font-weight: 500; color: #888888; font-size: 14px; width: 40%; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif; background-color: rgba(255, 255, 255, 0.02);">Proyecto</td>
+                                <td style="padding: 16px 20px; font-weight: 400; color: #ffffff; font-size: 15px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;">${data.request.title}</td>
+                              </tr>
+                              <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
+                                <td style="padding: 16px 20px; font-weight: 500; color: #888888; font-size: 14px; width: 40%; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif; background-color: rgba(255, 255, 255, 0.02);">Tipo</td>
+                                <td style="padding: 16px 20px; font-weight: 400; color: #ffffff; font-size: 15px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;">${data.request.project_type}</td>
+                              </tr>
+                              <tr ${data.request.budget_range ? 'style="border-bottom: 1px solid rgba(255, 255, 255, 0.05);"' : ''}>
+                                <td style="padding: 16px 20px; font-weight: 500; color: #888888; font-size: 14px; width: 40%; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif; background-color: rgba(255, 255, 255, 0.02);">Estado</td>
+                                <td style="padding: 16px 20px; font-weight: 400; color: #ffffff; font-size: 15px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;">
+                                  <span style="display: inline-flex; align-items: center; padding: 6px 12px; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 20px; font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: 1px; background-color: rgba(255, 255, 255, 0.05);">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" style="margin-right: 6px;">
+                                      <polyline points="20 6 9 17 4 12"/>
+                                    </svg>
+                                    APROBADA
+                                  </span>
+                                </td>
+                              </tr>
+                              ${data.request.budget_range ? `
+                              <tr>
+                                <td style="padding: 16px 20px; font-weight: 500; color: #888888; font-size: 14px; width: 40%; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif; background-color: rgba(255, 255, 255, 0.02);">Presupuesto</td>
+                                <td style="padding: 16px 20px; font-weight: 400; color: #ffffff; font-size: 15px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;">${data.request.budget_range}</td>
+                              </tr>
+                              ` : ''}
+                            </table>
+                          </td>
+                        </tr>
+                      </table>
+                      
+                      <!-- Next Steps -->
+                      <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin: 32px 0; border-left: 3px solid #ffffff; background-color: rgba(255, 255, 255, 0.02);">
+                        <tr>
+                          <td style="padding: 24px 32px;">
+                            <p style="margin: 0; color: #888888; font-weight: 300; font-size: 15px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif; display: flex; align-items: flex-start;">
+                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" style="margin-right: 12px; margin-top: 2px; flex-shrink: 0;">
+                                <path d="M9 11H1v6h8v-6zM23 11h-8v6h8v-6zM16 3H8v6h8V3z"/>
+                              </svg>
+                              <span><strong style="color: #ffffff;">Próximos pasos:</strong><br>
+                              • Nuestro equipo se pondrá en contacto contigo en las próximas 24 horas<br>
+                              • Recibirás una propuesta detallada y cronograma del proyecto<br>
+                              • Programaremos una reunión para discutir los detalles específicos</span>
+                            </p>
+                          </td>
+                        </tr>
+                      </table>
+                      
+                      <!-- CTA Button -->
+                      <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                        <tr>
+                          <td style="text-align: center; padding: 40px 0;">
+                            <a href="https://genswave.org/dashboard" style="display: inline-block; background-color: transparent; color: #ffffff; padding: 16px 32px; text-decoration: none; border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 50px; font-weight: 500; font-size: 15px; letter-spacing: 0.08em; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;">VER DETALLES COMPLETOS</a>
+                          </td>
+                        </tr>
+                      </table>
+                      
+                    </td>
+                  </tr>
+                  
+                  <!-- Footer -->
+                  <tr>
+                    <td style="padding: 40px 50px; text-align: center; border-top: 1px solid rgba(255, 255, 255, 0.1);">
+                      <h4 style="color: #ffffff; font-weight: 300; font-size: 16px; margin: 0 0 16px 0; letter-spacing: 0.2em; text-transform: uppercase; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;">GENSWAVE</h4>
+                      <p style="color: #666666; font-size: 14px; line-height: 1.6; margin: 0 0 24px 0; font-weight: 300; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;">
+                        Construido para empresas de la era digital.
+                      </p>
+                      <p style="color: rgba(255, 255, 255, 0.4); font-size: 12px; margin: 0; font-weight: 300; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;">
+                        © 2024 Genswave. Todos los derechos reservados.
+                      </p>
+                    </td>
+                  </tr>
+                  
+                </table>
                 
-                <!-- Footer -->
-                <tr>
-                  <td style="background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%); padding: 40px 50px; text-align: center;">
-                    <h4 style="color: #ffffff; font-weight: 700; font-size: 16px; margin: 0 0 8px 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;">GENSWAVE</h4>
-                    <p style="color: #a0aec0; font-size: 14px; line-height: 1.6; margin: 0 0 20px 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;">
-                      Transformando ideas en experiencias digitales excepcionales
-                    </p>
-                    <p style="color: #a0aec0; font-size: 12px; margin: 16px 0 0 0; opacity: 0.7; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;">
-                      © 2024 Genswave. Todos los derechos reservados.
-                    </p>
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
-        </table>
+              </td>
+            </tr>
+          </table>
+          
+        </body>
+        </html>
       `;
 
     case 'admin_message_notification':
       return `
-        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin: 0; padding: 0; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh;">
-          <tr>
-            <td style="padding: 60px 20px;">
-              <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="650" style="margin: 0 auto; background: #ffffff; border-radius: 24px; box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25); overflow: hidden;">
-                <!-- Header -->
-                <tr>
-                  <td style="background: linear-gradient(135deg, #000000 0%, #2d3748 50%, #1a202c 100%); padding: 50px 40px 70px; text-align: center; position: relative;">
-                    <h1 style="font-size: 36px; font-weight: 800; color: #ffffff; letter-spacing: -1px; margin: 0 0 10px 0; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;">GENSWAVE</h1>
-                    <p style="color: rgba(255, 255, 255, 0.8); font-size: 15px; font-weight: 500; text-transform: uppercase; letter-spacing: 2px; margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;">Nuevo Mensaje del Equipo</p>
-                  </td>
-                </tr>
+        <!DOCTYPE html>
+        <html lang="es" style="margin: 0; padding: 0;">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Nuevo Mensaje - Genswave</title>
+        </head>
+        <body style="margin: 0; padding: 0; background-color: #080808; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif; color: #ffffff; line-height: 1.6;">
+          
+          <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin: 0; padding: 0; background-color: #080808; min-height: 100vh;">
+            <tr>
+              <td style="padding: 40px 20px;">
                 
-                <!-- Content -->
-                <tr>
-                  <td style="padding: 60px 50px;">
-                    <h2 style="font-size: 28px; font-weight: 700; color: #1a202c; margin: 0 0 20px 0; letter-spacing: -0.5px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif; line-height: 1.2;">Hola ${data.userName}, 💬</h2>
-                    
-                    <p style="font-size: 17px; color: #4a5568; margin: 0 0 40px 0; line-height: 1.7; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;">
-                      Has recibido un nuevo mensaje de nuestro equipo. Te mantenemos informado sobre el progreso de tu proyecto y cualquier actualización importante.
-                    </p>
-                    
-                    <!-- Message Bubble -->
-                    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background: linear-gradient(135deg, #f0fff4 0%, #c6f6d5 100%); border-left: 4px solid #48bb78; border-radius: 16px; margin: 24px 0; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);">
-                      <tr>
-                        <td style="padding: 24px;">
-                          <p style="font-size: 13px; color: #718096; margin: 0 0 12px 0; font-weight: 600; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;">
-                            <span style="display: inline-block; width: 16px; height: 16px; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 50%; margin-right: 8px; vertical-align: middle;"></span>
-                            ${data.adminName} • ${new Date(data.timestamp).toLocaleString('es-ES', {
-                              weekday: 'long',
-                              year: 'numeric',
-                              month: 'long',
-                              day: 'numeric',
-                              hour: '2-digit',
-                              minute: '2-digit'
-                            })}
-                          </p>
-                          <p style="color: #1a202c; font-size: 15px; line-height: 1.7; margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;">${data.message}</p>
-                        </td>
-                      </tr>
-                    </table>
-                    
-                    <!-- Context Card -->
-                    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%); border: 1px solid #e2e8f0; border-radius: 16px; margin: 32px 0; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);">
-                      <tr>
-                        <td style="height: 4px; background: linear-gradient(90deg, #667eea, #764ba2); border-radius: 16px 16px 0 0;"></td>
-                      </tr>
-                      <tr>
-                        <td style="padding: 32px;">
-                          <h3 style="font-size: 20px; font-weight: 700; color: #1a202c; margin: 0 0 20px 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;">
-                            💬 Contexto de la Conversación
-                          </h3>
-                          
-                          <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);">
-                            <tr style="border-bottom: 1px solid #e2e8f0;">
-                              <td style="padding: 16px 20px; font-weight: 600; color: #4a5568; font-size: 14px; width: 40%; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif; background: #f7fafc;">Proyecto</td>
-                              <td style="padding: 16px 20px; font-weight: 500; color: #1a202c; font-size: 15px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;">${data.projectTitle || 'Consulta General'}</td>
-                            </tr>
-                            <tr style="border-bottom: 1px solid #e2e8f0;">
-                              <td style="padding: 16px 20px; font-weight: 600; color: #4a5568; font-size: 14px; width: 40%; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif; background: #f7fafc;">Miembro del Equipo</td>
-                              <td style="padding: 16px 20px; font-weight: 500; color: #1a202c; font-size: 15px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;">${data.adminName}</td>
-                            </tr>
-                            <tr>
-                              <td style="padding: 16px 20px; font-weight: 600; color: #4a5568; font-size: 14px; width: 40%; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif; background: #f7fafc;">Fecha</td>
-                              <td style="padding: 16px 20px; font-weight: 500; color: #1a202c; font-size: 15px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;">${new Date(data.timestamp).toLocaleDateString('es-ES')}</td>
-                            </tr>
-                          </table>
-                        </td>
-                      </tr>
-                    </table>
-                    
-                    <!-- Tip Box -->
-                    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background: linear-gradient(135deg, #ebf8ff 0%, #bee3f8 100%); border-left: 6px solid #3182ce; border-radius: 12px; margin: 32px 0; box-shadow: 0 4px 12px rgba(49, 130, 206, 0.1);">
-                      <tr>
-                        <td style="padding: 24px;">
-                          <p style="margin: 0; color: #2d3748; font-weight: 500; font-size: 15px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;">
-                            📱 <strong>Responde fácilmente:</strong> Accede a tu dashboard para continuar la conversación y mantener todo organizado en un solo lugar.
-                          </p>
-                        </td>
-                      </tr>
-                    </table>
-                    
-                    <!-- CTA Button -->
-                    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
-                      <tr>
-                        <td style="text-align: center; margin: 40px 0;">
-                          <a href="https://genswave.org/dashboard" style="display: inline-block; background: linear-gradient(135deg, #000000 0%, #2d3748 100%); color: #ffffff; padding: 18px 40px; text-decoration: none; border-radius: 12px; font-weight: 600; font-size: 16px; text-transform: uppercase; letter-spacing: 1px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);">RESPONDER MENSAJE</a>
-                        </td>
-                      </tr>
-                    </table>
-                  </td>
-                </tr>
+                <!-- Main Container -->
+                <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" style="margin: 0 auto; background-color: #080808; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; overflow: hidden;">
+                  
+                  <!-- Header with Logo -->
+                  <tr>
+                    <td style="padding: 60px 50px 40px; text-align: center; border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
+                      <img src="https://genswave.org/genswave.png" alt="Genswave" style="height: 48px; width: auto; margin-bottom: 24px; filter: brightness(0) invert(1);">
+                      <h1 style="font-size: 24px; font-weight: 300; color: #ffffff; letter-spacing: 0.2em; text-transform: uppercase; margin: 0; opacity: 0.8; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;">GENSWAVE</h1>
+                      <p style="color: rgba(255, 255, 255, 0.6); font-size: 14px; font-weight: 300; margin: 8px 0 0 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;">Nuevo Mensaje del Equipo</p>
+                    </td>
+                  </tr>
+                  
+                  <!-- Main Content -->
+                  <tr>
+                    <td style="padding: 50px;">
+                      
+                      <!-- Message Title -->
+                      <h2 style="font-size: 48px; font-weight: 800; color: #ffffff; margin: 0 0 24px 0; line-height: 0.95; letter-spacing: -0.02em; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;">Hola ${data.userName}</h2>
+                      
+                      <!-- Message Intro -->
+                      <p style="font-size: 18px; color: #888888; margin: 0 0 40px 0; line-height: 1.8; font-weight: 300; border-left: 3px solid #ffffff; padding-left: 32px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;">
+                        Has recibido un nuevo mensaje de nuestro equipo. Te mantenemos informado sobre el progreso de tu proyecto y cualquier actualización importante.
+                      </p>
+                      
+                      <!-- Message Content -->
+                      <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin: 40px 0; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; background-color: rgba(255, 255, 255, 0.02);">
+                        <tr>
+                          <td style="padding: 40px;">
+                            
+                            <!-- Message Header -->
+                            <div style="display: flex; align-items: center; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
+                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" style="margin-right: 12px; flex-shrink: 0;">
+                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                              </svg>
+                              <div>
+                                <p style="margin: 0; color: #ffffff; font-size: 15px; font-weight: 500; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;">${data.adminName}</p>
+                                <p style="margin: 0; color: #666666; font-size: 13px; font-weight: 300; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;">${new Date(data.timestamp).toLocaleString('es-ES', {
+                                  weekday: 'long',
+                                  year: 'numeric',
+                                  month: 'long',
+                                  day: 'numeric',
+                                  hour: '2-digit',
+                                  minute: '2-digit'
+                                })}</p>
+                              </div>
+                            </div>
+                            
+                            <!-- Message Text -->
+                            <p style="color: #ffffff; font-size: 16px; line-height: 1.7; margin: 0; font-weight: 300; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;">${data.message}</p>
+                            
+                          </td>
+                        </tr>
+                      </table>
+                      
+                      <!-- Context Information -->
+                      <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin: 32px 0; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; background-color: rgba(255, 255, 255, 0.02);">
+                        <tr>
+                          <td style="padding: 32px;">
+                            <h3 style="font-size: 18px; font-weight: 600; color: #ffffff; margin: 0 0 20px 0; display: flex; align-items: center; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;">
+                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" style="margin-right: 12px; vertical-align: middle;">
+                                <circle cx="12" cy="12" r="10"/>
+                                <line x1="12" y1="16" x2="12" y2="12"/>
+                                <line x1="12" y1="8" x2="12.01" y2="8"/>
+                              </svg>
+                              Contexto de la Conversación
+                            </h3>
+                            
+                            <!-- Context Table -->
+                            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; overflow: hidden;">
+                              <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
+                                <td style="padding: 12px 16px; font-weight: 500; color: #888888; font-size: 14px; width: 35%; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif; background-color: rgba(255, 255, 255, 0.02);">Proyecto</td>
+                                <td style="padding: 12px 16px; font-weight: 400; color: #ffffff; font-size: 14px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;">${data.projectTitle || 'Consulta General'}</td>
+                              </tr>
+                              <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
+                                <td style="padding: 12px 16px; font-weight: 500; color: #888888; font-size: 14px; width: 35%; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif; background-color: rgba(255, 255, 255, 0.02);">Miembro del Equipo</td>
+                                <td style="padding: 12px 16px; font-weight: 400; color: #ffffff; font-size: 14px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;">${data.adminName}</td>
+                              </tr>
+                              <tr>
+                                <td style="padding: 12px 16px; font-weight: 500; color: #888888; font-size: 14px; width: 35%; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif; background-color: rgba(255, 255, 255, 0.02);">Fecha</td>
+                                <td style="padding: 12px 16px; font-weight: 400; color: #ffffff; font-size: 14px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;">${new Date(data.timestamp).toLocaleDateString('es-ES')}</td>
+                              </tr>
+                            </table>
+                          </td>
+                        </tr>
+                      </table>
+                      
+                      <!-- Response Tip -->
+                      <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin: 32px 0; border-left: 3px solid #ffffff; background-color: rgba(255, 255, 255, 0.02);">
+                        <tr>
+                          <td style="padding: 24px 32px;">
+                            <p style="margin: 0; color: #888888; font-weight: 300; font-size: 15px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif; display: flex; align-items: flex-start;">
+                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" style="margin-right: 12px; margin-top: 2px; flex-shrink: 0;">
+                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                                <circle cx="12" cy="16" r="1"/>
+                                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                              </svg>
+                              <span><strong style="color: #ffffff;">Responde fácilmente:</strong> Accede a tu dashboard para continuar la conversación y mantener todo organizado en un solo lugar.</span>
+                            </p>
+                          </td>
+                        </tr>
+                      </table>
+                      
+                      <!-- CTA Button -->
+                      <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                        <tr>
+                          <td style="text-align: center; padding: 40px 0;">
+                            <a href="https://genswave.org/dashboard" style="display: inline-block; background-color: transparent; color: #ffffff; padding: 16px 32px; text-decoration: none; border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 50px; font-weight: 500; font-size: 15px; letter-spacing: 0.08em; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;">RESPONDER MENSAJE</a>
+                          </td>
+                        </tr>
+                      </table>
+                      
+                    </td>
+                  </tr>
+                  
+                  <!-- Footer -->
+                  <tr>
+                    <td style="padding: 40px 50px; text-align: center; border-top: 1px solid rgba(255, 255, 255, 0.1);">
+                      <h4 style="color: #ffffff; font-weight: 300; font-size: 16px; margin: 0 0 16px 0; letter-spacing: 0.2em; text-transform: uppercase; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;">GENSWAVE</h4>
+                      <p style="color: #666666; font-size: 14px; line-height: 1.6; margin: 0 0 24px 0; font-weight: 300; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;">
+                        Construido para empresas de la era digital.
+                      </p>
+                      <p style="color: rgba(255, 255, 255, 0.4); font-size: 12px; margin: 0; font-weight: 300; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;">
+                        © 2024 Genswave. Todos los derechos reservados.
+                      </p>
+                    </td>
+                  </tr>
+                  
+                </table>
                 
-                <!-- Footer -->
-                <tr>
-                  <td style="background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%); padding: 40px 50px; text-align: center;">
-                    <h4 style="color: #ffffff; font-weight: 700; font-size: 16px; margin: 0 0 8px 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;">GENSWAVE</h4>
-                    <p style="color: #a0aec0; font-size: 14px; line-height: 1.6; margin: 0 0 20px 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;">
-                      Transformando ideas en experiencias digitales excepcionales
-                    </p>
-                    <p style="color: #a0aec0; font-size: 12px; margin: 16px 0 0 0; opacity: 0.7; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;">
-                      © 2024 Genswave. Todos los derechos reservados.
-                    </p>
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
-        </table>
+              </td>
+            </tr>
+          </table>
+          
+        </body>
+        </html>
       `;
 
     default:
@@ -371,7 +509,7 @@ export const sendEmail = async (to, subject, type, data) => {
 export const sendWelcomeEmail = async (userEmail, userName) => {
   return await sendEmail(
     userEmail,
-    '🚀 ¡Bienvenido a Genswave! Tu viaje digital comienza aquí',
+    'Bienvenido a Genswave - Tu viaje digital comienza aquí',
     'welcome',
     { name: userName }
   );
@@ -380,7 +518,7 @@ export const sendWelcomeEmail = async (userEmail, userName) => {
 export const sendRequestApprovedEmail = async (userEmail, userName, request) => {
   return await sendEmail(
     userEmail,
-    `🎉 ¡Solicitud Aprobada! - ${request.title}`,
+    `Solicitud Aprobada - ${request.title}`,
     'request_approved',
     { userName, request }
   );
@@ -389,7 +527,7 @@ export const sendRequestApprovedEmail = async (userEmail, userName, request) => 
 export const sendAdminMessageNotification = async (userEmail, userName, messageData) => {
   return await sendEmail(
     userEmail,
-    `💬 Nuevo mensaje del equipo Genswave`,
+    `Nuevo mensaje del equipo Genswave`,
     'admin_message_notification',
     {
       userName,
@@ -422,7 +560,7 @@ export const sendProfileUpdateConfirmation = async (userEmail, userName, changes
 export const sendProjectCreatedEmail = async (userEmail, userName, project) => {
   return await sendEmail(
     userEmail,
-    `🎉 Nuevo proyecto creado: ${project.title}`,
+    `Nuevo proyecto creado: ${project.title}`,
     'project_created',
     { userName, project }
   );
@@ -431,7 +569,7 @@ export const sendProjectCreatedEmail = async (userEmail, userName, project) => {
 export const sendRequestCreatedEmail = async (userEmail, userName, request) => {
   return await sendEmail(
     userEmail,
-    `✅ Solicitud recibida: ${request.title}`,
+    `Solicitud recibida: ${request.title}`,
     'request_created',
     { userName, request }
   );
@@ -440,7 +578,7 @@ export const sendRequestCreatedEmail = async (userEmail, userName, request) => {
 export const sendRequestStatusUpdateEmail = async (userEmail, userName, request, previousStatus) => {
   return await sendEmail(
     userEmail,
-    `📢 Actualización de solicitud: ${request.title}`,
+    `Actualización de solicitud: ${request.title}`,
     'request_status_update',
     { userName, request, previousStatus }
   );

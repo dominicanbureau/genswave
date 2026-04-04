@@ -232,7 +232,7 @@ async function handleTextMessage(senderId, text, senderInfo) {
             `🆘 Escriba "ayuda" para ver opciones\n\n` +
             `¡Gracias por contactar a *Genswave*! 🚀`
           );
-        }
+        }qui
         break;
     }
   } catch (error) {
@@ -419,6 +419,35 @@ async function getBotUserSettings(userId) {
     return { bot_enabled: true }; // Default to enabled if error
   }
 }
+
+// Disable bot for specific user
+async function disableBotForUser(userId) {
+  try {
+    const result = await db.query(
+      `UPDATE bot_user_settings 
+       SET bot_enabled = false 
+       WHERE instagram_user_id = $1 
+       RETURNING *`,
+      [userId]
+    );
+    
+    if (result.rows.length === 0) {
+      // If no existing settings, create new ones with bot disabled
+      await db.query(
+        `INSERT INTO bot_user_settings (instagram_user_id, bot_enabled) 
+         VALUES ($1, $2)`,
+        [userId, false]
+      );
+    }
+    
+    console.log('✅ Bot disabled for user:', userId);
+    return true;
+  } catch (error) {
+    console.error('❌ Error disabling bot for user:', error);
+    return false;
+  }
+}
+
 // Get conversation state
 async function getConversationState(userId) {
   try {
@@ -907,6 +936,17 @@ router.post('/admin-reply', async (req, res) => {
     const success = await sendInstagramMessage(recipientId, message);
     
     if (success) {
+      // Check if message ends with ".." to disable auto-responses
+      if (message.trim().endsWith('..')) {
+        console.log('🔇 Message ends with ".." - disabling auto-responses for user:', recipientId);
+        const disableResult = await disableBotForUser(recipientId);
+        if (disableResult) {
+          console.log('✅ Auto-responses successfully disabled for user:', recipientId);
+        } else {
+          console.log('❌ Failed to disable auto-responses for user:', recipientId);
+        }
+      }
+      
       res.json({ success: true, message: 'Mensaje enviado correctamente' });
     } else {
       res.status(500).json({ error: 'Error al enviar mensaje' });

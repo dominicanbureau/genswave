@@ -153,6 +153,33 @@ router.post('/forgot-password', async (req, res) => {
     }
 });
 
+// Endpoint temporal para probar el email de bienvenida
+router.post('/send-welcome-email', async (req, res) => {
+    try {
+        if (!req.session.userId) {
+            return res.status(401).json({ error: 'No autorizado' });
+        }
+
+        const { email, name } = req.body;
+
+        if (!email || !name) {
+            return res.status(400).json({ error: 'Email y nombre son requeridos' });
+        }
+
+        // Send welcome email
+        const result = await sendWelcomeEmail(email, name);
+        
+        if (result.success) {
+            res.json({ success: true, message: 'Email enviado correctamente' });
+        } else {
+            res.status(500).json({ error: 'Error al enviar email' });
+        }
+    } catch (error) {
+        console.error('Error sending test welcome email:', error);
+        res.status(500).json({ error: 'Error en el servidor' });
+    }
+});
+
 export default router;
 // Get current user profile
 router.get('/profile', async (req, res) => {

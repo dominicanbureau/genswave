@@ -554,17 +554,10 @@ function ServicesPage() {
                       <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
                     </svg>
                   </a>
-                  <a href="#" className="mobile-social-icon" aria-label="Dribbble">
+                  <a href="mailto:support@genswave.org" className="mobile-social-icon" aria-label="Email">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                      <circle cx="12" cy="12" r="10"/>
-                      <path d="M8.56 2.75c4.37 6.03 6.02 9.42 8.03 17.5m2.54-15.38c-3.72 4.35-8.94 5.66-16.88 5.85m19.5 1.9c-3.5-.93-6.63-.82-8.94 0-2.58.92-5.01 2.86-7.44 6.32"/>
-                    </svg>
-                  </a>
-                  <a href="#" className="mobile-social-icon" aria-label="LinkedIn">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                      <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/>
-                      <rect x="2" y="9" width="4" height="12"/>
-                      <circle cx="4" cy="4" r="2"/>
+                      <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                      <polyline points="22,6 12,13 2,6"/>
                     </svg>
                   </a>
                 </div>
@@ -963,7 +956,7 @@ function HeroSection() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.5 }}
         >
-          Catálogo Completo<br />Servicios Empresariales
+          Catálogo Completo<br />de Servicios
         </motion.h1>
         <motion.p
           className="hero-description"

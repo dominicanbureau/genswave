@@ -77,8 +77,20 @@ async function handleInstagramMessage(messagingEvent) {
       return;
     }
 
+    // Additional safety: Check if this might be our own message by checking if sender is our page
+    // Instagram page IDs are typically longer and different from user IDs
+    if (senderId && senderId.length > 15) {
+      console.log('🔄 Potentially ignoring message from page/bot (long sender ID):', senderId);
+      // Don't return here, just log for debugging
+    }
+
     if (message && message.text) {
-      console.log(`📨 Message from ${senderId} to ${recipientId}:`, { text: message.text, is_echo: message.is_echo });
+      console.log(`📨 Message from ${senderId} to ${recipientId}:`, { 
+        text: message.text, 
+        is_echo: message.is_echo,
+        sender_length: senderId?.length,
+        recipient_length: recipientId?.length
+      });
 
       // Get sender info
       const senderInfo = await getInstagramUserInfo(senderId);
@@ -101,8 +113,9 @@ async function handleTextMessage(senderId, text, senderInfo) {
     
     // Check if bot is enabled for this user
     const botSettings = await getBotUserSettings(senderId);
+    console.log(`🤖 Bot settings for user ${senderId}:`, botSettings);
     if (!botSettings.bot_enabled) {
-      console.log(`🔇 Bot disabled for user ${senderId}, ignoring message`);
+      console.log(`🔇 Bot disabled for user ${senderId}, ignoring message: "${text}"`);
       return;
     }
     
@@ -232,12 +245,12 @@ async function handleTextMessage(senderId, text, senderInfo) {
             `🆘 Escriba "ayuda" para ver opciones\n\n` +
             `¡Gracias por contactar a *Genswave*! 🚀`
           );
-        }qui
+        }
         break;
     }
   } catch (error) {
     console.error('❌ Error handling text message:', error);
-    await sendErrorMessage(senderId);
+    // Don't send error message to user - just log it
   }
 }
 // Process name input
@@ -379,19 +392,9 @@ async function processCompanyInput(senderId, text, state) {
     
   } catch (error) {
     console.error('❌ Error generating code:', error);
-    await sendErrorMessage(senderId);
+    // Don't send error message to user - just log it and reset state
     await updateConversationState(senderId, 'idle', {});
   }
-}
-
-// Send error message
-async function sendErrorMessage(senderId) {
-  await sendInstagramMessage(senderId,
-    `❌ *ERROR TÉCNICO*\n\n` +
-    `Disculpe, ocurrió un error en nuestro sistema.\n\n` +
-    `Por favor, escriba "código" para reiniciar.\n\n` +
-    `Si persiste, contacte a nuestro equipo.`
-  );
 }
 
 // Get bot user settings
@@ -719,7 +722,7 @@ async function processConsultationInput(senderId, text, state) {
     
   } catch (error) {
     console.error('❌ Error processing consultation:', error);
-    await sendErrorMessage(senderId);
+    // Don't send error message to user - just log it and reset state
     await updateConversationState(senderId, 'idle', {});
   }
 }
@@ -933,18 +936,26 @@ router.post('/admin-reply', async (req, res) => {
       return res.status(400).json({ error: 'Faltan parámetros requeridos' });
     }
 
+    console.log(`📤 Admin sending message to ${recipientId}: "${message}"`);
+    
     const success = await sendInstagramMessage(recipientId, message);
     
     if (success) {
       // Check if message ends with ".." to disable auto-responses
       if (message.trim().endsWith('..')) {
         console.log('🔇 Message ends with ".." - disabling auto-responses for user:', recipientId);
+        console.log('🔍 Original message:', `"${message}"`);
+        console.log('🔍 Trimmed message:', `"${message.trim()}"`);
+        console.log('🔍 Ends with "..":', message.trim().endsWith('..'));
+        
         const disableResult = await disableBotForUser(recipientId);
         if (disableResult) {
           console.log('✅ Auto-responses successfully disabled for user:', recipientId);
         } else {
           console.log('❌ Failed to disable auto-responses for user:', recipientId);
         }
+      } else {
+        console.log('ℹ️ Message does not end with ".." - bot remains enabled for user:', recipientId);
       }
       
       res.json({ success: true, message: 'Mensaje enviado correctamente' });
@@ -1023,13 +1034,7 @@ async function processPasswordResetCommand(senderId, email) {
 
   } catch (error) {
     console.error('❌ Error processing password reset command:', error);
-    await sendInstagramMessage(senderId,
-      `❌ ERROR TÉCNICO\n\n` +
-      `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
-      `Ocurrió un error al procesar su solicitud.\n\n` +
-      `🔄 Intente nuevamente en unos minutos\n` +
-      `📞 Soporte: support@genswave.org`
-    );
+    // Don't send error message to user - just log it
   }
 }
 

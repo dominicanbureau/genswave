@@ -17,9 +17,12 @@ function Footer() {
       { label: 'Política de Cookies', path: '/cookies' }
     ],
     resources: [
-      { label: 'Proyectos', path: '/casos' },
       { label: 'FAQ', path: '/faq' },
-      { label: 'Soporte', path: '/soporte' }
+      { 
+        label: 'Soporte', 
+        path: 'mailto:support@genswave.org?subject=Solicitud de Soporte - Genswave&body=Hola equipo de Genswave,%0D%0A%0D%0AEspero que se encuentren bien. Me pongo en contacto con ustedes para solicitar soporte con:%0D%0A%0D%0A[Describe aquí tu consulta o problema]%0D%0A%0D%0AInformación adicional:%0D%0A- Nombre: %0D%0A- Empresa: %0D%0A- Teléfono: %0D%0A%0D%0AQuedo atento a su respuesta.%0D%0A%0D%0ASaludos cordiales',
+        isExternal: true 
+      }
     ]
   };
 
@@ -166,7 +169,11 @@ function Footer() {
                     viewport={{ once: true }}
                     transition={{ duration: 0.4, delay: 0.5 + index * 0.05 }}
                   >
-                    <Link to={link.path}>{link.label}</Link>
+                    {link.isExternal ? (
+                      <a href={link.path}>{link.label}</a>
+                    ) : (
+                      <Link to={link.path}>{link.label}</Link>
+                    )}
                   </motion.li>
                 ))}
               </ul>

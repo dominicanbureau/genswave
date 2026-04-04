@@ -4044,3 +4044,293 @@ body {
     padding: 0.75rem;
   }
 }
+/* Request type badge */
+.request-type-badge {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-muted);
+  border-radius: 4px;
+  margin-top: 0.5rem;
+}
+
+.request-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.5rem;
+}
+
+.request-contact {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  margin: 0.25rem 0;
+}
+
+.request-notes {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 0.75rem;
+  border-radius: 8px;
+  margin: 0.75rem 0;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+
+.light-mode .request-notes {
+  background: rgba(0, 0, 0, 0.05);
+}
+/* Request Type Badge Styles */
+.request-badges {
+  margin: 0.5rem 0;
+}
+
+.request-type-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.request-type-badge.service-form {
+  background: rgba(34, 197, 94, 0.1);
+  color: #16a34a;
+  border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.request-type-badge.dashboard {
+  background: rgba(59, 130, 246, 0.1);
+  color: #2563eb;
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+/* Service Form Details */
+.service-form-details {
+  margin: 1rem 0;
+  padding: 1rem;
+  background: rgba(34, 197, 94, 0.05);
+  border-radius: 8px;
+  border-left: 3px solid #16a34a;
+}
+
+.contact-detail {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0.5rem 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.contact-detail svg {
+  width: 16px;
+  height: 16px;
+  color: #16a34a;
+}
+
+.contact-detail span {
+  color: var(--text-light);
+}
+/* Requests Summary */
+.requests-summary {
+  display: flex;
+  gap: 1rem;
+  margin: 1rem 0;
+  padding: 0.75rem;
+  background: var(--bg-tertiary);
+  border-radius: 8px;
+  border: 1px solid var(--border-subtle);
+}
+
+.summary-item {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+/* Archive Controls */
+.archive-controls {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 2rem;
+}
+
+.btn-archive-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-archive-toggle:hover {
+  border-color: var(--border-hover);
+  color: var(--text-light);
+}
+
+.btn-archive-toggle.active {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+}
+
+.btn-archive-toggle svg {
+  width: 16px;
+  height: 16px;
+}
+
+.archive-count {
+  background: #ef4444;
+  color: white;
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 12px;
+  min-width: 20px;
+  text-align: center;
+}
+
+/* Archive Item Styles */
+.appointment-accordion-item.holding {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: #ef4444;
+  transform: scale(0.98);
+}
+
+.appointment-accordion-item.archived {
+  opacity: 0.7;
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.archived-badge {
+  background: rgba(156, 163, 175, 0.2);
+  color: #6b7280;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.btn-unarchive {
+  background: rgba(34, 197, 94, 0.1) !important;
+  color: #16a34a !important;
+  border: 1px solid rgba(34, 197, 94, 0.2) !important;
+}
+
+.btn-unarchive:hover {
+  background: rgba(34, 197, 94, 0.2) !important;
+}
+
+.appointment-summary-service {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* Hold to Archive Animation */
+@keyframes holdProgress {
+  0% { width: 0%; }
+  100% { width: 100%; }
+}
+
+.appointment-accordion-item.holding::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 3px;
+  background: #ef4444;
+  animation: holdProgress 1s linear;
+  border-radius: 4px 4px 0 0;
+}
+/* Message Actions */
+.message-actions {
+  display: flex;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.message:hover .message-actions {
+  opacity: 1;
+}
+
+.btn-email-message {
+  background: none;
+  border: none;
+  color: #6b7280;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.btn-email-message:hover {
+  background: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
+}
+
+.btn-email-message svg {
+  width: 14px;
+  height: 14px;
+}
+
+.btn-delete-message {
+  background: none;
+  border: none;
+  color: #6b7280;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.btn-delete-message:hover {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+}
+
+.btn-delete-message svg {
+  width: 14px;
+  height: 14px;
+}
+
+.message-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.message-header p {
+  flex: 1;
+  margin: 0;
+}
+
+/* Admin message styling */
+.message.admin {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border-left: 3px solid #000000;
+}
+
+.message.admin .message-actions {
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 6px;
+  padding: 2px;
+}

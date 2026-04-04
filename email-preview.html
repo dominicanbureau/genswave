@@ -1,0 +1,255 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preview - Email de Bienvenida Genswave</title>
+    <style>
+      /* Reset styles */
+      body, table, td, p, a, li, blockquote { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+      table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
+      img { -ms-interpolation-mode: bicubic; }
+      
+      /* Base styles */
+      body {
+        margin: 0 !important;
+        padding: 0 !important;
+        background-color: #f4f4f4 !important;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif !important;
+      }
+      
+      .email-wrapper {
+        width: 100% !important;
+        background-color: #f4f4f4 !important;
+        padding: 40px 0 !important;
+      }
+      
+      .email-container {
+        max-width: 600px !important;
+        margin: 0 auto !important;
+        background-color: #ffffff !important;
+        border-radius: 16px !important;
+        overflow: hidden !important;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1) !important;
+      }
+      
+      .header {
+        background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%) !important;
+        padding: 40px 40px 60px !important;
+        text-align: center !important;
+        position: relative !important;
+      }
+      
+      .logo {
+        font-size: 28px !important;
+        font-weight: 700 !important;
+        color: #ffffff !important;
+        letter-spacing: -0.5px !important;
+        margin: 0 0 8px 0 !important;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif !important;
+      }
+      
+      .header-subtitle {
+        color: rgba(255, 255, 255, 0.7) !important;
+        font-size: 14px !important;
+        font-weight: 400 !important;
+        text-transform: uppercase !important;
+        letter-spacing: 1px !important;
+        margin: 0 !important;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif !important;
+      }
+      
+      .content {
+        padding: 50px 40px !important;
+      }
+      
+      .greeting {
+        font-size: 24px !important;
+        font-weight: 600 !important;
+        color: #1a1a1a !important;
+        margin: 0 0 16px 0 !important;
+        letter-spacing: -0.3px !important;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif !important;
+      }
+      
+      .message {
+        font-size: 16px !important;
+        color: #4a5568 !important;
+        margin: 0 0 32px 0 !important;
+        line-height: 1.7 !important;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif !important;
+      }
+      
+      .card {
+        background-color: #f8f9fa !important;
+        border: 1px solid #e2e8f0 !important;
+        border-radius: 12px !important;
+        padding: 24px !important;
+        margin: 24px 0 !important;
+      }
+      
+      .card-title {
+        font-size: 18px !important;
+        font-weight: 600 !important;
+        color: #1a1a1a !important;
+        margin: 0 0 16px 0 !important;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif !important;
+      }
+      
+      .feature-list {
+        margin: 20px 0 !important;
+        padding: 0 !important;
+        list-style: none !important;
+      }
+      
+      .feature-list li {
+        padding: 8px 0 8px 24px !important;
+        position: relative !important;
+        color: #4a5568 !important;
+        font-size: 14px !important;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif !important;
+      }
+      
+      .feature-list li:before {
+        content: '✓' !important;
+        position: absolute !important;
+        left: 0 !important;
+        color: #10b981 !important;
+        font-weight: bold !important;
+      }
+      
+      .cta-button {
+        display: inline-block !important;
+        background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%) !important;
+        color: #ffffff !important;
+        padding: 16px 32px !important;
+        text-decoration: none !important;
+        border-radius: 8px !important;
+        font-weight: 600 !important;
+        font-size: 14px !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.5px !important;
+        margin: 24px 0 !important;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif !important;
+      }
+      
+      .highlight-box {
+        background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%) !important;
+        border-left: 4px solid #0ea5e9 !important;
+        padding: 20px !important;
+        border-radius: 8px !important;
+        margin: 24px 0 !important;
+      }
+      
+      .footer {
+        background-color: #f8f9fa !important;
+        padding: 32px 40px !important;
+        text-align: center !important;
+        border-top: 1px solid #e2e8f0 !important;
+      }
+      
+      .footer-content {
+        color: #6b7280 !important;
+        font-size: 13px !important;
+        line-height: 1.5 !important;
+        margin: 0 !important;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif !important;
+      }
+      
+      .footer-links {
+        margin: 16px 0 0 0 !important;
+      }
+      
+      .footer-links a {
+        color: #4a5568 !important;
+        text-decoration: none !important;
+        margin: 0 12px !important;
+        font-size: 13px !important;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif !important;
+      }
+      
+      .divider {
+        height: 1px !important;
+        background: linear-gradient(90deg, transparent, #e2e8f0, transparent) !important;
+        margin: 32px 0 !important;
+        border: none !important;
+      }
+      
+      /* Mobile responsive */
+      @media only screen and (max-width: 640px) {
+        .email-wrapper { padding: 20px 0 !important; }
+        .email-container { margin: 0 20px !important; border-radius: 12px !important; }
+        .header, .content, .footer { padding: 24px !important; }
+        .greeting { font-size: 20px !important; }
+        .cta-button { padding: 14px 24px !important; }
+      }
+    </style>
+</head>
+<body>
+    <div class="email-wrapper">
+      <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+        <tr>
+          <td>
+            <div class="email-container">
+              <div class="header">
+                <h1 class="logo">GENSWAVE</h1>
+                <p class="header-subtitle">Desarrollo Digital de Próxima Generación</p>
+              </div>
+              <div class="content">
+                <h2 class="greeting">¡Bienvenido a bordo, Miguel Rodríguez!</h2>
+                <p class="message">
+                  Nos emociona tenerte como parte de la familia Genswave. Tu cuenta ha sido creada exitosamente y ya puedes comenzar a explorar todas nuestras capacidades.
+                </p>
+                
+                <div class="card">
+                  <h3 class="card-title">🚀 Tu viaje digital comienza aquí</h3>
+                  <ul class="feature-list">
+                    <li>Acceso completo a nuestro dashboard personalizado</li>
+                    <li>Creación de solicitudes de proyectos detalladas</li>
+                    <li>Seguimiento en tiempo real del progreso</li>
+                    <li>Comunicación directa con nuestro equipo experto</li>
+                    <li>Gestión completa de tus proyectos digitales</li>
+                  </ul>
+                </div>
+                
+                <div class="highlight-box">
+                  <strong>💡 Consejo:</strong> Completa tu perfil para recibir recomendaciones personalizadas y acelerar el proceso de desarrollo de tus proyectos.
+                </div>
+                
+                <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                  <tr>
+                    <td align="center">
+                      <a href="https://genswave.org/dashboard" class="cta-button">Explorar Dashboard</a>
+                    </td>
+                  </tr>
+                </table>
+                
+                <hr class="divider">
+                
+                <p class="message">
+                  ¿Tienes preguntas? Nuestro equipo está aquí para ayudarte en cada paso del camino.
+                </p>
+              </div>
+              <div class="footer">
+                <p class="footer-content">
+                  <strong>GENSWAVE</strong><br>
+                  Transformando ideas en experiencias digitales excepcionales
+                </p>
+                <div class="footer-links">
+                  <a href="https://genswave.org">Sitio Web</a>
+                  <a href="https://genswave.org/services">Servicios</a>
+                  <a href="mailto:support@genswave.org">Soporte</a>
+                </div>
+                <p class="footer-content" style="margin-top: 16px; font-size: 12px;">
+                  © 2024 Genswave. Todos los derechos reservados.
+                </p>
+              </div>
+            </div>
+          </td>
+        </tr>
+      </table>
+    </div>
+</body>
+</html>
+  

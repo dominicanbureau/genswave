@@ -9,62 +9,45 @@ const processSteps = [
     number: '01',
     title: 'Descubrimiento',
     subtitle: 'Entendemos tu visión',
-    description: 'Comenzamos con una inmersión profunda en tu negocio, objetivos y desafíos. Realizamos investigación de mercado y análisis competitivo para establecer bases sólidas.',
+    description: 'Analizamos tu negocio y objetivos para establecer bases sólidas.',
     activities: [
-      'Reunión inicial y briefing',
+      'Reunión inicial',
       'Investigación de mercado',
-      'Análisis de competencia',
-      'Definición de objetivos',
-      'Identificación de audiencia',
-      'Propuesta de valor'
-    ],
-    deliverables: ['Fecha de Reunión', 'Roadmap inicial', 'Propuesta técnica'],
-    duration: '5 Horas'
+      'Análisis de competencia'
+    ]
   },
   {
     number: '02',
     title: 'Estrategia',
     subtitle: 'Planificamos el camino',
-    description: 'Diseñamos la arquitectura de información, definimos la experiencia de usuario y creamos un plan detallado que guiará todo el desarrollo del proyecto.',
+    description: 'Diseñamos la arquitectura y creamos un plan detallado del proyecto.',
     activities: [
       'Arquitectura de información',
-      'Estrategias de adaptación',
       'Definición de tecnologías',
-      'Planificación de proyecto',
-      'Estimación de recursos'
-    ],
-    deliverables: ['Arquitectura técnica', 'Cronograma detallado'],
-    duration: '2 Días'
+      'Planificación de proyecto'
+    ]
   },
   {
     number: '03',
     title: 'Diseño',
     subtitle: 'Creamos la experiencia',
-    description: 'Transformamos la estrategia en algo palpable. Creamos prototipos interactivos que permiten validar la experiencia antes del desarrollo.',
+    description: 'Transformamos la estrategia en prototipos interactivos.',
     activities: [
-      'Sistema de creación',
-      'UI mockups de alta calidad',
-      'Prototipos interactivos',
-      'Ajustes de diseño'
-    ],
-    deliverables: ['Modelo de demostración', 'Recomendaciones', 'Detalles finales'],
-    duration: '4 Días'
+      'Sistema de diseño',
+      'UI mockups',
+      'Prototipos interactivos'
+    ]
   },
   {
     number: '04',
     title: 'Finalización',
     subtitle: 'Garantizamos la calidad',
-    description: 'Realizamos pruebas exhaustivas en caso de haber solicitado sitios/apps. Optimizamos y te hacemos entrega del proyecto completo.',
+    description: 'Realizamos pruebas exhaustivas y entregamos el proyecto completo.',
     activities: [
-      'Prueba de funcionalidad',
-      'Prueba de rendimiento',
-      'Prueba de seguridad',
-      'Reajustes de servicio',
-      'Pago de cuotas restantes',
-      'Proceso de fidelización'
-    ],
-    deliverables: ['Reporte de resultados', 'Muestra de rendimiento', 'Certificaciones correspondientes'],
-    duration: '4 Días'
+      'Pruebas de funcionalidad',
+      'Optimización',
+      'Entrega final'
+    ]
   }
 ];
 
@@ -92,6 +75,10 @@ function ProcessPage() {
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
   }, []);
 
   const toggleTheme = () => {
@@ -298,98 +285,72 @@ function HeroSection() {
 }
 
 function TimelineSection({ scrollYProgress }) {
-  const lineHeight = useTransform(scrollYProgress, [0.1, 0.7], ['0%', '100%']);
-
   return (
     <section className="timeline-section">
       <div className="timeline-container">
-        <motion.div 
-          className="timeline-line"
-          style={{ scaleY: lineHeight }}
-        />
+        <div className="timeline-header">
+          <h2>Nuestro Proceso</h2>
+          <p>De la idea a la realidad en 4 pasos estructurados</p>
+        </div>
         
-        {processSteps.map((step, index) => (
-          <ProcessStep key={step.number} step={step} index={index} />
-        ))}
+        <div className="process-timeline">
+          <div className="timeline-line">
+            <motion.div 
+              className="timeline-progress"
+              style={{ scaleX: scrollYProgress }}
+            />
+          </div>
+          
+          <div className="timeline-steps">
+            {processSteps.map((step, index) => (
+              <ProcessTimelineStep key={step.number} step={step} index={index} />
+            ))}
+          </div>
+        </div>
       </div>
     </section>
   );
 }
 
-function ProcessStep({ step, index }) {
+function ProcessTimelineStep({ step, index }) {
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-100px" });
+  const isInView = useInView(ref, { once: true, margin: "-50px" });
 
   return (
     <motion.div
       ref={ref}
-      className="process-step"
-      initial={{ opacity: 0, y: 60 }}
+      className="timeline-step"
+      initial={{ opacity: 0, y: 30 }}
       animate={isInView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.8, delay: 0.2 }}
+      transition={{ duration: 0.6, delay: index * 0.2 }}
     >
       <motion.div 
-        className="step-number"
-        initial={{ scale: 0, opacity: 0 }}
-        animate={isInView ? { scale: 1, opacity: 1 } : {}}
-        transition={{ duration: 0.6, delay: 0.4, type: "spring", stiffness: 200 }}
+        className="step-marker"
+        initial={{ scale: 0 }}
+        animate={isInView ? { scale: 1 } : {}}
+        transition={{ duration: 0.4, delay: index * 0.2 + 0.3, type: "spring" }}
       >
-        {step.number}
+        <span className="step-number">{step.number}</span>
       </motion.div>
       
-      <motion.div 
-        className="step-content"
-        initial={{ opacity: 0, x: -30 }}
-        animate={isInView ? { opacity: 1, x: 0 } : {}}
-        transition={{ duration: 0.8, delay: 0.3 }}
-      >
-        <div className="step-header">
-          <div>
-            <h2>{step.title}</h2>
-            <h3>{step.subtitle}</h3>
-          </div>
-          <span className="step-duration">{step.duration}</span>
-        </div>
-        
-        <p className="step-description">{step.description}</p>
+      <div className="step-content">
+        <h3 className="step-title">{step.title}</h3>
+        <p className="step-subtitle">{step.subtitle}</p>
         
         <div className="step-details">
-          <div className="step-activities">
-            <h4>Actividades clave</h4>
-            <div className="activities-list">
-              {step.activities.map((activity, idx) => (
-                <motion.div
-                  key={idx}
-                  className="activity-item"
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={isInView ? { opacity: 1, x: 0 } : {}}
-                  transition={{ duration: 0.5, delay: 0.5 + idx * 0.08 }}
-                >
-                  <span className="activity-dot"></span>
-                  <span>{activity}</span>
-                </motion.div>
-              ))}
-            </div>
+          <div className="step-description">
+            {step.description}
           </div>
           
-          <div className="step-deliverables">
-            <h4>Entregables</h4>
-            <div className="deliverables-list">
-              {step.deliverables.map((deliverable, idx) => (
-                <motion.span
-                  key={idx}
-                  className="deliverable-tag"
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={isInView ? { opacity: 1, scale: 1 } : {}}
-                  transition={{ duration: 0.4, delay: 0.7 + idx * 0.1 }}
-                >
-                  {deliverable}
-                </motion.span>
-              ))}
-            </div>
+          <div className="activities-list">
+            {step.activities.map((activity, idx) => (
+              <span key={idx} className="activity-item">
+                {activity}
+              </span>
+            ))}
           </div>
         </div>
-      </motion.div>
+      </div>
     </motion.div>
   );
 }
@@ -489,12 +450,16 @@ function CTASection() {
           adaptar nuestro proceso a tus necesidades específicas
         </motion.p>
         <motion.div
+          className="cta-buttons"
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.8, delay: 0.4 }}
         >
-          <Link to="/contacto" className="cta-button">
+          <Link to="/contacto" className="cta-button primary">
             Agendar llamada
+          </Link>
+          <Link to="/servicios" className="cta-button secondary">
+            Ver Servicios
           </Link>
         </motion.div>
       </motion.div>

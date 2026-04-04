@@ -1179,7 +1179,7 @@ function Appointments({ appointments, requests, fetchData, setActiveTab }) {
                   </span>
                 </div>
                 <p className="appointment-date">
-                  Fecha preferida: {new Date(appointment.preferred_date).toLocaleDateString()}
+                  Fecha preferida: {appointment.preferred_date ? new Date(appointment.preferred_date).toLocaleDateString() : 'No especificada'}
                 </p>
                 {appointment.business_name && (
                   <p className="appointment-business">Negocio: {appointment.business_name}</p>

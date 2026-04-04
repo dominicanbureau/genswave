@@ -17,7 +17,6 @@ function ContactPage() {
     company: '',
     service: '',
     budget: '',
-    preferredDate: '',
     message: '',
     howFound: ''
   });
@@ -54,7 +53,14 @@ function ContactPage() {
       const response = await fetch('/api/appointments', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          businessName: formData.company,
+          service: formData.service,
+          message: formData.message
+        })
       });
       
       const data = await response.json();
@@ -63,7 +69,7 @@ function ContactPage() {
         setMessage({ text: '¡Mensaje enviado! Te contactaremos pronto.', type: 'success' });
         setFormData({
           name: '', email: '', phone: '', company: '', service: '',
-          budget: '', preferredDate: '', message: '', howFound: ''
+          budget: '', message: '', howFound: ''
         });
       } else {
         setMessage({ text: 'Error al enviar. Intenta de nuevo.', type: 'error' });
@@ -74,8 +80,6 @@ function ContactPage() {
     
     setTimeout(() => setMessage({ text: '', type: '' }), 5000);
   };
-
-  const today = new Date().toISOString().split('T')[0];
 
   return (
     <div className={isDarkMode ? 'dark-mode' : 'light-mode'}>
@@ -188,7 +192,6 @@ function ContactPage() {
           handleChange={handleChange}
           handleSubmit={handleSubmit}
           message={message}
-          today={today}
         />
         
         <InfoSection />
@@ -214,10 +217,14 @@ function HeroSection() {
   );
 }
 
-function FormSection({ formData, handleChange, handleSubmit, message, today }) {
+function FormSection({ formData, handleChange, handleSubmit, message }) {
   return (
     <section className="contact-form-section">
       <div className="form-container">
+        <div className="form-header">
+          <h2>Cuéntanos sobre tu proyecto</h2>
+          <p>Completa el formulario y nos pondremos en contacto contigo para discutir los detalles</p>
+        </div>
         <form className="contact-form" onSubmit={handleSubmit}>
           <div className="form-grid">
             <div className="form-field">
@@ -287,35 +294,21 @@ function FormSection({ formData, handleChange, handleSubmit, message, today }) {
             </select>
           </div>
           
-          <div className="form-grid">
-            <div className="form-field">
-              <label htmlFor="budget">Presupuesto estimado</label>
-              <select
-                id="budget"
-                name="budget"
-                value={formData.budget}
-                onChange={handleChange}
-              >
-                <option value="">Selecciona un rango</option>
-                <option value="5k-10k">$5,000 - $10,000</option>
-                <option value="10k-25k">$10,000 - $25,000</option>
-                <option value="25k-50k">$25,000 - $50,000</option>
-                <option value="50k+">$50,000+</option>
-              </select>
-            </div>
-            
-            <div className="form-field">
-              <label htmlFor="preferredDate">Fecha preferida para iniciar <span className="required">*</span></label>
-              <input
-                id="preferredDate"
-                name="preferredDate"
-                type="date"
-                value={formData.preferredDate}
-                onChange={handleChange}
-                min={today}
-                required
-              />
-            </div>
+          <div className="form-field">
+            <label htmlFor="budget">Presupuesto estimado</label>
+            <select
+              id="budget"
+              name="budget"
+              value={formData.budget}
+              onChange={handleChange}
+            >
+              <option value="">Selecciona un rango</option>
+              <option value="not-sure">No estoy seguro</option>
+              <option value="5k-10k">$5,000 - $10,000</option>
+              <option value="10k-25k">$10,000 - $25,000</option>
+              <option value="25k-50k">$25,000 - $50,000</option>
+              <option value="50k+">$50,000+</option>
+            </select>
           </div>
           
           <div className="form-field">

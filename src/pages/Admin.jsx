@@ -321,7 +321,11 @@ function UsersSection() {
 // Appointments Section Component
 function AppointmentsSection() {
   const [appointments, setAppointments] = useState([]);
-  const [requests, setRequests] = useState([]);
+  const [serviceRequests, setServiceRequests] = useState([]);
+  const [dashboardRequests, setDashboardRequests] = useState([]);
+  const [showArchived, setShowArchived] = useState(false);
+  const [archivedAppointments, setArchivedAppointments] = useState([]);
+  const [archivedRequests, setArchivedRequests] = useState([]);
 
   useEffect(() => {
     loadAppointments();
@@ -342,9 +346,90 @@ function AppointmentsSection() {
     try {
       const response = await fetch('/api/requests/admin/requests');
       const data = await response.json();
-      setRequests(data);
+      // Separate service form requests from dashboard requests
+      const serviceFormRequests = data.filter(r => r.request_type === 'formulario_servicios');
+      const dashboardOnlyRequests = data.filter(r => r.request_type === 'panel');
+      setServiceRequests(serviceFormRequests);
+      setDashboardRequests(dashboardOnlyRequests);
     } catch (error) {
       console.error('Error al cargar solicitudes:', error);
+    }
+  };
+
+  const loadArchivedItems = async () => {
+    try {
+      const [appointmentsRes, requestsRes] = await Promise.all([
+        fetch('/api/appointments/archived'),
+        fetch('/api/requests/admin/requests/archived')
+      ]);
+      
+      const archivedAppts = await appointmentsRes.json();
+      const archivedReqs = await requestsRes.json();
+      
+      setArchivedAppointments(archivedAppts);
+      setArchivedRequests(archivedReqs);
+    } catch (error) {
+      console.error('Error al cargar elementos archivados:', error);
+    }
+  };
+
+  const archiveAppointment = async (id) => {
+    try {
+      const response = await fetch(`/api/appointments/${id}/archive`, {
+        method: 'PATCH'
+      });
+      
+      if (response.ok) {
+        loadAppointments();
+        loadArchivedItems();
+      }
+    } catch (error) {
+      console.error('Error al archivar cita:', error);
+    }
+  };
+
+  const archiveRequest = async (id) => {
+    try {
+      const response = await fetch(`/api/requests/admin/requests/${id}/archive`, {
+        method: 'PATCH'
+      });
+      
+      if (response.ok) {
+        loadRequests();
+        loadArchivedItems();
+      }
+    } catch (error) {
+      console.error('Error al archivar solicitud:', error);
+    }
+  };
+
+  const unarchiveAppointment = async (id) => {
+    try {
+      const response = await fetch(`/api/appointments/${id}/unarchive`, {
+        method: 'PATCH'
+      });
+      
+      if (response.ok) {
+        loadAppointments();
+        loadArchivedItems();
+      }
+    } catch (error) {
+      console.error('Error al desarchivar cita:', error);
+    }
+  };
+
+  const unarchiveRequest = async (id) => {
+    try {
+      const response = await fetch(`/api/requests/admin/requests/${id}/unarchive`, {
+        method: 'PATCH'
+      });
+      
+      if (response.ok) {
+        loadRequests();
+        loadArchivedItems();
+      }
+    } catch (error) {
+      console.error('Error al desarchivar solicitud:', error);
     }
   };
 
@@ -424,133 +509,275 @@ function AppointmentsSection() {
     >
       <h1>GESTIÓN DE SOLICITUDES</h1>
       
-      {/* Appointments from main form */}
+      {/* Archive toggle button */}
+      <div className="archive-controls">
+        <motion.button
+          className={`btn-archive-toggle ${showArchived ? 'active' : ''}`}
+          onClick={() => {
+            setShowArchived(!showArchived);
+            if (!showArchived) {
+              loadArchivedItems();
+            }
+          }}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+            <path d="M9 9h6v6H9z"/>
+          </svg>
+          {showArchived ? 'Ver Activas' : 'Ver Archivadas'}
+          {!showArchived && (archivedAppointments.length + archivedRequests.length > 0) && (
+            <span className="archive-count">
+              {archivedAppointments.length + archivedRequests.length}
+            </span>
+          )}
+        </motion.button>
+      </div>
+      
+      {/* Appointments from main form and service requests */}
       <div className="appointments-section">
-        <h2>Solicitudes desde Formulario Principal</h2>
+        <h2>
+          {showArchived ? 'Citas Archivadas' : 'Solicitudes de Citas'} 
+          ({showArchived ? 
+            archivedAppointments.length + archivedRequests.filter(r => r.request_type === 'formulario_servicios').length : 
+            appointments.length + serviceRequests.length
+          })
+        </h2>
         <div className="appointments-accordion">
-          {appointments.length === 0 ? (
-            <p className="empty-state">No hay solicitudes del formulario</p>
+          {showArchived ? (
+            // Show archived items
+            archivedAppointments.length === 0 && archivedRequests.filter(r => r.request_type === 'formulario_servicios').length === 0 ? (
+              <p className="empty-state">No hay citas archivadas</p>
+            ) : (
+              <>
+                {/* Archived appointments */}
+                {archivedAppointments.map((apt, index) => (
+                  <AppointmentAccordionItem
+                    key={`archived-apt-${apt.id}`}
+                    appointment={apt}
+                    index={index}
+                    onUpdateStatus={updateStatus}
+                    onDelete={deleteAppointment}
+                    onArchive={unarchiveAppointment}
+                    getStatusText={getStatusText}
+                    isArchived={true}
+                  />
+                ))}
+                {/* Archived service requests */}
+                {archivedRequests.filter(r => r.request_type === 'formulario_servicios').map((request, index) => (
+                  <AppointmentAccordionItem
+                    key={`archived-req-${request.id}`}
+                    appointment={{
+                      ...request,
+                      name: request.user_name,
+                      email: request.user_email,
+                      phone: request.contact_phone,
+                      message: request.additional_notes || request.description,
+                      preferred_date: null,
+                      service: request.title.replace('Solicitud de información - ', ''),
+                      type: 'service_request'
+                    }}
+                    index={archivedAppointments.length + index}
+                    onUpdateStatus={updateRequestStatus}
+                    onDelete={deleteRequest}
+                    onArchive={unarchiveRequest}
+                    getStatusText={getStatusText}
+                    isArchived={true}
+                  />
+                ))}
+              </>
+            )
           ) : (
-            appointments.map((apt, index) => (
-              <AppointmentAccordionItem
-                key={apt.id}
-                appointment={apt}
-                index={index}
-                onUpdateStatus={updateStatus}
-                onDelete={deleteAppointment}
-                getStatusText={getStatusText}
-              />
-            ))
+            // Show active items
+            appointments.length === 0 && serviceRequests.length === 0 ? (
+              <p className="empty-state">No hay solicitudes del formulario</p>
+            ) : (
+              <>
+                {/* Regular appointments */}
+                {appointments.map((apt, index) => (
+                  <AppointmentAccordionItem
+                    key={`apt-${apt.id}`}
+                    appointment={apt}
+                    index={index}
+                    onUpdateStatus={updateStatus}
+                    onDelete={deleteAppointment}
+                    onArchive={archiveAppointment}
+                    getStatusText={getStatusText}
+                    isArchived={false}
+                  />
+                ))}
+                {/* Service form requests */}
+                {serviceRequests.map((request, index) => (
+                  <AppointmentAccordionItem
+                    key={`req-${request.id}`}
+                    appointment={{
+                      ...request,
+                      name: request.user_name,
+                      email: request.user_email,
+                      phone: request.contact_phone,
+                      message: request.additional_notes || request.description,
+                      preferred_date: null,
+                      service: request.title.replace('Solicitud de información - ', ''),
+                      type: 'service_request'
+                    }}
+                    index={appointments.length + index}
+                    onUpdateStatus={updateRequestStatus}
+                    onDelete={deleteRequest}
+                    onArchive={archiveRequest}
+                    getStatusText={getStatusText}
+                    isArchived={false}
+                  />
+                ))}
+              </>
+            )
           )}
         </div>
       </div>
-      {/* Detailed requests from dashboard */}
-      <div className="requests-section">
-        <h2>Solicitudes Detalladas desde Dashboard</h2>
-        <div className="requests-grid-admin">
-          {requests.length === 0 ? (
-            <p className="empty-state">No hay solicitudes detalladas</p>
-          ) : (
-            requests.map((request, index) => (
-              <motion.div
-                key={request.id}
-                className="request-card-admin"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.05 * index }}
-                whileHover={{ y: -4 }}
-              >
-                <div className="request-header">
-                  <div>
-                    <h3>{request.title}</h3>
-                    <p className="request-user">Usuario: {request.user_name}</p>
-                    <p className="request-type-label">{request.project_type}</p>
+      
+      {/* Dashboard requests section */}
+      {!showArchived && (
+        <div className="requests-section">
+          <h2>Solicitudes del Dashboard ({dashboardRequests.length})</h2>
+          <div className="requests-grid-admin">
+            {dashboardRequests.length === 0 ? (
+              <p className="empty-state">No hay solicitudes del dashboard</p>
+            ) : (
+              dashboardRequests.map((request, index) => (
+                <motion.div
+                  key={request.id}
+                  className="request-card-admin"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.05 * index }}
+                  whileHover={{ y: -4 }}
+                  onMouseDown={(e) => {
+                    const timer = setTimeout(() => {
+                      archiveRequest(request.id);
+                    }, 1000); // 1 second hold
+                    
+                    const handleMouseUp = () => {
+                      clearTimeout(timer);
+                      document.removeEventListener('mouseup', handleMouseUp);
+                    };
+                    
+                    document.addEventListener('mouseup', handleMouseUp);
+                  }}
+                >
+                  <div className="request-header">
+                    <div>
+                      <h3>{request.title}</h3>
+                      <p className="request-user">Usuario: {request.user_name}</p>
+                      <p className="request-type-label">{request.project_type}</p>
+                    </div>
+                    <span className={`status-badge status-${request.status}`}>
+                      {getStatusText(request.status)}
+                    </span>
                   </div>
-                  <span className={`status-badge status-${request.status}`}>
-                    {getStatusText(request.status)}
-                  </span>
-                </div>
 
-                <p className="request-description">{request.description}</p>
+                  <p className="request-description">{request.description}</p>
 
-                <div className="request-details-grid">
-                  {request.budget_range && (
-                    <div className="detail-tag">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <line x1="12" y1="1" x2="12" y2="23"/>
-                        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-                      </svg>
-                      {request.budget_range}
-                    </div>
-                  )}
-                  {request.timeline && (
-                    <div className="detail-tag">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <circle cx="12" cy="12" r="10"/>
-                        <polyline points="12 6 12 12 16 14"/>
-                      </svg>
-                      {request.timeline}
-                    </div>
-                  )}
-                  {request.budget && (
-                    <div className="detail-tag">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <line x1="12" y1="1" x2="12" y2="23"/>
-                        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-                      </svg>
-                      ${request.budget}
-                    </div>
-                  )}
-                </div>
-
-                {request.attachments && request.attachments.length > 0 && (
-                  <div className="request-attachments">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/>
-                    </svg>
-                    <span>{request.attachments.length} archivo(s)</span>
+                  <div className="request-details-grid">
+                    {request.budget_range && (
+                      <div className="detail-tag">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <line x1="12" y1="1" x2="12" y2="23"/>
+                          <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                        </svg>
+                        {request.budget_range}
+                      </div>
+                    )}
+                    {request.timeline && (
+                      <div className="detail-tag">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <circle cx="12" cy="12" r="10"/>
+                          <polyline points="12 6 12 12 16 14"/>
+                        </svg>
+                        {request.timeline}
+                      </div>
+                    )}
+                    {request.budget && (
+                      <div className="detail-tag">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <line x1="12" y1="1" x2="12" y2="23"/>
+                          <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                        </svg>
+                        ${request.budget}
+                      </div>
+                    )}
                   </div>
-                )}
 
-                <div className="request-actions">
-                  {request.status === 'pending' && (
+                  {request.attachments && request.attachments.length > 0 && (
+                    <div className="request-attachments">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/>
+                      </svg>
+                      <span>{request.attachments.length} archivo(s)</span>
+                    </div>
+                  )}
+
+                  <div className="request-actions">
+                    {request.status === 'pending' && (
+                      <motion.button
+                        className="btn-action btn-confirm"
+                        onClick={() => updateRequestStatus(request.id, 'confirmed')}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                      >
+                        Aprobar
+                      </motion.button>
+                    )}
                     <motion.button
-                      className="btn-action btn-confirm"
-                      onClick={() => updateRequestStatus(request.id, 'confirmed')}
+                      className="btn-action btn-delete"
+                      onClick={() => deleteRequest(request.id)}
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                     >
-                      Aprobar
+                      Eliminar
                     </motion.button>
-                  )}
-                  <motion.button
-                    className="btn-action btn-delete"
-                    onClick={() => deleteRequest(request.id)}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    Eliminar
-                  </motion.button>
-                </div>
-              </motion.div>
-            ))
-          )}
+                  </div>
+                </motion.div>
+              ))
+            )}
+          </div>
         </div>
-      </div>
+      )}
     </motion.div>
   );
 }
 
 // Appointment Accordion Item Component
-function AppointmentAccordionItem({ appointment, index, onUpdateStatus, onDelete, getStatusText }) {
+function AppointmentAccordionItem({ appointment, index, onUpdateStatus, onDelete, onArchive, getStatusText, isArchived }) {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isHolding, setIsHolding] = useState(false);
+
+  const handleMouseDown = (e) => {
+    if (isArchived) return; // Don't allow archiving if already archived
+    
+    setIsHolding(true);
+    const timer = setTimeout(() => {
+      onArchive(appointment.id);
+      setIsHolding(false);
+    }, 1000); // 1 second hold
+    
+    const handleMouseUp = () => {
+      clearTimeout(timer);
+      setIsHolding(false);
+      document.removeEventListener('mouseup', handleMouseUp);
+      document.removeEventListener('mouseleave', handleMouseUp);
+    };
+    
+    document.addEventListener('mouseup', handleMouseUp);
+    document.addEventListener('mouseleave', handleMouseUp);
+  };
 
   return (
     <motion.div
-      className="appointment-accordion-item"
+      className={`appointment-accordion-item ${isHolding ? 'holding' : ''} ${isArchived ? 'archived' : ''}`}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.05 * index }}
+      onMouseDown={handleMouseDown}
     >
       <motion.div
         className="appointment-accordion-header"
@@ -564,13 +791,19 @@ function AppointmentAccordionItem({ appointment, index, onUpdateStatus, onDelete
             {appointment.business_name && (
               <span className="appointment-summary-business">{appointment.business_name}</span>
             )}
+            {appointment.service && (
+              <span className="appointment-summary-service">Servicio: {appointment.service}</span>
+            )}
           </div>
           <div className="appointment-summary-meta">
+            {isArchived && (
+              <span className="archived-badge">Archivada</span>
+            )}
             <span className={`status-badge-small status-${appointment.status}`}>
               {getStatusText(appointment.status)}
             </span>
             <span className="appointment-date">
-              {new Date(appointment.preferred_date).toLocaleDateString('es-ES')}
+              {appointment.preferred_date ? new Date(appointment.preferred_date).toLocaleDateString('es-ES') : 'No especificada'}
             </span>
           </div>
         </div>
@@ -610,7 +843,7 @@ function AppointmentAccordionItem({ appointment, index, onUpdateStatus, onDelete
                 <line x1="8" y1="2" x2="8" y2="6"/>
                 <line x1="3" y1="10" x2="21" y2="10"/>
               </svg>
-              <span>{new Date(appointment.preferred_date).toLocaleDateString('es-ES')}</span>
+              <span>{appointment.preferred_date ? new Date(appointment.preferred_date).toLocaleDateString('es-ES') : 'No especificada'}</span>
             </div>
           </div>
 
@@ -622,25 +855,38 @@ function AppointmentAccordionItem({ appointment, index, onUpdateStatus, onDelete
           )}
 
           <div className="appointment-actions">
-            {appointment.status === 'pending' && (
+            {isArchived ? (
               <motion.button
-                className="btn-action btn-confirm"
-                onClick={() => onUpdateStatus(appointment.id, 'confirmed')}
+                className="btn-action btn-unarchive"
+                onClick={() => onArchive(appointment.id)}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
-                Confirmar
+                Desarchivar
               </motion.button>
-            )}
-            {appointment.status === 'confirmed' && (
-              <motion.button
-                className="btn-action btn-complete"
-                onClick={() => onUpdateStatus(appointment.id, 'completed')}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                Completar
-              </motion.button>
+            ) : (
+              <>
+                {appointment.status === 'pending' && (
+                  <motion.button
+                    className="btn-action btn-confirm"
+                    onClick={() => onUpdateStatus(appointment.id, 'confirmed')}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    Confirmar
+                  </motion.button>
+                )}
+                {appointment.status === 'confirmed' && (
+                  <motion.button
+                    className="btn-action btn-complete"
+                    onClick={() => onUpdateStatus(appointment.id, 'completed')}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    Completar
+                  </motion.button>
+                )}
+              </>
             )}
             <motion.button
               className="btn-action btn-delete"
@@ -801,6 +1047,40 @@ function ChatsSection() {
       }
       return prev.filter(att => att.id !== id);
     });
+  };
+
+  const sendEmailNotification = async (message) => {
+    try {
+      if (!selectedConversation) return;
+      
+      const response = await fetch('/api/requests/admin/send-message-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: selectedConversation.id,
+          message: message.message,
+          adminName: 'Equipo Genswave' // Could be dynamic based on logged admin
+        })
+      });
+
+      if (response.ok) {
+        // Show success notification (you could add a toast notification here)
+        console.log('✅ Email notification sent successfully');
+        
+        // Optional: Add visual feedback
+        const button = document.querySelector(`[data-message-id="${message.id}"] .btn-email-message`);
+        if (button) {
+          button.style.color = '#10b981';
+          setTimeout(() => {
+            button.style.color = '';
+          }, 2000);
+        }
+      } else {
+        console.error('❌ Failed to send email notification');
+      }
+    } catch (error) {
+      console.error('Error sending email notification:', error);
+    }
   };
 
   const sendMessage = async (e) => {
@@ -1208,19 +1488,35 @@ function ChatsSection() {
                       <div className="message-content">
                         <div className="message-header">
                           <p>{message.message}</p>
-                          <motion.button
-                            className="btn-delete-message"
-                            onClick={() => deleteMessage(message.id)}
-                            whileHover={{ scale: 1.1 }}
-                            whileTap={{ scale: 0.9 }}
-                            title="Eliminar mensaje"
-                          >
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                              <path d="M3 6h18"/>
-                              <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
-                              <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
-                            </svg>
-                          </motion.button>
+                          <div className="message-actions">
+                            {message.sender_role === 'admin' && (
+                              <motion.button
+                                className="btn-email-message"
+                                onClick={() => sendEmailNotification(message)}
+                                whileHover={{ scale: 1.1 }}
+                                whileTap={{ scale: 0.9 }}
+                                title="Enviar email al usuario"
+                              >
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                                  <polyline points="22,6 12,13 2,6"/>
+                                </svg>
+                              </motion.button>
+                            )}
+                            <motion.button
+                              className="btn-delete-message"
+                              onClick={() => deleteMessage(message.id)}
+                              whileHover={{ scale: 1.1 }}
+                              whileTap={{ scale: 0.9 }}
+                              title="Eliminar mensaje"
+                            >
+                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                <path d="M3 6h18"/>
+                                <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
+                                <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
+                              </svg>
+                            </motion.button>
+                          </div>
                         </div>
                         {message.attachments && message.attachments.length > 0 && (
                           <div className="message-attachments">

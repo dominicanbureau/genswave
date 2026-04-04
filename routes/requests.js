@@ -1,6 +1,6 @@
 import express from 'express';
 import db from '../database.js';
-import { sendRequestCreatedEmail, sendRequestStatusUpdateEmail } from '../utils/emailService.js';
+import { sendRequestCreatedEmail, sendRequestStatusUpdateEmail, sendRequestApprovedEmail, sendAdminMessageNotification } from '../utils/emailService.js';
 
 const router = express.Router();
 
@@ -24,9 +24,13 @@ const requireAdmin = (req, res, next) => {
 router.get('/admin/requests', requireAdmin, async (req, res) => {
     try {
         const result = await db.query(`
-            SELECT r.*, u.name as user_name, u.email as user_email
+            SELECT r.*, 
+                   COALESCE(u.name, r.contact_name) as user_name, 
+                   COALESCE(u.email, r.contact_email) as user_email,
+                   r.request_type
             FROM requests r
-            JOIN users u ON r.user_id = u.id
+            LEFT JOIN users u ON r.user_id = u.id
+            WHERE r.archived = FALSE OR r.archived IS NULL
             ORDER BY r.created_at DESC
         `);
         
@@ -45,7 +49,7 @@ router.patch('/admin/requests/:id/status', requireAdmin, async (req, res) => {
 
         // Get current request data for comparison
         const currentRequest = await db.query(
-            'SELECT r.*, u.name as user_name, u.email as user_email FROM requests r JOIN users u ON r.user_id = u.id WHERE r.id = $1',
+            'SELECT r.*, COALESCE(u.name, r.contact_name) as user_name, COALESCE(u.email, r.contact_email) as user_email FROM requests r LEFT JOIN users u ON r.user_id = u.id WHERE r.id = $1',
             [id]
         );
 
@@ -69,8 +73,16 @@ router.patch('/admin/requests/:id/status', requireAdmin, async (req, res) => {
             try {
                 const user = currentRequest.rows[0];
                 const updatedRequest = { ...result.rows[0], title: user.title };
-                await sendRequestStatusUpdateEmail(user.user_email, user.user_name, updatedRequest, previousStatus);
-                console.log(`✅ Request status update email sent to ${user.user_email} for request ${updatedRequest.unique_id}`);
+                
+                // Send special approval email if status is confirmed/approved
+                if (status === 'confirmed') {
+                    await sendRequestApprovedEmail(user.user_email, user.user_name, updatedRequest);
+                    console.log(`✅ Request approval email sent to ${user.user_email} for request ${updatedRequest.unique_id}`);
+                } else {
+                    // Send regular status update email for other status changes
+                    await sendRequestStatusUpdateEmail(user.user_email, user.user_name, updatedRequest, previousStatus);
+                    console.log(`✅ Request status update email sent to ${user.user_email} for request ${updatedRequest.unique_id}`);
+                }
             } catch (emailError) {
                 console.error('❌ Failed to send request status update email:', emailError);
                 // Don't fail update if email fails
@@ -149,6 +161,49 @@ router.get('/check-limit', requireAuth, async (req, res) => {
     } catch (error) {
         console.error('Error al verificar límite:', error);
         res.status(500).json({ error: 'Error en el servidor' });
+    }
+});
+
+// Create request from services form (no auth required)
+router.post('/services-form', async (req, res) => {
+    try {
+        const { nombre, correo, numero, nota, servicio } = req.body;
+
+        // Validate required fields
+        if (!nombre || !correo || !servicio) {
+            return res.status(400).json({ 
+                error: 'Faltan campos requeridos: nombre, correo y servicio son obligatorios' 
+            });
+        }
+
+        // Generate unique ID for request
+        const uniqueId = 'SF' + Math.floor(Math.random() * 900000 + 100000).toString();
+
+        const result = await db.query(
+            `INSERT INTO requests (
+                title, description, project_type, status, unique_id, contact_name, contact_email, 
+                contact_phone, additional_notes, created_at, updated_at, request_type
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, $10) 
+            RETURNING *`,
+            [
+                `Solicitud de información - ${servicio}`,
+                `Solicitud de información para el servicio: ${servicio}`,
+                'consulta', // Default project type for service inquiries
+                'pendiente',
+                uniqueId,
+                nombre,
+                correo,
+                numero || null,
+                nota || null,
+                'formulario_servicios'
+            ]
+        );
+
+        console.log('✅ Services form request created:', uniqueId);
+        res.json({ success: true, request: result.rows[0] });
+    } catch (error) {
+        console.error('❌ Error al crear solicitud desde formulario de servicios:', error);
+        res.status(500).json({ error: 'Error al crear la solicitud' });
     }
 });
 
@@ -306,3 +361,104 @@ router.delete('/:id', requireAuth, async (req, res) => {
 });
 
 export default router;
+// Archive request (admin only)
+router.patch('/admin/requests/:id/archive', requireAdmin, async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const result = await db.query(
+            'UPDATE requests SET archived = TRUE, updated_at = CURRENT_TIMESTAMP WHERE id = $1 RETURNING *',
+            [id]
+        );
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ error: 'Solicitud no encontrada' });
+        }
+
+        res.json({ success: true, request: result.rows[0] });
+    } catch (error) {
+        console.error('Error al archivar solicitud:', error);
+        res.status(500).json({ error: 'Error al archivar la solicitud' });
+    }
+});
+
+// Unarchive request (admin only)
+router.patch('/admin/requests/:id/unarchive', requireAdmin, async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const result = await db.query(
+            'UPDATE requests SET archived = FALSE, updated_at = CURRENT_TIMESTAMP WHERE id = $1 RETURNING *',
+            [id]
+        );
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ error: 'Solicitud no encontrada' });
+        }
+
+        res.json({ success: true, request: result.rows[0] });
+    } catch (error) {
+        console.error('Error al desarchivar solicitud:', error);
+        res.status(500).json({ error: 'Error al desarchivar la solicitud' });
+    }
+});
+
+// Get archived requests (admin only)
+router.get('/admin/requests/archived', requireAdmin, async (req, res) => {
+    try {
+        const result = await db.query(`
+            SELECT r.*, 
+                   COALESCE(u.name, r.contact_name) as user_name, 
+                   COALESCE(u.email, r.contact_email) as user_email,
+                   r.request_type
+            FROM requests r
+            LEFT JOIN users u ON r.user_id = u.id
+            WHERE r.archived = TRUE
+            ORDER BY r.updated_at DESC
+        `);
+        
+        res.json(result.rows);
+    } catch (error) {
+        console.error('Error al obtener solicitudes archivadas:', error);
+        res.status(500).json({ error: 'Error en el servidor' });
+    }
+});
+// Send email notification for admin message (admin only)
+router.post('/admin/send-message-email', requireAdmin, async (req, res) => {
+    try {
+        const { userId, message, adminName } = req.body;
+
+        // Get user information
+        const userResult = await db.query(
+            'SELECT name, email FROM users WHERE id = $1',
+            [userId]
+        );
+
+        if (userResult.rows.length === 0) {
+            return res.status(404).json({ error: 'Usuario no encontrado' });
+        }
+
+        const user = userResult.rows[0];
+
+        // Send email notification
+        const emailResult = await sendAdminMessageNotification(
+            user.email,
+            user.name,
+            {
+                message,
+                adminName,
+                timestamp: new Date(),
+                projectTitle: null // Could be enhanced to include project context
+            }
+        );
+
+        if (emailResult.success) {
+            res.json({ success: true, message: 'Email enviado correctamente' });
+        } else {
+            res.status(500).json({ error: 'Error al enviar email' });
+        }
+    } catch (error) {
+        console.error('Error al enviar email de mensaje:', error);
+        res.status(500).json({ error: 'Error en el servidor' });
+    }
+});

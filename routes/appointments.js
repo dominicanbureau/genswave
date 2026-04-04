@@ -23,7 +23,7 @@ router.post('/', async (req, res) => {
         const result = await db.query(
             `INSERT INTO appointments (name, email, phone, business_name, service, message, preferred_date, unique_id) 
              VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
-            [name, email, phone, businessName || null, service, message, preferredDate, uniqueId]
+            [name, email, phone, businessName || null, service, message, preferredDate || null, uniqueId]
         );
 
         res.json({ success: true, appointment: result.rows[0] });
@@ -42,10 +42,10 @@ router.get('/', requireAuth, async (req, res) => {
         let query, params;
         
         if (isAdmin) {
-            query = 'SELECT * FROM appointments ORDER BY created_at DESC';
+            query = 'SELECT * FROM appointments WHERE archived = FALSE OR archived IS NULL ORDER BY created_at DESC';
             params = [];
         } else {
-            query = 'SELECT * FROM appointments WHERE user_id = $1 ORDER BY created_at DESC';
+            query = 'SELECT * FROM appointments WHERE user_id = $1 AND (archived = FALSE OR archived IS NULL) ORDER BY created_at DESC';
             params = [userId];
         }
         
@@ -129,3 +129,74 @@ router.delete('/:id', requireAuth, async (req, res) => {
 });
 
 export default router;
+// Archive appointment (admin only)
+router.patch('/:id/archive', requireAuth, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const isAdmin = req.session.user?.role === 'admin';
+        
+        if (!isAdmin) {
+            return res.status(403).json({ error: 'No autorizado' });
+        }
+
+        const result = await db.query(
+            'UPDATE appointments SET archived = TRUE, updated_at = CURRENT_TIMESTAMP WHERE id = $1 RETURNING *',
+            [id]
+        );
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ error: 'Cita no encontrada' });
+        }
+
+        res.json({ success: true, appointment: result.rows[0] });
+    } catch (error) {
+        console.error('Error al archivar cita:', error);
+        res.status(500).json({ error: 'Error al archivar la cita' });
+    }
+});
+
+// Unarchive appointment (admin only)
+router.patch('/:id/unarchive', requireAuth, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const isAdmin = req.session.user?.role === 'admin';
+        
+        if (!isAdmin) {
+            return res.status(403).json({ error: 'No autorizado' });
+        }
+
+        const result = await db.query(
+            'UPDATE appointments SET archived = FALSE, updated_at = CURRENT_TIMESTAMP WHERE id = $1 RETURNING *',
+            [id]
+        );
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ error: 'Cita no encontrada' });
+        }
+
+        res.json({ success: true, appointment: result.rows[0] });
+    } catch (error) {
+        console.error('Error al desarchivar cita:', error);
+        res.status(500).json({ error: 'Error al desarchivar la cita' });
+    }
+});
+
+// Get archived appointments (admin only)
+router.get('/archived', requireAuth, async (req, res) => {
+    try {
+        const isAdmin = req.session.user?.role === 'admin';
+        
+        if (!isAdmin) {
+            return res.status(403).json({ error: 'No autorizado' });
+        }
+
+        const result = await db.query(
+            'SELECT * FROM appointments WHERE archived = TRUE ORDER BY updated_at DESC'
+        );
+        
+        res.json(result.rows);
+    } catch (error) {
+        console.error('Error al obtener citas archivadas:', error);
+        res.status(500).json({ error: 'Error en el servidor' });
+    }
+});

@@ -19,6 +19,19 @@ function AIAssistant() {
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
 
+  // Prevent body scroll when chat is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isOpen]);
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
@@ -234,6 +247,8 @@ function AIAssistant() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ duration: 0.3, ease: "easeOut" }}
+            onWheel={(e) => e.stopPropagation()}
+            onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
             <div className="chat-header">

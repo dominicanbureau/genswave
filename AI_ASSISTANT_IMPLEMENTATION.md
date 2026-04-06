@@ -1,8 +1,8 @@
-# 🤖 Implementación del Asistente Virtual con IA
+# 🤖 Implementación del Asistente Virtual con IA (Google Gemini)
 
 ## Resumen de la Implementación
 
-Se ha implementado exitosamente un asistente virtual avanzado con IA y machine learning para Genswave, con conocimiento completo del sitio web, servicios, backend y todas las funcionalidades.
+Se ha implementado exitosamente un asistente virtual avanzado con IA usando Google Gemini 2.5 Flash para Genswave, con conocimiento completo del sitio web, servicios, backend y todas las funcionalidades. El asistente es extremadamente conversacional, persuasivo y capaz de manejar objeciones profesionalmente.
 
 ## ✅ Componentes Implementados
 
@@ -21,14 +21,24 @@ Se ha implementado exitosamente un asistente virtual avanzado con IA y machine l
 - Transferencia automática a soporte humano cuando sea necesario
 
 **Funcionalidades:**
-- Respuestas instantáneas basadas en conocimiento del sitio
+- Respuestas instantáneas con Google Gemini AI
+- Conversación natural y persuasiva
 - Navegación asistida con botones de acción
 - Transferencia inteligente a soporte humano
 - Historial de conversación persistente
 - Indicadores visuales de estado
+- Scroll aislado (no afecta el scroll de la página)
+- Prevención de scroll del body cuando el chat está abierto
 
-### 2. Backend - API Routes
+### 2. Backend - API Routes con Google Gemini
 **Archivo:** `routes/aiAssistant.js`
+
+**Integración con Google Gemini:**
+- Modelo: `gemini-2.5-flash` (free tier)
+- API Key: Configurada en `.env` como `GEMINI_API_KEY`
+- Temperatura: 0.9 (muy conversacional)
+- Max tokens: 1000
+- Sistema de prompts completo con toda la información de Genswave
 
 **Endpoints Implementados:**
 
@@ -218,10 +228,10 @@ El sistema almacena:
 
 ## 🚀 Próximos Pasos (Mejoras Futuras)
 
-1. **Integración con OpenAI GPT-4**
-   - Respuestas más naturales y contextuales
-   - Mejor comprensión de intenciones
-   - Aprendizaje continuo
+1. **Optimización de Gemini**
+   - Fine-tuning del modelo con conversaciones reales
+   - Ajuste de temperatura y parámetros
+   - Mejora continua del system prompt
 
 2. **Machine Learning Real**
    - Entrenamiento con conversaciones reales
@@ -251,41 +261,75 @@ El sistema almacena:
 ## 🔧 Mantenimiento
 
 ### Actualizar Base de Conocimiento
-Editar el archivo `routes/aiAssistant.js` en la función `generateAIResponse()` para agregar o modificar respuestas.
+Editar el archivo `routes/aiAssistant.js` en la constante `SYSTEM_PROMPT` para agregar o modificar información que el AI debe conocer.
 
 ### Agregar Nuevos Servicios
-Actualizar el objeto `responses.services` con la nueva información.
+Actualizar la sección de servicios en `SYSTEM_PROMPT` con la nueva información.
 
-### Modificar Comportamiento
-Ajustar la lógica de matching de keywords y respuestas en la función `generateAIResponse()`.
+### Modificar Comportamiento del AI
+Ajustar el `SYSTEM_PROMPT` para cambiar la personalidad, tono o estilo de respuestas del asistente.
+
+### Configurar API Key de Gemini
+La API key se configura en el archivo `.env`:
+```
+GEMINI_API_KEY=AIzaSyAYwwxDzjq3NedHz5uM3U1umYJxQvhubt4
+```
 
 ## 📝 Notas Técnicas
 
-- El AI actualmente usa un sistema de matching de keywords
-- Las respuestas están pre-programadas pero son muy completas
-- El sistema es escalable para integrar IA real (GPT-4, etc.)
+- El AI usa Google Gemini 2.5 Flash (modelo gratuito)
+- Las respuestas son generadas en tiempo real por el modelo
+- System prompt completo con toda la información de Genswave
 - Todas las conversaciones se almacenan para análisis futuro
 - El sistema es seguro y no expone información sensible
+- Scroll del chat aislado del scroll de la página
+- Prevención de scroll del body cuando el chat está abierto
+- Fallback automático si Gemini falla
 
 ## ✨ Características Destacadas
 
-1. **Conocimiento Completo**: El AI conoce TODO sobre Genswave
-2. **Transferencia Inteligente**: Solo transfiere cuando es necesario
-3. **Diseño Profesional**: Matching perfecto con el sitio
-4. **Panel Admin Integrado**: Gestión completa de transferencias
-5. **Escalable**: Fácil de mejorar con IA real
-6. **Responsive**: Funciona perfectamente en desktop
-7. **Accesible**: Cumple con estándares de accesibilidad
-8. **Performante**: Respuestas instantáneas
+1. **IA Real con Gemini**: Respuestas naturales generadas por Google Gemini 2.5 Flash
+2. **Extremadamente Conversacional**: Tono natural, persuasivo y profesional
+3. **Conocimiento Completo**: El AI conoce TODO sobre Genswave (21 servicios, precios, proceso, FAQ)
+4. **Manejo de Objeciones**: Responde profesionalmente a dudas sobre precio, confianza, competencia
+5. **Transferencia Inteligente**: Solo transfiere cuando es necesario
+6. **Diseño Profesional**: Matching perfecto con el sitio
+7. **Panel Admin Integrado**: Gestión completa de transferencias
+8. **Scroll Aislado**: El chat no afecta el scroll de la página
+9. **Responsive**: Funciona perfectamente en desktop
+10. **Accesible**: Cumple con estándares de accesibilidad
+11. **Performante**: Respuestas rápidas con fallback automático
 
 ## 🎯 Resultado Final
 
-Se ha implementado un asistente virtual profesional y avanzado que:
-- Responde preguntas sobre servicios, precios, procesos
-- Guía a usuarios por el sitio web
-- Transfiere a soporte humano cuando es necesario
+Se ha implementado un asistente virtual profesional y avanzado con Google Gemini AI que:
+- Responde de forma natural y conversacional a TODAS las preguntas
+- Conoce los 21 servicios, precios, proceso completo y FAQ
+- Maneja objeciones profesionalmente (precio, confianza, competencia)
+- Es persuasivo sin ser agresivo - enfoca en valor y ROI
+- Guía a usuarios por el sitio web con acciones contextuales
+- Transfiere a soporte humano solo cuando es necesario
 - Se integra perfectamente con el panel de administración
 - Mantiene el estilo y diseño del sitio
+- Scroll aislado que no afecta la navegación de la página
 - Proporciona una experiencia de usuario excepcional
 
-El sistema está listo para producción y puede ser mejorado gradualmente con IA más avanzada en el futuro.
+El sistema está listo para producción y usa IA real de Google Gemini con capacidad de aprendizaje y mejora continua.
+
+## 🔑 Configuración de API
+
+**Google Gemini API:**
+- API Key: `AIzaSyAYwwxDzjq3NedHz5uM3U1umYJxQvhubt4`
+- Modelo: `gemini-2.5-flash`
+- Tier: Gratuito
+- Límites: 5 RPM, 250K TPM, 20 RPD
+
+## 🐛 Problemas Resueltos
+
+1. **Error de modelo incorrecto**: Cambiado de `gemini-1.5-flash` a `gemini-2.5-flash`
+2. **Respuestas no naturales**: Ajustado temperature a 0.9 y mejorado system prompt
+3. **No responde a todo**: Expandido system prompt con instrucciones de responder SIEMPRE
+4. **Scroll de página al usar chat**: Implementado scroll aislado con:
+   - `overflow: hidden` en body cuando chat está abierto
+   - `onWheel` handler para prevenir propagación
+   - `overscroll-behavior: contain` en CSS del chat

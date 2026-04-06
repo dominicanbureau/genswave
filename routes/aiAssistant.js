@@ -208,21 +208,22 @@ router.post('/chat', async (req, res) => {
       SELECT message, sender, created_at
       FROM ai_chat_sessions
       WHERE session_id = $1
-      ORDER BY created_at ASC
-      LIMIT 20
+      ORDER BY created_at DESC
+      LIMIT 10
     `, [sessionId]);
 
-    // Build conversation history for Gemini
-    const conversationHistory = historyResult.rows.map(row => ({
-      role: row.sender === 'user' ? 'user' : 'model',
-      parts: [{ text: row.message }]
-    }));
+    // Build conversation context
+    let conversationContext = '';
+    if (historyResult.rows.length > 0) {
+      conversationContext = '\n\nCONTEXTO DE LA CONVERSACIÓN ANTERIOR:\n';
+      historyResult.rows.reverse().forEach(row => {
+        conversationContext += `${row.sender === 'user' ? 'Usuario' : 'Genswave'}: ${row.message}\n`;
+      });
+    }
 
-    // Generate AI response using Gemini
-    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
-    
-    const chat = model.startChat({
-      history: conversationHistory.slice(0, -1), // Exclude the last message (current one)
+    // Generate AI response using Gemini (gemini-2.5-flash is the correct model for free tier)
+    const model = genAI.getGenerativeModel({ 
+      model: "gemini-2.5-flash",
       generationConfig: {
         maxOutputTokens: 1000,
         temperature: 0.9,
@@ -231,9 +232,13 @@ router.post('/chat', async (req, res) => {
       },
     });
 
-    // Send message with system prompt context
-    const result = await chat.sendMessage(`${SYSTEM_PROMPT}\n\nUsuario: ${message}`);
-    const aiResponse = result.response.text();
+    // Create the full prompt
+    const fullPrompt = `${SYSTEM_PROMPT}${conversationContext}\n\nUsuario: ${message}\n\nGenswave:`;
+
+    // Generate response
+    const result = await model.generateContent(fullPrompt);
+    const response = await result.response;
+    const aiResponse = response.text();
 
     // Detect if user wants to transfer to human support
     const transferKeywords = [

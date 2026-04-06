@@ -1,7 +1,189 @@
 import express from 'express';
 import db from '../database.js';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
 const router = express.Router();
+
+// Initialize Gemini AI
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+
+// System prompt with complete knowledge base
+const SYSTEM_PROMPT = `Eres Genswave, el asistente virtual de la empresa de desarrollo de software Genswave. Eres extremadamente conversacional, amigable, persuasivo y profesional. Tu objetivo es ayudar a los usuarios, responder todas sus preguntas y guiarlos hacia convertirse en clientes.
+
+INFORMACIÓN COMPLETA DE GENSWAVE:
+
+📍 UBICACIÓN Y CONTACTO:
+- Ubicación: Distrito Nacional, Santo Domingo, República Dominicana
+- Email general: info@genswave.org
+- Email soporte: support@genswave.org
+- Instagram: @genswave
+- Horarios: Lunes a Viernes 9:00 AM - 6:00 PM, Sábados 9:00 AM - 2:00 PM
+
+💼 SERVICIOS (21 categorías principales):
+
+1. **Plataformas Digitales** - Sistemas empresariales completos con registro, autenticación, bases de datos, control de ventas, gestión de inventario, reportes y analytics. Tecnologías: React, Node.js, PostgreSQL, AWS.
+
+2. **Gestión de Proyectos** - Asesoría integral desde la conceptualización hasta el lanzamiento. Incluye análisis de ideas, planificación estratégica, roadmap de desarrollo, asesoría en modelo de negocio.
+
+3. **Automatización e IA** - Chatbots inteligentes 24/7, automatización de redes sociales, análisis predictivo, procesamiento de lenguaje natural, asistentes virtuales personalizados. Tecnologías: OpenAI, Python, TensorFlow.
+
+4. **Comercio Electrónico** - Tiendas online con pasarelas de pago múltiples, sistema de envíos, gestión de productos, carrito inteligente, cupones y descuentos. Tecnologías: Shopify, WooCommerce, Stripe, PayPal.
+
+5. **Marketing Digital** - Campañas en redes sociales, email marketing automatizado, SEO, publicidad programática, marketing de contenidos, analytics ROI. Tecnologías: Google Ads, Facebook Ads, Mailchimp, HubSpot.
+
+6. **Gestión de Empleados** - RRHH digitalizado con control de asistencia biométrico, gestión de nóminas, evaluaciones de desempeño, portal del empleado. Tecnologías: SAP, Workday, BambooHR.
+
+7. **Social Media** - Gestión de redes sociales con programación de contenido, análisis de engagement, gestión de comunidades, influencer marketing, social listening.
+
+8. **Logística y Tracking** - Rastreo GPS en tiempo real, optimización de rutas, gestión de almacenes, control de inventarios, predicción de demanda.
+
+9. **Suscripciones y Membresías** - Cobros automáticos recurrentes, gestión de niveles, portal del cliente, análisis de retención.
+
+10. **Salud Digital** - Telemedicina, consultas virtuales, historiales clínicos digitales, recordatorios de medicamentos, monitoreo de signos vitales.
+
+11. **Inmobiliaria** - PropTech con tours virtuales 360°, CRM inmobiliario, valuaciones automatizadas, matching inteligente.
+
+12. **Eventos Digitales** - Plataformas para eventos híbridos y virtuales, streaming de alta calidad, networking virtual, gamificación.
+
+13. **Agrotecnología** - Agricultura inteligente con monitoreo IoT de cultivos, predicción climática, optimización de riego, trazabilidad.
+
+14. **Blockchain y Crypto** - Smart contracts, tokenización de activos, DeFi, NFT marketplaces, wallets corporativas.
+
+15. **IoT y Sensores** - Redes de sensores, monitoreo ambiental, automatización del hogar, ciudades inteligentes, mantenimiento predictivo.
+
+16. **Ciberseguridad** - Auditorías de seguridad, sistemas de detección, backup y recuperación, autenticación multifactor, monitoreo 24/7.
+
+17. **Cloud y DevOps** - Migración a la nube, CI/CD pipelines, containerización, microservicios, escalabilidad automática. Tecnologías: AWS, Docker, Kubernetes.
+
+18. **Analytics y BI** - Dashboards interactivos, data warehousing, machine learning aplicado, reportes automatizados, predicciones de negocio.
+
+19. **APIs e Integraciones** - APIs RESTful y GraphQL, integraciones ERP/CRM, webhooks, sincronización de datos, middleware empresarial.
+
+20. **FinTech y Pagos** - Wallets digitales, transferencias P2P, sistemas de crédito scoring, facturación electrónica, conciliación bancaria.
+
+21. **Educación Online** - LMS, aulas virtuales interactivas, gestión de cursos, evaluaciones automatizadas, certificaciones digitales, gamificación.
+
+💰 PRECIOS:
+- Sitios web básicos: Desde $5,000
+- Aplicaciones web: $15,000 - $50,000
+- Sistemas empresariales: $25,000 - $100,000+
+- Soluciones personalizadas: Cotización personalizada
+
+INCLUYE TODO:
+✅ Consulta inicial GRATUITA
+✅ Diseño personalizado (nada de plantillas)
+✅ Desarrollo completo
+✅ 30 días de soporte post-lanzamiento GRATIS
+✅ Documentación completa
+✅ Capacitación del equipo
+✅ Hosting y dominio primer año
+✅ Actualizaciones de seguridad
+
+OPCIONES DE PAGO:
+- 50% al inicio, 50% al terminar
+- Planes de pago mensuales disponibles
+- Descuentos por proyectos múltiples
+- Paquetes escalables
+
+🔄 PROCESO DE TRABAJO (5 ETAPAS):
+
+1. **Consulta y Análisis** (1-2 semanas) - GRATIS
+   - Reunión inicial (virtual o presencial)
+   - Entendemos tu negocio y objetivos
+   - Análisis de requerimientos técnicos
+   - Propuesta detallada con cronograma y precio fijo
+
+2. **Diseño y Planificación** (2-3 semanas)
+   - Wireframes y mockups visuales
+   - Arquitectura del sistema
+   - Tú apruebas el diseño
+   - Ajustes hasta que te encante
+
+3. **Desarrollo** (4-12 semanas)
+   - Desarrollo iterativo
+   - Revisiones semanales contigo
+   - Ves el progreso en tiempo real
+   - Testing continuo
+
+4. **Testing y Optimización** (1-2 semanas)
+   - Pruebas exhaustivas
+   - Optimización de rendimiento y velocidad
+   - Corrección de errores
+   - Seguridad de nivel bancario
+
+5. **Lanzamiento y Soporte** (1 semana)
+   - Despliegue en producción
+   - ¡Tu proyecto va en vivo!
+   - Capacitación completa de tu equipo
+   - 30 días de soporte incluido
+
+🛠️ TECNOLOGÍAS QUE USAMOS:
+
+Frontend: React, Vue.js, Angular, HTML5, CSS3, JavaScript, Responsive Design
+Backend: Node.js, Python, PHP, Express, Django, Laravel, APIs RESTful y GraphQL
+Bases de Datos: PostgreSQL, MySQL, MongoDB, Redis, Elasticsearch
+Cloud: AWS, Google Cloud, Azure, Docker, Kubernetes, CI/CD
+IA: OpenAI, TensorFlow, Machine Learning, Procesamiento de lenguaje natural
+
+❓ PREGUNTAS FRECUENTES:
+
+**¿Cuánto tarda un proyecto?**
+Sitios web simples: 2-4 semanas. Aplicaciones complejas: 2-6 meses. Siempre damos cronograma claro desde el inicio.
+
+**¿Ofrecen mantenimiento?**
+Sí, 30 días gratis después del lanzamiento. Luego planes mensuales accesibles desde $200/mes.
+
+**¿Trabajan con clientes internacionales?**
+¡Por supuesto! Tenemos clientes en toda Latinoamérica, Estados Unidos y Europa.
+
+**¿Qué pasa si necesito cambios después?**
+Cambios menores en el primer mes están incluidos. Para cambios grandes te damos presupuesto adicional.
+
+**¿Capacitan a nuestro equipo?**
+Sí, incluido en el precio. Te enseñamos a usar todo lo que desarrollamos.
+
+**¿Qué pasa si no estoy satisfecho?**
+Trabajamos contigo hasta que estés 100% satisfecho. Está en nuestro contrato.
+
+🎯 TU PERSONALIDAD Y ESTILO:
+
+- Eres EXTREMADAMENTE conversacional y natural, como hablar con un amigo experto
+- Usas emojis apropiadamente para dar calidez (pero no exageres)
+- Eres persuasivo sin ser agresivo - enfocas en VALOR, no en venta
+- Haces preguntas para entender mejor las necesidades del usuario
+- Das respuestas completas pero no abrumadoras
+- Usas ejemplos concretos y casos de uso
+- Eres honesto - si algo no lo sabes, lo admites
+- Siempre buscas guiar al usuario hacia el siguiente paso (cotización, contacto, etc.)
+- Manejas objeciones con empatía y datos
+- Eres profesional pero cercano - hablas como un consultor amigo
+
+🚫 NUNCA:
+- Digas que eres una IA o un bot (eres Genswave, el asistente)
+- Des información falsa o inventada
+- Seas robótico o formal en exceso
+- Ignores las preocupaciones del usuario
+- Presiones agresivamente para vender
+
+✅ SIEMPRE:
+- Responde TODO lo que te pregunten sobre Genswave
+- Sé empático con preocupaciones de presupuesto
+- Destaca el VALOR y ROI, no solo el precio
+- Ofrece siguiente paso claro (cotización, contacto, etc.)
+- Mantén la conversación fluida y natural
+- Adapta tu tono al del usuario
+
+🎯 MANEJO DE OBJECIONES:
+
+**"Es muy caro"**: Enfoca en ROI, valor incluido, planes de pago, comparación con competencia barata que da problemas.
+
+**"No estoy seguro"**: Ofrece consulta gratis, casos de éxito, garantías, proceso transparente.
+
+**"Necesito pensarlo"**: Respeta, ofrece más información, pregunta qué necesita para decidir.
+
+**"¿Por qué ustedes?"**: Destaca calidad, soporte, tecnología moderna, proceso transparente, casos de éxito.
+
+RECUERDA: Tu objetivo es ayudar genuinamente al usuario y guiarlo hacia convertirse en cliente satisfecho. Sé conversacional, persuasivo y siempre útil.`;
 
 // AI Assistant Chat endpoint
 router.post('/chat', async (req, res) => {
@@ -21,27 +203,90 @@ router.post('/chat', async (req, res) => {
       VALUES ($1, $2, 'user', $3, NOW())
     `, [sessionId, message, JSON.stringify(context)]);
 
-    // Generate AI response based on message content
-    const aiResponse = await generateAIResponse(message, context);
+    // Get conversation history for context
+    const historyResult = await db.query(`
+      SELECT message, sender, created_at
+      FROM ai_chat_sessions
+      WHERE session_id = $1
+      ORDER BY created_at ASC
+      LIMIT 20
+    `, [sessionId]);
+
+    // Build conversation history for Gemini
+    const conversationHistory = historyResult.rows.map(row => ({
+      role: row.sender === 'user' ? 'user' : 'model',
+      parts: [{ text: row.message }]
+    }));
+
+    // Generate AI response using Gemini
+    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+    
+    const chat = model.startChat({
+      history: conversationHistory.slice(0, -1), // Exclude the last message (current one)
+      generationConfig: {
+        maxOutputTokens: 1000,
+        temperature: 0.9,
+        topP: 0.8,
+        topK: 40,
+      },
+    });
+
+    // Send message with system prompt context
+    const result = await chat.sendMessage(`${SYSTEM_PROMPT}\n\nUsuario: ${message}`);
+    const aiResponse = result.response.text();
+
+    // Detect if user wants to transfer to human support
+    const transferKeywords = [
+      'hablar con humano', 'hablar con persona', 'agente humano', 
+      'soporte humano', 'hablar con alguien', 'operador',
+      'quiero hablar con', 'necesito hablar con', 'conectar con'
+    ];
+    
+    const shouldTransfer = transferKeywords.some(keyword => 
+      message.toLowerCase().includes(keyword)
+    );
+
+    // Determine suggested actions based on response content
+    const actions = [];
+    if (aiResponse.toLowerCase().includes('cotización') || aiResponse.toLowerCase().includes('presupuesto')) {
+      actions.push({ type: 'navigate', url: '/contacto', label: 'Solicitar cotización' });
+    }
+    if (aiResponse.toLowerCase().includes('servicios')) {
+      actions.push({ type: 'navigate', url: '/servicios', label: 'Ver servicios' });
+    }
+    if (aiResponse.toLowerCase().includes('proceso')) {
+      actions.push({ type: 'navigate', url: '/proceso', label: 'Ver proceso' });
+    }
+    if (shouldTransfer || aiResponse.toLowerCase().includes('soporte humano')) {
+      actions.push({ type: 'transfer', label: 'Hablar con agente humano' });
+    }
 
     // Store AI response
     await db.query(`
       INSERT INTO ai_chat_sessions (session_id, message, sender, context, created_at)
       VALUES ($1, $2, 'ai', $3, NOW())
-    `, [sessionId, aiResponse.response, JSON.stringify(context)]);
+    `, [sessionId, aiResponse, JSON.stringify(context)]);
 
     res.json({
       success: true,
-      response: aiResponse.response,
-      actions: aiResponse.actions || [],
-      transferToSupport: aiResponse.transferToSupport || false
+      response: aiResponse,
+      actions: actions,
+      transferToSupport: shouldTransfer
     });
 
   } catch (error) {
     console.error('Error in AI chat:', error);
-    res.status(500).json({ 
-      success: false, 
-      error: 'Error interno del servidor' 
+    
+    // Fallback response if Gemini fails
+    const fallbackResponse = 'Disculpa, estoy teniendo un pequeño problema técnico en este momento. ¿Te gustaría que te conecte con nuestro equipo de soporte humano? Ellos pueden ayudarte de inmediato.';
+    
+    res.json({
+      success: true,
+      response: fallbackResponse,
+      actions: [
+        { type: 'transfer', label: 'Hablar con soporte humano' }
+      ],
+      transferToSupport: false
     });
   }
 });
@@ -201,128 +446,5 @@ router.patch('/admin/transfers/:transferId/resolve', async (req, res) => {
     });
   }
 });
-
-// AI Response Generation Function
-async function generateAIResponse(message, context) {
-  const lowerMessage = message.toLowerCase();
-  
-  // Knowledge base responses
-  const responses = {
-    // Greetings
-    greeting: {
-      keywords: ['hola', 'buenos días', 'buenas tardes', 'buenas noches', 'saludos', 'hey'],
-      response: '¡Hola! Soy Genswave, tu asistente virtual. Estoy aquí para ayudarte con cualquier pregunta sobre nuestros servicios, procesos, precios o funcionalidades de la plataforma. ¿En qué puedo asistirte hoy?'
-    },
-
-    // Services
-    services: {
-      keywords: ['servicios', 'que ofrecen', 'que hacen', 'productos', 'soluciones'],
-      response: 'Ofrecemos más de 20 servicios empresariales especializados:\n\n• **Plataformas Digitales** - Sistemas empresariales completos\n• **Gestión de Proyectos** - Asesoría integral para lanzar tu idea\n• **Automatización e IA** - Chatbots y asistentes virtuales\n• **Comercio Electrónico** - Tiendas online profesionales\n• **Marketing Digital** - Estrategias de crecimiento\n• **Gestión de Empleados** - RRHH digitalizado\n• **Social Media** - Gestión de redes sociales\n• **Logística y Tracking** - Seguimiento en tiempo real\n\nY muchos más. ¿Te interesa algún servicio en particular?',
-      actions: [
-        { type: 'navigate', url: '/servicios', label: 'Ver todos los servicios' }
-      ]
-    },
-
-    // Pricing
-    pricing: {
-      keywords: ['precio', 'costo', 'cuanto cuesta', 'presupuesto', 'cotización', 'tarifa'],
-      response: 'Nuestros precios varían según la complejidad y alcance del proyecto:\n\n• **Sitios web básicos**: Desde $5,000\n• **Aplicaciones web**: $15,000 - $50,000\n• **Sistemas empresariales**: $25,000 - $100,000+\n• **Soluciones personalizadas**: Cotización personalizada\n\nTodos los proyectos incluyen:\n✓ Consulta inicial gratuita\n✓ 30 días de soporte post-lanzamiento\n✓ Documentación completa\n✓ Capacitación del equipo\n\n¿Te gustaría una cotización personalizada?',
-      actions: [
-        { type: 'navigate', url: '/contacto', label: 'Solicitar cotización' }
-      ]
-    },
-
-    // Process
-    process: {
-      keywords: ['proceso', 'como trabajan', 'metodología', 'pasos', 'etapas'],
-      response: 'Nuestro proceso de trabajo consta de 5 etapas principales:\n\n**1. Consulta y Análisis** (1-2 semanas)\n• Reunión inicial para entender tus necesidades\n• Análisis de requerimientos técnicos\n• Propuesta detallada con cronograma\n\n**2. Diseño y Planificación** (2-3 semanas)\n• Wireframes y mockups\n• Arquitectura del sistema\n• Aprobación del diseño\n\n**3. Desarrollo** (4-12 semanas)\n• Desarrollo iterativo\n• Revisiones semanales\n• Testing continuo\n\n**4. Testing y Optimización** (1-2 semanas)\n• Pruebas exhaustivas\n• Optimización de rendimiento\n• Corrección de errores\n\n**5. Lanzamiento y Soporte** (1 semana)\n• Despliegue en producción\n• Capacitación del equipo\n• Soporte post-lanzamiento\n\n¿Te gustaría conocer más detalles sobre alguna etapa?',
-      actions: [
-        { type: 'navigate', url: '/proceso', label: 'Ver proceso completo' }
-      ]
-    },
-
-    // Technologies
-    technologies: {
-      keywords: ['tecnologías', 'tecnologia', 'stack', 'herramientas', 'frameworks'],
-      response: 'Utilizamos tecnologías modernas y probadas:\n\n**Frontend:**\n• React, Vue.js, Angular\n• HTML5, CSS3, JavaScript\n• Responsive Design\n\n**Backend:**\n• Node.js, Python, PHP\n• Express, Django, Laravel\n• APIs RESTful y GraphQL\n\n**Bases de Datos:**\n• PostgreSQL, MySQL, MongoDB\n• Redis para caché\n• Elasticsearch para búsquedas\n\n**Cloud & DevOps:**\n• AWS, Google Cloud, Azure\n• Docker, Kubernetes\n• CI/CD pipelines\n\n**IA y Machine Learning:**\n• OpenAI, TensorFlow\n• Procesamiento de lenguaje natural\n• Análisis predictivo\n\nSeleccionamos la stack más apropiada para cada proyecto según sus necesidades específicas.'
-    },
-
-    // Contact
-    contact: {
-      keywords: ['contacto', 'contactar', 'hablar', 'comunicar', 'telefono', 'email'],
-      response: 'Puedes contactarnos de varias formas:\n\n📧 **Email:** info@genswave.org\n📧 **Soporte:** support@genswave.org\n📍 **Ubicación:** Distrito Nacional, Santo Domingo\n📱 **Instagram:** @genswave\n\n**Horarios de atención:**\nLunes a Viernes: 9:00 AM - 6:00 PM\nSábados: 9:00 AM - 2:00 PM\n\n¿Prefieres que te conecte con nuestro equipo de soporte humano?',
-      actions: [
-        { type: 'navigate', url: '/contacto', label: 'Formulario de contacto' },
-        { type: 'transfer', label: 'Hablar con soporte' }
-      ]
-    },
-
-    // Login/Account
-    account: {
-      keywords: ['login', 'cuenta', 'registrar', 'acceso', 'panel', 'dashboard'],
-      response: 'Para acceder a tu panel de usuario:\n\n1. **Si ya tienes cuenta:** Haz clic en "Iniciar Sesión" en la esquina superior derecha\n2. **Si eres nuevo:** Puedes registrarte desde la misma página de login\n\n**En tu panel podrás:**\n• Ver el estado de tus proyectos\n• Comunicarte con nuestro equipo\n• Descargar documentos y recursos\n• Gestionar tus solicitudes\n• Acceder a reportes de progreso\n\n¿Necesitas ayuda para acceder a tu cuenta?',
-      actions: [
-        { type: 'navigate', url: '/login', label: 'Ir al login' }
-      ]
-    },
-
-    // FAQ
-    faq: {
-      keywords: ['preguntas', 'faq', 'dudas', 'frecuentes', 'ayuda'],
-      response: 'Aquí tienes respuestas a las preguntas más frecuentes:\n\n**¿Cuánto tiempo toma un proyecto?**\nDepende de la complejidad: 2-4 semanas para sitios básicos, 2-6 meses para aplicaciones complejas.\n\n**¿Ofrecen mantenimiento?**\nSí, tenemos planes mensuales de mantenimiento y 30 días de soporte gratuito post-lanzamiento.\n\n**¿Trabajan con clientes internacionales?**\nAbsolutamente, trabajamos con clientes de todo el mundo.\n\n**¿Qué pasa si no estoy satisfecho?**\nTrabajamos contigo hasta que estés completamente satisfecho con el resultado.\n\n¿Tienes alguna pregunta específica que no esté aquí?',
-      actions: [
-        { type: 'navigate', url: '/faq', label: 'Ver todas las FAQ' }
-      ]
-    },
-
-    // Support request
-    support: {
-      keywords: ['soporte', 'ayuda', 'problema', 'error', 'no funciona', 'bug'],
-      response: 'Entiendo que necesitas ayuda técnica. Puedo asistirte con:\n\n• Problemas de acceso a tu cuenta\n• Dudas sobre funcionalidades\n• Reportar errores o bugs\n• Solicitar nuevas características\n• Consultas sobre tu proyecto\n\n¿Podrías describir específicamente qué problema estás experimentando? Si es algo técnico complejo, puedo conectarte directamente con nuestro equipo de soporte.',
-      actions: [
-        { type: 'transfer', label: 'Conectar con soporte técnico' }
-      ]
-    }
-  };
-
-  // Find matching response
-  let matchedResponse = null;
-  let maxMatches = 0;
-
-  for (const [key, responseData] of Object.entries(responses)) {
-    const matches = responseData.keywords.filter(keyword => 
-      lowerMessage.includes(keyword)
-    ).length;
-
-    if (matches > maxMatches) {
-      maxMatches = matches;
-      matchedResponse = responseData;
-    }
-  }
-
-  // Default response if no match found
-  if (!matchedResponse || maxMatches === 0) {
-    // Check if user is asking for human support
-    if (lowerMessage.includes('humano') || lowerMessage.includes('persona') || 
-        lowerMessage.includes('agente') || lowerMessage.includes('operador')) {
-      return {
-        response: 'Por supuesto, te conectaré con nuestro equipo de soporte humano. Un agente revisará tu consulta y te responderá pronto.',
-        transferToSupport: true
-      };
-    }
-
-    return {
-      response: 'Gracias por tu mensaje. Puedo ayudarte con información sobre:\n\n• Nuestros servicios y soluciones\n• Precios y cotizaciones\n• Proceso de trabajo\n• Tecnologías que utilizamos\n• Contacto y soporte\n• Preguntas frecuentes\n\n¿Sobre qué te gustaría saber más? O si prefieres, puedo conectarte con nuestro equipo de soporte humano.',
-      actions: [
-        { type: 'transfer', label: 'Hablar con soporte humano' }
-      ]
-    };
-  }
-
-  return {
-    response: matchedResponse.response,
-    actions: matchedResponse.actions || []
-  };
-}
 
 export default router;

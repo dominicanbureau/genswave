@@ -4,20 +4,114 @@ import './AIAssistant.css';
 
 function AIAssistant() {
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState([
-    {
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    // Detect dark mode from localStorage
+    const savedTheme = localStorage.getItem('theme');
+    return savedTheme === 'dark';
+  });
+  const [messages, setMessages] = useState(() => {
+    // Load messages from localStorage on mount
+    const savedMessages = localStorage.getItem('ai_chat_messages');
+    if (savedMessages) {
+      try {
+        return JSON.parse(savedMessages);
+      } catch (e) {
+        return [{
+          id: 1,
+          text: "¡Hola! Soy Genswave, tu asistente virtual. Conozco todo sobre nuestros servicios, procesos y funcionalidades. ¿En qué puedo ayudarte hoy?",
+          sender: 'ai',
+          timestamp: new Date()
+        }];
+      }
+    }
+    return [{
       id: 1,
       text: "¡Hola! Soy Genswave, tu asistente virtual. Conozco todo sobre nuestros servicios, procesos y funcionalidades. ¿En qué puedo ayudarte hoy?",
       sender: 'ai',
       timestamp: new Date()
-    }
-  ]);
+    }];
+  });
   const [inputMessage, setInputMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [isTransferring, setIsTransferring] = useState(false);
-  const [sessionId] = useState(() => 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9));
+  const [sessionId] = useState(() => {
+    // Load or create session ID
+    const savedSessionId = localStorage.getItem('ai_chat_session_id');
+    if (savedSessionId) {
+      return savedSessionId;
+    }
+    const newSessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    localStorage.setItem('ai_chat_session_id', newSessionId);
+    return newSessionId;
+  });
+  const [chatActive, setChatActive] = useState(() => {
+    // Check if chat is still active
+    const savedActive = localStorage.getItem('ai_chat_active');
+    return savedActive !== 'false';
+  });
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
+
+  // Listen for theme changes
+  useEffect(() => {
+    const handleStorageChange = (e) => {
+      if (e.key === 'theme') {
+        setIsDarkMode(e.newValue === 'dark');
+      }
+    };
+
+    // Also check for theme changes in the same tab
+    const checkTheme = () => {
+      const savedTheme = localStorage.getItem('theme');
+      setIsDarkMode(savedTheme === 'dark');
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    // Check theme periodically in case it changes in the same tab
+    const interval = setInterval(checkTheme, 500);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      clearInterval(interval);
+    };
+  }, []);
+
+  // Save messages to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem('ai_chat_messages', JSON.stringify(messages));
+  }, [messages]);
+
+  // Mark chat as active when opened
+  useEffect(() => {
+    if (isOpen) {
+      localStorage.setItem('ai_chat_active', 'true');
+      setChatActive(true);
+    }
+  }, [isOpen]);
+
+  // Detect when user closes the page/tab
+  useEffect(() => {
+    const handleBeforeUnload = async () => {
+      // Mark chat as inactive
+      localStorage.setItem('ai_chat_active', 'false');
+      
+      // Notify server that chat is closed
+      try {
+        await fetch(`/api/ai-assistant/session/${sessionId}/close`, {
+          method: 'POST',
+          keepalive: true // Ensures request completes even if page is closing
+        });
+      } catch (error) {
+        console.error('Error closing session:', error);
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [sessionId]);
 
   // Prevent body scroll when chat is open
   useEffect(() => {
@@ -80,6 +174,28 @@ function AIAssistant() {
       const data = await response.json();
 
       if (data.success) {
+        // Check if chat is transferred and should be silent
+        if (data.transferred && data.silent) {
+          setIsTyping(false);
+          // Don't add any message, just wait for admin response
+          return;
+        }
+
+        // Check if chat is transferred (legacy support)
+        if (data.transferred) {
+          const transferredMessage = {
+            id: Date.now() + 1,
+            text: data.response,
+            sender: 'ai',
+            timestamp: new Date(),
+            isTransferred: true
+          };
+          
+          setIsTyping(false);
+          setMessages(prev => [...prev, transferredMessage]);
+          return;
+        }
+
         const aiMessage = {
           id: Date.now() + 1,
           text: data.response,
@@ -141,13 +257,28 @@ function AIAssistant() {
             if (supportMessages.length > 0) {
               setMessages(prev => {
                 const newMessages = [...prev];
+                
+                // Add system message if this is the first support message
+                const hasSystemMessage = prev.some(m => m.isSystemMessage && m.agentName === data.agentName);
+                if (!hasSystemMessage && data.agentName) {
+                  newMessages.push({
+                    id: 'system-' + Date.now(),
+                    text: `Estás siendo atendido por ${data.agentName}`,
+                    sender: 'system',
+                    timestamp: new Date(),
+                    isSystemMessage: true,
+                    agentName: data.agentName
+                  });
+                }
+                
                 supportMessages.forEach(msg => {
                   newMessages.push({
                     id: msg.id,
                     text: msg.message,
                     sender: 'support',
                     timestamp: new Date(msg.created_at),
-                    isSupport: true
+                    isSupport: true,
+                    agentName: msg.agent_name || data.agentName
                   });
                 });
                 return newMessages;
@@ -220,7 +351,7 @@ function AIAssistant() {
   };
 
   return (
-    <>
+    <div className={isDarkMode ? 'dark-mode' : ''}>
       {/* Floating Button */}
       <motion.button
         className="ai-assistant-button"
@@ -315,55 +446,79 @@ function AIAssistant() {
             {/* Messages */}
             <div className="chat-messages">
               {messages.map((message) => (
-                <motion.div
-                  key={message.id}
-                  className={`message ${message.sender === 'support' ? 'support' : message.sender}`}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  {(message.sender === 'ai' || message.sender === 'support') && (
-                    <div className="message-avatar">
-                      <img src="/genswave.png" alt="Genswave" />
-                      {message.sender === 'support' && (
-                        <div className="support-badge" title="Soporte Humano">
-                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                            <circle cx="12" cy="7" r="4"/>
-                          </svg>
-                        </div>
-                      )}
+                message.sender === 'system' ? (
+                  <motion.div
+                    key={message.id}
+                    className="system-message"
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <div className="system-message-content">
+                      {message.text}
                     </div>
-                  )}
-                  <div className="message-content">
-                    <div 
-                      className="message-text"
-                      dangerouslySetInnerHTML={{ __html: message.text }}
-                    />
-                    {message.actions && message.actions.length > 0 && (
-                      <div className="message-actions">
-                        {message.actions.map((action, index) => (
-                          <button
-                            key={index}
-                            className="action-button"
-                            onClick={() => handleActionClick(action)}
-                          >
-                            {action.label}
-                          </button>
-                        ))}
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key={message.id}
+                    className={`message ${message.sender === 'support' ? 'support' : message.sender} ${message.isTransferred ? 'transferred' : ''}`}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    {(message.sender === 'ai' || message.sender === 'support') && (
+                      <div className="message-avatar">
+                        <img src="/genswave.png" alt="Genswave" />
+                        {message.sender === 'support' && (
+                          <div className="support-badge" title="Soporte Humano">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                              <circle cx="12" cy="7" r="4"/>
+                            </svg>
+                          </div>
+                        )}
                       </div>
                     )}
-                    <div className="message-time">
-                      {message.timestamp.toLocaleTimeString([], { 
-                        hour: '2-digit', 
-                        minute: '2-digit' 
-                      })}
-                      {message.sender === 'support' && (
-                        <span className="support-label"> • Soporte</span>
+                    <div className="message-content">
+                      {message.sender === 'support' && message.agentName && (
+                        <div className="agent-name">{message.agentName}</div>
                       )}
+                      <div 
+                        className="message-text"
+                        dangerouslySetInnerHTML={{ __html: message.text }}
+                      />
+                      {message.actions && message.actions.length > 0 && (
+                        <div className="message-actions">
+                          {message.actions.map((action, index) => (
+                            <button
+                              key={index}
+                              className="action-button"
+                              onClick={() => handleActionClick(action)}
+                            >
+                              {action.label}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                      <div className="message-time">
+                        {message.timestamp && typeof message.timestamp.toLocaleTimeString === 'function' ? (
+                          message.timestamp.toLocaleTimeString([], { 
+                            hour: '2-digit', 
+                            minute: '2-digit' 
+                          })
+                        ) : (
+                          new Date(message.timestamp).toLocaleTimeString([], { 
+                            hour: '2-digit', 
+                            minute: '2-digit' 
+                          })
+                        )}
+                        {message.sender === 'support' && (
+                          <span className="support-label"> • Soporte</span>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                </motion.div>
+                  </motion.div>
+                )
               ))}
 
               {/* Typing Indicator */}
@@ -434,7 +589,7 @@ function AIAssistant() {
           </motion.div>
         )}
       </AnimatePresence>
-    </>
+    </div>
   );
 }
 

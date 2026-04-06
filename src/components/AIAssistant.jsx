@@ -287,7 +287,10 @@ function AIAssistant() {
                     </div>
                   )}
                   <div className="message-content">
-                    <div className="message-text">{message.text}</div>
+                    <div 
+                      className="message-text"
+                      dangerouslySetInnerHTML={{ __html: message.text }}
+                    />
                     {message.actions && message.actions.length > 0 && (
                       <div className="message-actions">
                         {message.actions.map((action, index) => (

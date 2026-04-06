@@ -4334,3 +4334,114 @@ body {
   border-radius: 6px;
   padding: 2px;
 }
+
+/* AI Bot Transfer Styles */
+.conversation-avatar.ai-bot {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.conversation-avatar.ai-bot svg {
+  width: 20px;
+  height: 20px;
+  color: white;
+}
+
+.message.ai-transfer {
+  opacity: 0.95;
+}
+
+.ai-transfer-info {
+  padding: 1.5rem;
+  background: var(--bg-tertiary);
+  border-top: 1px solid var(--border-subtle);
+  text-align: center;
+}
+
+.ai-transfer-info p {
+  margin: 0 0 1rem 0;
+  color: var(--text-secondary);
+  font-size: 0.9375rem;
+}
+
+.btn-resolve-transfer {
+  padding: 0.75rem 1.5rem;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-resolve-transfer:hover {
+  background: #333333;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.status-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-badge.status-pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.status-badge.status-in_progress {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.status-badge.status-resolved {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+/* Dark mode AI bot styles */
+.dark-mode .conversation-avatar.ai-bot {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.dark-mode .ai-transfer-info {
+  background: #222222;
+  border-top-color: #333333;
+}
+
+.dark-mode .ai-transfer-info p {
+  color: #9ca3af;
+}
+
+.dark-mode .btn-resolve-transfer {
+  background: #ffffff;
+  color: #000000;
+}
+
+.dark-mode .btn-resolve-transfer:hover {
+  background: #f3f4f6;
+}
+
+.dark-mode .status-badge.status-pending {
+  background: #451a03;
+  color: #fbbf24;
+}
+
+.dark-mode .status-badge.status-in_progress {
+  background: #1e3a8a;
+  color: #93c5fd;
+}
+
+.dark-mode .status-badge.status-resolved {
+  background: #064e3b;
+  color: #6ee7b7;
+}

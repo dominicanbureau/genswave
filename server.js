@@ -19,6 +19,7 @@ import passwordResetRoutes from './routes/passwordReset.js';
 import dataDeletionRoutes from './routes/dataDeletion.js';
 import notificationRoutes from './routes/notifications.js';
 import migrateRoutes from './routes/migrate.js';
+import aiAssistantRoutes from './routes/aiAssistant.js';
 
 dotenv.config();
 
@@ -99,6 +100,7 @@ app.use('/api/password-reset', passwordResetRoutes);
 app.use('/api/data-deletion', dataDeletionRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/migrate', migrateRoutes);
+app.use('/api/ai-assistant', aiAssistantRoutes);
 app.use('/api', quickCodeRoutes);
 
 // Serve uploaded files

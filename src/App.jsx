@@ -17,49 +17,55 @@ import DataDeletionPage from './pages/DataDeletionPage';
 import ContactInfoPage from './pages/ContactInfoPage';
 import ResetPassword from './pages/ResetPassword';
 import ProtectedRoute from './components/ProtectedRoute';
+import AIAssistant from './components/AIAssistant';
 
 function App() {
   return (
-    <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="/servicios" element={<ServicesPage />} />
-      <Route path="/proceso" element={<ProcessPage />} />
-      <Route path="/contacto" element={<ContactPage />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/reset-password" element={<ResetPassword />} />
-      <Route path="/terminos" element={<TermsPage />} />
-      <Route path="/privacidad" element={<PrivacyPage />} />
-      <Route path="/cookies" element={<CookiesPage />} />
-      <Route path="/data-deletion" element={<DataDeletionPage />} />
-      <Route path="/contact-info" element={<ContactInfoPage />} />
-      <Route path="/faq" element={<FAQPage />} />
-      <Route path="/soporte" element={<SupportPage />} />
-      <Route path="/casos" element={<CasesPage />} />
-      <Route 
-        path="/dashboard" 
-        element={
-          <ProtectedRoute>
-            <UserDashboard />
-          </ProtectedRoute>
-        } 
-      />
-      <Route 
-        path="/project/:id" 
-        element={
-          <ProtectedRoute>
-            <ProjectDetail />
-          </ProtectedRoute>
-        } 
-      />
-      <Route 
-        path="/admin" 
-        element={
-          <ProtectedRoute requireAdmin>
-            <Admin />
-          </ProtectedRoute>
-        } 
-      />
-    </Routes>
+    <>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/servicios" element={<ServicesPage />} />
+        <Route path="/proceso" element={<ProcessPage />} />
+        <Route path="/contacto" element={<ContactPage />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/terminos" element={<TermsPage />} />
+        <Route path="/privacidad" element={<PrivacyPage />} />
+        <Route path="/cookies" element={<CookiesPage />} />
+        <Route path="/data-deletion" element={<DataDeletionPage />} />
+        <Route path="/contact-info" element={<ContactInfoPage />} />
+        <Route path="/faq" element={<FAQPage />} />
+        <Route path="/soporte" element={<SupportPage />} />
+        <Route path="/casos" element={<CasesPage />} />
+        <Route 
+          path="/dashboard" 
+          element={
+            <ProtectedRoute>
+              <UserDashboard />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/project/:id" 
+          element={
+            <ProtectedRoute>
+              <ProjectDetail />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/admin" 
+          element={
+            <ProtectedRoute requireAdmin>
+              <Admin />
+            </ProtectedRoute>
+          } 
+        />
+      </Routes>
+      
+      {/* AI Assistant - Only show on desktop and not on admin pages */}
+      <AIAssistant />
+    </>
   );
 }
 

@@ -912,11 +912,15 @@ function ChatsSection() {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [attachments, setAttachments] = useState([]);
-  const [chatType, setChatType] = useState('web'); // 'web' or 'instagram'
+  const [chatType, setChatType] = useState('web'); // 'web', 'instagram', or 'ai-bot'
   const [instagramBotUsers, setInstagramBotUsers] = useState([]);
   const [filteredInstagramBotUsers, setFilteredInstagramBotUsers] = useState([]);
   const [instagramMessages, setInstagramMessages] = useState([]);
   const [selectedInstagramConversation, setSelectedInstagramConversation] = useState(null);
+  const [aiTransfers, setAiTransfers] = useState([]);
+  const [filteredAiTransfers, setFilteredAiTransfers] = useState([]);
+  const [selectedAiTransfer, setSelectedAiTransfer] = useState(null);
+  const [aiTransferMessages, setAiTransferMessages] = useState([]);
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
 
@@ -929,6 +933,12 @@ function ChatsSection() {
   useEffect(() => {
     loadInstagramBotUsers();
     const interval = setInterval(loadInstagramBotUsers, 10000);
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    loadAiTransfers();
+    const interval = setInterval(loadAiTransfers, 10000);
     return () => clearInterval(interval);
   }, []);
 
@@ -949,8 +959,16 @@ function ChatsSection() {
   }, [selectedInstagramConversation, chatType]);
 
   useEffect(() => {
+    if (selectedAiTransfer && chatType === 'ai-bot') {
+      loadAiTransferMessages(selectedAiTransfer.id);
+      const interval = setInterval(() => loadAiTransferMessages(selectedAiTransfer.id), 3000);
+      return () => clearInterval(interval);
+    }
+  }, [selectedAiTransfer, chatType]);
+
+  useEffect(() => {
     scrollToBottom();
-  }, [messages, instagramMessages]);
+  }, [messages, instagramMessages, aiTransferMessages]);
 
   // Filter conversations based on search query
   useEffect(() => {
@@ -965,7 +983,7 @@ function ChatsSection() {
         );
         setFilteredConversations(filtered);
       }
-    } else {
+    } else if (chatType === 'instagram') {
       if (!searchQuery.trim()) {
         setFilteredInstagramBotUsers(instagramBotUsers);
       } else {
@@ -976,8 +994,18 @@ function ChatsSection() {
         );
         setFilteredInstagramBotUsers(filtered);
       }
+    } else if (chatType === 'ai-bot') {
+      if (!searchQuery.trim()) {
+        setFilteredAiTransfers(aiTransfers);
+      } else {
+        const filtered = aiTransfers.filter(transfer => 
+          transfer.session_id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          (transfer.last_message && transfer.last_message.toLowerCase().includes(searchQuery.toLowerCase()))
+        );
+        setFilteredAiTransfers(filtered);
+      }
     }
-  }, [conversations, instagramBotUsers, searchQuery, chatType]);
+  }, [conversations, instagramBotUsers, aiTransfers, searchQuery, chatType]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -992,6 +1020,18 @@ function ChatsSection() {
       }
     } catch (error) {
       console.error('Error loading Instagram bot users:', error);
+    }
+  };
+
+  const loadAiTransfers = async () => {
+    try {
+      const response = await fetch('/api/ai-assistant/admin/transfers');
+      if (response.ok) {
+        const data = await response.json();
+        setAiTransfers(data.transfers || []);
+      }
+    } catch (error) {
+      console.error('Error loading AI transfers:', error);
     }
   };
 
@@ -1012,6 +1052,18 @@ function ChatsSection() {
       setInstagramMessages(data);
     } catch (error) {
       console.error('Error al cargar mensajes de Instagram:', error);
+    }
+  };
+
+  const loadAiTransferMessages = async (transferId) => {
+    try {
+      const response = await fetch(`/api/ai-assistant/admin/transfers/${transferId}/messages`);
+      if (response.ok) {
+        const data = await response.json();
+        setAiTransferMessages(data.messages || []);
+      }
+    } catch (error) {
+      console.error('Error loading AI transfer messages:', error);
     }
   };
 
@@ -1278,8 +1330,10 @@ function ChatsSection() {
             setChatType('web');
             setSelectedConversation(null);
             setSelectedInstagramConversation(null);
+            setSelectedAiTransfer(null);
             setMessages([]);
             setInstagramMessages([]);
+            setAiTransferMessages([]);
           }}
         >
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -1293,8 +1347,10 @@ function ChatsSection() {
             setChatType('instagram');
             setSelectedConversation(null);
             setSelectedInstagramConversation(null);
+            setSelectedAiTransfer(null);
             setMessages([]);
             setInstagramMessages([]);
+            setAiTransferMessages([]);
           }}
         >
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -1304,12 +1360,37 @@ function ChatsSection() {
           </svg>
           Instagram
         </button>
+        <button 
+          className={`toggle-btn ${chatType === 'ai-bot' ? 'active' : ''}`}
+          onClick={() => {
+            setChatType('ai-bot');
+            setSelectedConversation(null);
+            setSelectedInstagramConversation(null);
+            setSelectedAiTransfer(null);
+            setMessages([]);
+            setInstagramMessages([]);
+            setAiTransferMessages([]);
+          }}
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M9 12l2 2 4-4"/>
+            <path d="M21 12c-1 0-3-1-3-3s2-3 3-3 3 1 3 3-2 3-3 3"/>
+            <path d="M3 12c1 0 3-1 3-3s-2-3-3-3-3 1-3 3 2 3 3 3"/>
+            <path d="M12 3c0 1-1 3-3 3s-3-2-3-3 1-3 3-3 3 2 3 3"/>
+            <path d="M12 21c0-1-1-3-3-3s-3 2-3 3 1 3 3 3 3-2 3-3"/>
+          </svg>
+          AI Bot
+        </button>
       </div>
       
       <div className="chat-layout">
         <div className="conversations-list">
           <div className="conversations-header">
-            <h3>{chatType === 'web' ? 'Conversaciones Web' : 'Conversaciones Instagram'}</h3>
+            <h3>
+              {chatType === 'web' ? 'Conversaciones Web' : 
+               chatType === 'instagram' ? 'Conversaciones Instagram' : 
+               'Transferencias AI Bot'}
+            </h3>
             <div className="search-container">
               <div className="search-input-wrapper">
                 <svg className="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -1368,7 +1449,7 @@ function ChatsSection() {
                 </motion.div>
               ))
             )
-          ) : (
+          ) : chatType === 'instagram' ? (
             filteredInstagramBotUsers.length === 0 ? (
               <p className="empty-state">
                 {searchQuery ? 'No se encontraron conversaciones de Instagram' : 'No hay conversaciones de Instagram'}
@@ -1405,11 +1486,48 @@ function ChatsSection() {
                 </motion.div>
               ))
             )
+          ) : (
+            filteredAiTransfers.length === 0 ? (
+              <p className="empty-state">
+                {searchQuery ? 'No se encontraron transferencias de AI' : 'No hay transferencias de AI Bot'}
+              </p>
+            ) : (
+              filteredAiTransfers.map((transfer) => (
+                <motion.div
+                  key={transfer.id}
+                  className={`conversation-item ${selectedAiTransfer?.id === transfer.id ? 'active' : ''}`}
+                  onClick={() => setSelectedAiTransfer(transfer)}
+                  whileHover={{ x: 5 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <div className="conversation-avatar ai-bot">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M9 12l2 2 4-4"/>
+                      <path d="M21 12c-1 0-3-1-3-3s2-3 3-3 3 1 3 3-2 3-3 3"/>
+                      <path d="M3 12c1 0 3-1 3-3s-2-3-3-3-3 1-3 3 2 3 3 3"/>
+                    </svg>
+                  </div>
+                  <div className="conversation-info">
+                    <h4>Sesión AI: {transfer.session_id.substring(0, 12)}...</h4>
+                    <p className="last-message">{transfer.last_message}</p>
+                    <span className="conversation-time">
+                      {new Date(transfer.created_at).toLocaleDateString('es-ES')}
+                    </span>
+                  </div>
+                  <span className={`status-badge status-${transfer.status}`}>
+                    {transfer.status === 'pending' ? 'Pendiente' : 
+                     transfer.status === 'in_progress' ? 'En Progreso' : 'Resuelto'}
+                  </span>
+                </motion.div>
+              ))
+            )
           )}
         </div>
 
         <div className="chat-area">
-          {(chatType === 'web' && selectedConversation) || (chatType === 'instagram' && selectedInstagramConversation) ? (
+          {(chatType === 'web' && selectedConversation) || 
+           (chatType === 'instagram' && selectedInstagramConversation) || 
+           (chatType === 'ai-bot' && selectedAiTransfer) ? (
             <>
               <div className="chat-header">
                 <div className="chat-header-content">
@@ -1418,10 +1536,16 @@ function ChatsSection() {
                       <h3>Chat con {selectedConversation.user_name}</h3>
                       <p>{selectedConversation.user_email}</p>
                     </>
-                  ) : (
+                  ) : chatType === 'instagram' ? (
                     <>
                       <h3>Instagram: {selectedInstagramConversation.sender_name}</h3>
                       <p>@{selectedInstagramConversation.instagram_username || 'Sin username'}</p>
+                    </>
+                  ) : (
+                    <>
+                      <h3>AI Bot Transfer: {selectedAiTransfer.session_id.substring(0, 12)}...</h3>
+                      <p>Estado: {selectedAiTransfer.status === 'pending' ? 'Pendiente' : 
+                                 selectedAiTransfer.status === 'in_progress' ? 'En Progreso' : 'Resuelto'}</p>
                     </>
                   )}
                 </div>
@@ -1546,7 +1670,7 @@ function ChatsSection() {
                       </div>
                     </div>
                   ))
-                ) : (
+                ) : chatType === 'instagram' ? (
                   instagramMessages.map((message) => (
                     <div
                       key={message.id}
@@ -1571,6 +1695,38 @@ function ChatsSection() {
                         </div>
                         <span className="message-time">
                           {new Date(message.created_at).toLocaleTimeString('es-ES', {
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          })}
+                        </span>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  aiTransferMessages.map((message) => (
+                    <div
+                      key={message.id}
+                      className={`message ${message.sender === 'ai' ? 'admin' : 'user'} ai-transfer`}
+                    >
+                      <div className="message-content">
+                        <div className="message-header">
+                          <p>{message.text}</p>
+                          <div className="message-type-indicator">
+                            {message.sender === 'user' ? (
+                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                                <circle cx="12" cy="7" r="4"/>
+                              </svg>
+                            ) : (
+                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                <path d="M9 12l2 2 4-4"/>
+                                <path d="M21 12c-1 0-3-1-3-3s2-3 3-3 3 1 3 3-2 3-3 3"/>
+                              </svg>
+                            )}
+                          </div>
+                        </div>
+                        <span className="message-time">
+                          {new Date(message.timestamp).toLocaleTimeString('es-ES', {
                             hour: '2-digit',
                             minute: '2-digit'
                           })}
@@ -1616,54 +1772,85 @@ function ChatsSection() {
                 </div>
               )}
 
-              <form onSubmit={sendMessage} className="message-form">
-                <div className="message-input-container">
-                  <input
-                    type="text"
-                    value={newMessage}
-                    onChange={(e) => setNewMessage(e.target.value)}
-                    placeholder={chatType === 'web' ? "Escribe tu respuesta..." : "Responder por Instagram..."}
-                  />
+              {chatType !== 'ai-bot' ? (
+                <form onSubmit={sendMessage} className="message-form">
+                  <div className="message-input-container">
+                    <input
+                      type="text"
+                      value={newMessage}
+                      onChange={(e) => setNewMessage(e.target.value)}
+                      placeholder={chatType === 'web' ? "Escribe tu respuesta..." : "Responder por Instagram..."}
+                    />
+                    
+                    {chatType === 'web' && (
+                      <div className="attachment-controls">
+                        <input
+                          ref={fileInputRef}
+                          type="file"
+                          multiple
+                          onChange={handleFileSelect}
+                          style={{ display: 'none' }}
+                          accept="image/*,.pdf,.doc,.docx,.txt,.zip"
+                        />
+                        
+                        <motion.button
+                          type="button"
+                          className="attachment-btn"
+                          onClick={() => fileInputRef.current?.click()}
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          title="Adjuntar archivo"
+                        >
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/>
+                          </svg>
+                        </motion.button>
+                      </div>
+                    )}
+                  </div>
                   
-                  {chatType === 'web' && (
-                    <div className="attachment-controls">
-                      <input
-                        ref={fileInputRef}
-                        type="file"
-                        multiple
-                        onChange={handleFileSelect}
-                        style={{ display: 'none' }}
-                        accept="image/*,.pdf,.doc,.docx,.txt,.zip"
-                      />
-                      
-                      <motion.button
-                        type="button"
-                        className="attachment-btn"
-                        onClick={() => fileInputRef.current?.click()}
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        title="Adjuntar archivo"
-                      >
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                          <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/>
-                        </svg>
-                      </motion.button>
-                    </div>
-                  )}
+                  <motion.button
+                    type="submit"
+                    className="send-btn"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <line x1="22" y1="2" x2="11" y2="13"/>
+                      <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                    </svg>
+                  </motion.button>
+                </form>
+              ) : (
+                <div className="ai-transfer-info">
+                  <p>Esta es una conversación transferida del AI Bot. Puedes revisar el historial pero no enviar mensajes directamente.</p>
+                  <motion.button
+                    className="btn-resolve-transfer"
+                    onClick={async () => {
+                      try {
+                        const response = await fetch(`/api/ai-assistant/admin/transfers/${selectedAiTransfer.id}/resolve`, {
+                          method: 'PATCH',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({
+                            resolvedBy: 'Admin',
+                            notes: 'Revisado y resuelto'
+                          })
+                        });
+                        if (response.ok) {
+                          alert('Transfer marcado como resuelto');
+                          loadAiTransfers();
+                        }
+                      } catch (error) {
+                        console.error('Error resolving transfer:', error);
+                      }
+                    }}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    Marcar como Resuelto
+                  </motion.button>
                 </div>
-                
-                <motion.button
-                  type="submit"
-                  className="send-btn"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <line x1="22" y1="2" x2="11" y2="13"/>
-                    <polygon points="22 2 15 22 11 13 2 9 22 2"/>
-                  </svg>
-                </motion.button>
-              </form>
+              )}
             </>
           ) : (
             <div className="no-conversation">

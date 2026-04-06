@@ -1197,6 +1197,68 @@ function ChatsSection() {
             message: newMessage
           })
         });
+      }
+    } catch (error) {
+      console.error('Error sending message:', error);
+    }
+  };
+
+  const sendAiTransferMessage = async (e) => {
+    e.preventDefault();
+    if (!newMessage.trim() || !selectedAiTransfer) return;
+
+    try {
+      const response = await fetch(`/api/ai-assistant/admin/transfers/${selectedAiTransfer.id}/reply`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: newMessage,
+          sessionId: selectedAiTransfer.session_id
+        })
+      });
+
+      if (response.ok) {
+        setNewMessage('');
+        loadAiTransferMessages(selectedAiTransfer.id);
+        // Update transfer status to in_progress if it was pending
+        if (selectedAiTransfer.status === 'pending') {
+          await fetch(`/api/ai-assistant/admin/transfers/${selectedAiTransfer.id}/status`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status: 'in_progress' })
+          });
+          loadAiTransfers();
+        }
+      }
+    } catch (error) {
+      console.error('Error sending AI transfer message:', error);
+    }
+  };
+
+  const resolveAiTransfer = async () => {
+    if (!selectedAiTransfer) return;
+
+    try {
+      const response = await fetch(`/api/ai-assistant/admin/transfers/${selectedAiTransfer.id}/resolve`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          resolvedBy: 'Admin',
+          notes: 'Caso resuelto por el equipo de soporte'
+        })
+      });
+
+      if (response.ok) {
+        alert('✅ Caso marcado como resuelto. El usuario será notificado.');
+        loadAiTransfers();
+        // Reload messages to show resolution
+        loadAiTransferMessages(selectedAiTransfer.id);
+      }
+    } catch (error) {
+      console.error('Error resolving transfer:', error);
+      alert('❌ Error al resolver el caso');
+    }
+  };
 
         if (response.ok) {
           setNewMessage('');
@@ -1822,34 +1884,58 @@ function ChatsSection() {
                   </motion.button>
                 </form>
               ) : (
-                <div className="ai-transfer-info">
-                  <p>Esta es una conversación transferida del AI Bot. Puedes revisar el historial pero no enviar mensajes directamente.</p>
-                  <motion.button
-                    className="btn-resolve-transfer"
-                    onClick={async () => {
-                      try {
-                        const response = await fetch(`/api/ai-assistant/admin/transfers/${selectedAiTransfer.id}/resolve`, {
-                          method: 'PATCH',
-                          headers: { 'Content-Type': 'application/json' },
-                          body: JSON.stringify({
-                            resolvedBy: 'Admin',
-                            notes: 'Revisado y resuelto'
-                          })
-                        });
-                        if (response.ok) {
-                          alert('Transfer marcado como resuelto');
-                          loadAiTransfers();
-                        }
-                      } catch (error) {
-                        console.error('Error resolving transfer:', error);
-                      }
-                    }}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    Marcar como Resuelto
-                  </motion.button>
-                </div>
+                <>
+                  {selectedAiTransfer.status !== 'resolved' && (
+                    <form onSubmit={sendAiTransferMessage} className="message-form">
+                      <div className="message-input-container">
+                        <input
+                          type="text"
+                          value={newMessage}
+                          onChange={(e) => setNewMessage(e.target.value)}
+                          placeholder="Responder al usuario..."
+                        />
+                      </div>
+                      
+                      <motion.button
+                        type="submit"
+                        className="send-btn"
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                      >
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <line x1="22" y1="2" x2="11" y2="13"/>
+                          <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                        </svg>
+                      </motion.button>
+                    </form>
+                  )}
+                  
+                  <div className="ai-transfer-actions">
+                    {selectedAiTransfer.status !== 'resolved' && (
+                      <motion.button
+                        className="btn-resolve-transfer"
+                        onClick={resolveAiTransfer}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                      >
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path d="M9 12l2 2 4-4"/>
+                          <circle cx="12" cy="12" r="10"/>
+                        </svg>
+                        Marcar como Resuelto
+                      </motion.button>
+                    )}
+                    {selectedAiTransfer.status === 'resolved' && (
+                      <div className="resolved-indicator">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path d="M9 12l2 2 4-4"/>
+                          <circle cx="12" cy="12" r="10"/>
+                        </svg>
+                        <span>Caso Resuelto</span>
+                      </div>
+                    )}
+                  </div>
+                </>
               )}
             </>
           ) : (

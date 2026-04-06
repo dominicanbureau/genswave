@@ -122,6 +122,47 @@ function AIAssistant() {
     }
   };
 
+  // Poll for new messages from support
+  useEffect(() => {
+    if (!isOpen || !sessionId) return;
+
+    const pollInterval = setInterval(async () => {
+      try {
+        const response = await fetch(`/api/ai-assistant/session/${sessionId}/messages`);
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success && data.messages) {
+            // Check for new support messages
+            const supportMessages = data.messages.filter(msg => 
+              msg.sender === 'support' && 
+              !messages.some(m => m.id === msg.id)
+            );
+
+            if (supportMessages.length > 0) {
+              setMessages(prev => {
+                const newMessages = [...prev];
+                supportMessages.forEach(msg => {
+                  newMessages.push({
+                    id: msg.id,
+                    text: msg.message,
+                    sender: 'support',
+                    timestamp: new Date(msg.created_at),
+                    isSupport: true
+                  });
+                });
+                return newMessages;
+              });
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Error polling messages:', error);
+      }
+    }, 3000); // Poll every 3 seconds
+
+    return () => clearInterval(pollInterval);
+  }, [isOpen, sessionId, messages]);
+
   const handleTransferToSupport = async (lastUserMessage) => {
     try {
       const response = await fetch('/api/ai-assistant/transfer-to-support', {
@@ -276,14 +317,22 @@ function AIAssistant() {
               {messages.map((message) => (
                 <motion.div
                   key={message.id}
-                  className={`message ${message.sender}`}
+                  className={`message ${message.sender === 'support' ? 'support' : message.sender}`}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.3 }}
                 >
-                  {message.sender === 'ai' && (
+                  {(message.sender === 'ai' || message.sender === 'support') && (
                     <div className="message-avatar">
-                      <img src="/genswave.png" alt="Genswave AI" />
+                      <img src="/genswave.png" alt="Genswave" />
+                      {message.sender === 'support' && (
+                        <div className="support-badge" title="Soporte Humano">
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                            <circle cx="12" cy="7" r="4"/>
+                          </svg>
+                        </div>
+                      )}
                     </div>
                   )}
                   <div className="message-content">
@@ -309,6 +358,9 @@ function AIAssistant() {
                         hour: '2-digit', 
                         minute: '2-digit' 
                       })}
+                      {message.sender === 'support' && (
+                        <span className="support-label"> • Soporte</span>
+                      )}
                     </div>
                   </div>
                 </motion.div>

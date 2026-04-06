@@ -714,6 +714,25 @@ router.patch('/admin/transfers/:transferId/resolve', async (req, res) => {
       WHERE id = $3
     `, [resolvedBy, notes, transferId]);
 
+    // Send resolution message to the session
+    const transferResult = await db.query(`
+      SELECT session_id FROM ai_support_transfers WHERE id = $1
+    `, [transferId]);
+
+    if (transferResult.rows.length > 0) {
+      const sessionId = transferResult.rows[0].session_id;
+      
+      // Add resolution message to chat history
+      await db.query(`
+        INSERT INTO ai_chat_sessions (session_id, message, sender, context, created_at)
+        VALUES ($1, $2, 'support', $3, NOW())
+      `, [
+        sessionId,
+        '✅ Tu caso ha sido resuelto por nuestro equipo de soporte. Si necesitas más ayuda, no dudes en contactarnos nuevamente.',
+        JSON.stringify({ type: 'resolution', resolved_by: resolvedBy })
+      ]);
+    }
+
     res.json({
       success: true,
       message: 'Transfer resolved successfully'
@@ -721,6 +740,91 @@ router.patch('/admin/transfers/:transferId/resolve', async (req, res) => {
 
   } catch (error) {
     console.error('Error resolving transfer:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: 'Error interno del servidor' 
+    });
+  }
+});
+
+// Reply to AI transfer (admin response)
+router.post('/admin/transfers/:transferId/reply', async (req, res) => {
+  try {
+    const { transferId } = req.params;
+    const { message, sessionId } = req.body;
+
+    if (!message || !sessionId) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Message and sessionId are required' 
+      });
+    }
+
+    // Store admin reply in chat sessions
+    await db.query(`
+      INSERT INTO ai_chat_sessions (session_id, message, sender, context, created_at)
+      VALUES ($1, $2, 'support', $3, NOW())
+    `, [sessionId, message, JSON.stringify({ type: 'admin_reply', transfer_id: transferId })]);
+
+    res.json({
+      success: true,
+      message: 'Reply sent successfully'
+    });
+
+  } catch (error) {
+    console.error('Error sending reply:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: 'Error interno del servidor' 
+    });
+  }
+});
+
+// Update transfer status
+router.patch('/admin/transfers/:transferId/status', async (req, res) => {
+  try {
+    const { transferId } = req.params;
+    const { status } = req.body;
+
+    await db.query(`
+      UPDATE ai_support_transfers 
+      SET status = $1
+      WHERE id = $2
+    `, [status, transferId]);
+
+    res.json({
+      success: true,
+      message: 'Status updated successfully'
+    });
+
+  } catch (error) {
+    console.error('Error updating status:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: 'Error interno del servidor' 
+    });
+  }
+});
+
+// Get messages for a session (for polling)
+router.get('/session/:sessionId/messages', async (req, res) => {
+  try {
+    const { sessionId } = req.params;
+
+    const result = await db.query(`
+      SELECT id, message, sender, created_at
+      FROM ai_chat_sessions
+      WHERE session_id = $1
+      ORDER BY created_at ASC
+    `, [sessionId]);
+
+    res.json({
+      success: true,
+      messages: result.rows
+    });
+
+  } catch (error) {
+    console.error('Error getting session messages:', error);
     res.status(500).json({ 
       success: false, 
       error: 'Error interno del servidor' 

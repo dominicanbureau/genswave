@@ -1060,7 +1060,37 @@ function ChatsSection() {
       const response = await fetch(`/api/ai-assistant/admin/transfers/${transferId}/messages`);
       if (response.ok) {
         const data = await response.json();
-        setAiTransferMessages(data.messages || []);
+        // Combine messages_history and sessionMessages
+        const allMessages = [];
+        
+        // Add messages from history (initial conversation)
+        if (data.messages && Array.isArray(data.messages)) {
+          data.messages.forEach(msg => {
+            allMessages.push({
+              id: `hist-${Math.random()}`,
+              text: msg.text || msg.message || '',
+              sender: msg.sender || 'user',
+              timestamp: msg.timestamp || new Date()
+            });
+          });
+        }
+        
+        // Add messages from session (ongoing conversation)
+        if (data.sessionMessages && Array.isArray(data.sessionMessages)) {
+          data.sessionMessages.forEach(msg => {
+            allMessages.push({
+              id: msg.id || `sess-${Math.random()}`,
+              text: msg.message || '',
+              sender: msg.sender || 'user',
+              timestamp: msg.created_at || new Date()
+            });
+          });
+        }
+        
+        // Sort by timestamp
+        allMessages.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+        
+        setAiTransferMessages(allMessages);
       }
     } catch (error) {
       console.error('Error loading AI transfer messages:', error);
@@ -1268,6 +1298,28 @@ function ChatsSection() {
     }
   };
 
+  const deleteAiTransfer = async () => {
+    if (!selectedAiTransfer) return;
+    
+    if (!confirm('¿Estás seguro de eliminar esta conversación? Esta acción no se puede deshacer.')) return;
+
+    try {
+      const response = await fetch(`/api/ai-assistant/admin/transfers/${selectedAiTransfer.id}`, {
+        method: 'DELETE'
+      });
+
+      if (response.ok) {
+        alert('✅ Conversación eliminada');
+        setSelectedAiTransfer(null);
+        setAiTransferMessages([]);
+        loadAiTransfers();
+      }
+    } catch (error) {
+      console.error('Error deleting transfer:', error);
+      alert('❌ Error al eliminar la conversación');
+    }
+  };
+
   const formatFileSize = (bytes) => {
     if (bytes === 0) return '0 Bytes';
     const k = 1024;
@@ -1297,22 +1349,50 @@ function ChatsSection() {
   };
 
   const deleteAllMessages = async () => {
-    if (!confirm(`¿Estás seguro de eliminar TODA la conversación con ${selectedConversation.user_name}? Esta acción no se puede deshacer.`)) return;
+    // Determine which type of chat we're deleting
+    let confirmMessage = '';
+    let deleteAction = null;
+
+    if (chatType === 'web' && selectedConversation) {
+      confirmMessage = `¿Estás seguro de eliminar TODA la conversación con ${selectedConversation.user_name}? Esta acción no se puede deshacer.`;
+      deleteAction = async () => {
+        const response = await fetch(`/api/messages/conversation/${selectedConversation.id}/all`, {
+          method: 'DELETE'
+        });
+        if (response.ok) {
+          const result = await response.json();
+          alert(`${result.deletedCount} mensajes eliminados`);
+          setMessages([]);
+          loadConversations();
+        }
+      };
+    } else if (chatType === 'ai-bot' && selectedAiTransfer) {
+      confirmMessage = `¿Estás seguro de eliminar TODA la conversación del AI Bot (Sesión: ${selectedAiTransfer.session_id.substring(0, 12)}...)? Esta acción no se puede deshacer.`;
+      deleteAction = async () => {
+        const response = await fetch(`/api/ai-assistant/admin/transfers/${selectedAiTransfer.id}`, {
+          method: 'DELETE'
+        });
+        if (response.ok) {
+          alert('Conversación eliminada completamente');
+          setAiTransferMessages([]);
+          setSelectedAiTransfer(null);
+          loadAiTransfers();
+        }
+      };
+    } else if (chatType === 'instagram' && selectedInstagramConversation) {
+      confirmMessage = `¿Estás seguro de eliminar TODA la conversación de Instagram con ${selectedInstagramConversation.sender_name}? Esta acción no se puede deshacer.`;
+      deleteAction = async () => {
+        // Instagram delete logic (if exists)
+        alert('Función de eliminación de Instagram no implementada aún');
+      };
+    } else {
+      return;
+    }
+
+    if (!confirm(confirmMessage)) return;
     
     try {
-      const response = await fetch(`/api/messages/conversation/${selectedConversation.id}/all`, {
-        method: 'DELETE'
-      });
-      
-      if (response.ok) {
-        const result = await response.json();
-        alert(`${result.deletedCount} mensajes eliminados`);
-        // Refresh messages and conversations
-        setMessages([]);
-        loadConversations();
-      } else {
-        alert('Error al eliminar la conversación');
-      }
+      await deleteAction();
     } catch (error) {
       console.error('Error al eliminar conversación:', error);
       alert('Error al eliminar la conversación');
@@ -1552,28 +1632,40 @@ function ChatsSection() {
               filteredAiTransfers.map((transfer) => (
                 <motion.div
                   key={transfer.id}
-                  className={`conversation-item ${selectedAiTransfer?.id === transfer.id ? 'active' : ''}`}
+                  className={`conversation-item ${selectedAiTransfer?.id === transfer.id ? 'active' : ''} ${transfer.status === 'user_disconnected' ? 'disconnected' : ''}`}
                   onClick={() => setSelectedAiTransfer(transfer)}
                   whileHover={{ x: 5 }}
                   whileTap={{ scale: 0.98 }}
                 >
                   <div className="conversation-avatar ai-bot">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M9 12l2 2 4-4"/>
-                      <path d="M21 12c-1 0-3-1-3-3s2-3 3-3 3 1 3 3-2 3-3 3"/>
-                      <path d="M3 12c1 0 3-1 3-3s-2-3-3-3-3 1-3 3 2 3 3 3"/>
-                    </svg>
+                    {transfer.status === 'user_disconnected' ? (
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="15" y1="9" x2="9" y2="15"/>
+                        <line x1="9" y1="9" x2="15" y2="15"/>
+                      </svg>
+                    ) : (
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M9 12l2 2 4-4"/>
+                        <path d="M21 12c-1 0-3-1-3-3s2-3 3-3 3 1 3 3-2 3-3 3"/>
+                        <path d="M3 12c1 0 3-1 3-3s-2-3-3-3-3 1-3 3 2 3 3 3"/>
+                      </svg>
+                    )}
                   </div>
                   <div className="conversation-info">
                     <h4>Sesión AI: {transfer.session_id.substring(0, 12)}...</h4>
                     <p className="last-message">{transfer.last_message}</p>
+                    {transfer.status === 'user_disconnected' && (
+                      <span className="disconnected-warning">⚠️ Usuario desconectado</span>
+                    )}
                     <span className="conversation-time">
                       {new Date(transfer.created_at).toLocaleDateString('es-ES')}
                     </span>
                   </div>
                   <span className={`status-badge status-${transfer.status}`}>
                     {transfer.status === 'pending' ? 'Pendiente' : 
-                     transfer.status === 'in_progress' ? 'En Progreso' : 'Resuelto'}
+                     transfer.status === 'in_progress' ? 'En Progreso' : 
+                     transfer.status === 'user_disconnected' ? 'Desconectado' : 'Resuelto'}
                   </span>
                 </motion.div>
               ))
@@ -1602,7 +1694,11 @@ function ChatsSection() {
                     <>
                       <h3>AI Bot Transfer: {selectedAiTransfer.session_id.substring(0, 12)}...</h3>
                       <p>Estado: {selectedAiTransfer.status === 'pending' ? 'Pendiente' : 
-                                 selectedAiTransfer.status === 'in_progress' ? 'En Progreso' : 'Resuelto'}</p>
+                                 selectedAiTransfer.status === 'in_progress' ? 'En Progreso' : 
+                                 selectedAiTransfer.status === 'user_disconnected' ? 'Usuario Desconectado' : 'Resuelto'}</p>
+                      {selectedAiTransfer.status === 'user_disconnected' && (
+                        <p className="warning-text">⚠️ El usuario cerró el chat. No recibirá más mensajes.</p>
+                      )}
                     </>
                   )}
                 </div>
@@ -1763,13 +1859,20 @@ function ChatsSection() {
                   aiTransferMessages.map((message) => (
                     <div
                       key={message.id}
-                      className={`message ${message.sender === 'ai' ? 'admin' : 'user'} ai-transfer`}
+                      className={`message ${message.sender === 'ai' || message.sender === 'support' ? 'admin' : 'user'} ai-transfer`}
                     >
                       <div className="message-content">
                         <div className="message-header">
-                          <p>{message.text}</p>
+                          <div 
+                            dangerouslySetInnerHTML={{ __html: message.text }}
+                          />
                           <div className="message-type-indicator">
                             {message.sender === 'user' ? (
+                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                                <circle cx="12" cy="7" r="4"/>
+                              </svg>
+                            ) : message.sender === 'support' ? (
                               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
                                 <circle cx="12" cy="7" r="4"/>
@@ -1787,6 +1890,9 @@ function ChatsSection() {
                             hour: '2-digit',
                             minute: '2-digit'
                           })}
+                          {message.sender === 'support' && (
+                            <span className="support-label"> • Soporte</span>
+                          )}
                         </span>
                       </div>
                     </div>
@@ -1906,7 +2012,21 @@ function ChatsSection() {
                   )}
                   
                   <div className="ai-transfer-actions">
-                    {selectedAiTransfer.status !== 'resolved' && (
+                    {selectedAiTransfer.status === 'user_disconnected' ? (
+                      <motion.button
+                        className="btn-delete-transfer"
+                        onClick={deleteAiTransfer}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                      >
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path d="M3 6h18"/>
+                          <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
+                          <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
+                        </svg>
+                        Eliminar Conversación
+                      </motion.button>
+                    ) : selectedAiTransfer.status !== 'resolved' ? (
                       <motion.button
                         className="btn-resolve-transfer"
                         onClick={resolveAiTransfer}
@@ -1919,8 +2039,7 @@ function ChatsSection() {
                         </svg>
                         Marcar como Resuelto
                       </motion.button>
-                    )}
-                    {selectedAiTransfer.status === 'resolved' && (
+                    ) : (
                       <div className="resolved-indicator">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                           <path d="M9 12l2 2 4-4"/>

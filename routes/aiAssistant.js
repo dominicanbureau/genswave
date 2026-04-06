@@ -1,11 +1,37 @@
 import express from 'express';
 import db from '../database.js';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { searchKnowledge } from '../utils/ragIndexer.js';
 
 const router = express.Router();
 
 // Initialize Gemini AI
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+
+// Refined Spanish names for support agents
+const SUPPORT_NAMES = {
+  firstNames: [
+    'Sebastián', 'Valentina', 'Alejandro', 'Isabella', 'Nicolás',
+    'Sofía', 'Matías', 'Camila', 'Santiago', 'Luciana',
+    'Gabriel', 'Victoria', 'Leonardo', 'Catalina', 'Maximiliano',
+    'Emilia', 'Rafael', 'Martina', 'Adrián', 'Antonella'
+  ],
+  lastNames: [
+    'Mendoza', 'Castellanos', 'Valenzuela', 'Santamaría', 'Villarreal',
+    'Montalvo', 'Cervantes', 'Delgado', 'Navarro', 'Quintero',
+    'Salazar', 'Vega', 'Morales', 'Herrera', 'Rojas'
+  ]
+};
+
+// Generate a random support agent name
+function generateSupportAgentName(sessionId) {
+  // Use sessionId as seed for consistency
+  const seed = sessionId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  const firstNameIndex = seed % SUPPORT_NAMES.firstNames.length;
+  const lastNameIndex = (seed * 7) % SUPPORT_NAMES.lastNames.length;
+  
+  return `${SUPPORT_NAMES.firstNames[firstNameIndex]} ${SUPPORT_NAMES.lastNames[lastNameIndex]}`;
+}
 
 // Helper function to convert markdown to HTML
 function markdownToHtml(text) {
@@ -409,6 +435,32 @@ IA: OpenAI, TensorFlow, Machine Learning, Procesamiento de lenguaje natural
 • Cambios menores en primer mes suelen estar cubiertos
 • Cambios mayores: presupuestos adicionales
 
+🔑 CÓDIGOS QUICK (QUICK CODES):
+
+¿Qué es un Código Quick?
+• Es un código especial de acceso rápido que te permite crear una cuenta en Genswave sin necesidad de registro manual
+• Te lo proporciona el equipo de Genswave después de una consulta o reunión
+• Es un código alfanumérico único (ejemplo: ABC123)
+
+¿Cómo usar un Código Quick?
+1. Ve a la página de login/registro en genswave.org
+2. Busca la opción "¿Tienes un código Quick?"
+3. Ingresa tu código (en mayúsculas)
+4. El sistema creará automáticamente tu cuenta con los datos que ya tenemos
+5. Serás redirigido a tu dashboard personal
+
+Características de los Códigos Quick:
+• Son de un solo uso
+• Tienen fecha de expiración
+• Crean tu cuenta automáticamente
+• Te dan acceso inmediato al dashboard
+• No necesitas crear contraseña manualmente (se genera una temporal)
+
+Si tienes un Código Quick:
+• Úsalo lo antes posible antes de que expire
+• Si no funciona, contacta a support@genswave.org
+• Si lo perdiste, pide uno nuevo al equipo
+
 🎯 TU PERSONALIDAD Y ESTILO:
 
 - Eres EXTREMADAMENTE conversacional y natural
@@ -469,7 +521,7 @@ Los proyectos de e-commerce típicamente están en el rango de $5,000 a $50,000+
 
 RECUERDA: Tu objetivo es ayudar genuinamente al usuario y guiarlo hacia convertirse en cliente satisfecho. Sé conversacional, persuasivo y siempre útil.`;
 
-// AI Assistant Chat endpoint
+// AI Assistant Chat endpoint with RAG
 router.post('/chat', async (req, res) => {
   try {
     const { message, sessionId, context } = req.body;
@@ -478,6 +530,31 @@ router.post('/chat', async (req, res) => {
       return res.status(400).json({ 
         success: false, 
         error: 'Message and sessionId are required' 
+      });
+    }
+
+    // Check if session is transferred to support
+    const transferCheck = await db.query(`
+      SELECT id, status FROM ai_support_transfers 
+      WHERE session_id = $1 
+      AND status IN ('pending', 'in_progress')
+      ORDER BY created_at DESC 
+      LIMIT 1
+    `, [sessionId]);
+
+    // If transferred, don't respond with AI - let admin handle it
+    if (transferCheck.rows.length > 0) {
+      // Store user message but don't generate AI response
+      await db.query(`
+        INSERT INTO ai_chat_sessions (session_id, message, sender, context, created_at)
+        VALUES ($1, $2, 'user', $3, NOW())
+      `, [sessionId, message, JSON.stringify(context)]);
+
+      // Don't send any automatic response - just acknowledge receipt
+      return res.json({
+        success: true,
+        transferred: true,
+        silent: true // Flag to indicate no message should be shown
       });
     }
 
@@ -505,12 +582,27 @@ router.post('/chat', async (req, res) => {
       });
     }
 
+    // 🧠 RAG: Search for relevant knowledge
+    console.log('🔍 Searching knowledge base for:', message);
+    const relevantKnowledge = await searchKnowledge(message, 10);
+    
+    let ragContext = '';
+    if (relevantKnowledge && relevantKnowledge.length > 0) {
+      ragContext = '\n\n📚 CONTEXTO INTERNO (USA ESTO PARA ENTENDER, PERO NO MENCIONES DETALLES TÉCNICOS AL USUARIO):\n\n';
+      relevantKnowledge.forEach((item, index) => {
+        ragContext += `[${index + 1}] ${item.content.substring(0, 400)}...\n\n`;
+      });
+      console.log(`✅ Found ${relevantKnowledge.length} relevant knowledge chunks`);
+    } else {
+      console.log('ℹ️  No relevant knowledge found, using base prompt');
+    }
+
     // Generate AI response using Gemini
     const model = genAI.getGenerativeModel({ 
-      model: "gemini-2.5-flash",
+      model: "models/gemini-2.5-flash",
       generationConfig: {
-        maxOutputTokens: 600, // Reduced for more concise responses
-        temperature: 0.5, // Lower for more focused, less creative responses
+        maxOutputTokens: 4096,
+        temperature: 0.5,
         topP: 0.85,
         topK: 30,
       },
@@ -526,23 +618,44 @@ router.post('/chat', async (req, res) => {
       ],
     });
 
-    // Create the full prompt with strict instructions
-    const fullPrompt = `${SYSTEM_PROMPT}${conversationContext}
+    // Create the full prompt with RAG context
+    const fullPrompt = `${SYSTEM_PROMPT}${ragContext}${conversationContext}
 
-🚨 INSTRUCCIONES FINALES CRÍTICAS - DEBES SEGUIRLAS AL PIE DE LA LETRA:
+🚨 INSTRUCCIONES FINALES ABSOLUTAS:
 
-1. NO uses asteriscos (*) ni guiones bajos (_) para formato
-2. Escribe en texto plano, conversacional y natural
-3. Usa números (1. 2. 3.) para listas ordenadas
-4. Separa párrafos con doble salto de línea
-5. SOLO usa información del SYSTEM_PROMPT arriba
-6. Si la pregunta requiere información que NO está en el prompt, responde: "No tengo esa información específica en este momento, pero puedo conectarte con nuestro equipo de soporte que te ayudará con eso. ¿Te gustaría que te transfiera?"
-7. Sé específico y preciso con precios, servicios y características
-8. Mantén respuestas estructuradas pero conversacionales
+1. NUNCA JAMÁS menciones al usuario:
+   - Código (CSS, JavaScript, Python, etc.)
+   - Nombres de modelos de IA (embeddings, GPT, etc.)
+   - Nombres de funciones, variables o archivos
+   - Implementaciones técnicas (useState, router, db.query, etc.)
+   - Configuraciones de servidor o base de datos
+   - Border-radius, estilos, o cualquier detalle de programación
+
+2. El contexto interno puede contener código técnico - ÚSALO para entender el sistema, pero NUNCA lo menciones al usuario
+
+3. SOLO habla al usuario sobre:
+   - Servicios que ofrecemos
+   - Precios y planes de pago
+   - Proceso de trabajo
+   - Beneficios para el cliente
+   - Cómo contactarnos
+   - Quick Codes (si pregunta)
+   - Información de negocio
+
+4. Si el usuario solo dice "hola" o saluda:
+   - Responde con un saludo amigable y breve
+   - Pregunta en qué puedes ayudar
+   - NO des información no solicitada
+   - Mantén la respuesta corta (2-3 líneas máximo)
+
+5. NO uses asteriscos (*) ni guiones bajos (_) para formato
+6. Escribe en texto plano, conversacional y natural
+7. Sé COMPLETO solo cuando te hagan una pregunta específica
+8. Responde de forma profesional pero amigable
 
 Usuario: ${message}
 
-Genswave (responde en texto plano, sin asteriscos ni formato markdown):`;
+Genswave (responde de forma APROPIADA al mensaje del usuario, SIN mencionar detalles técnicos):`;
 
     // Generate response
     const result = await model.generateContent(fullPrompt);
@@ -620,6 +733,9 @@ router.post('/transfer-to-support', async (req, res) => {
       });
     }
 
+    // Generate a unique support agent name for this transfer
+    const agentName = generateSupportAgentName(sessionId);
+
     // Create a support ticket/conversation
     const result = await db.query(`
       INSERT INTO ai_support_transfers (
@@ -627,15 +743,17 @@ router.post('/transfer-to-support', async (req, res) => {
         messages_history, 
         last_message, 
         context, 
-        status, 
+        status,
+        assigned_agent_name,
         created_at
-      ) VALUES ($1, $2, $3, $4, 'pending', NOW())
+      ) VALUES ($1, $2, $3, $4, 'pending', $5, NOW())
       RETURNING id
     `, [
       sessionId, 
       JSON.stringify(messages), 
       lastMessage, 
-      JSON.stringify(context)
+      JSON.stringify(context),
+      agentName
     ]);
 
     // Mark session as transferred
@@ -648,6 +766,7 @@ router.post('/transfer-to-support', async (req, res) => {
     res.json({
       success: true,
       transferId: result.rows[0].id,
+      agentName: agentName,
       message: 'Conversación transferida al equipo de soporte'
     });
 
@@ -719,9 +838,22 @@ router.get('/admin/transfers/:transferId/messages', async (req, res) => {
       ORDER BY created_at ASC
     `, [transfer.session_id]);
 
+    // Parse messages_history if it's a string, otherwise use as is
+    let messagesHistory = transfer.messages_history;
+    if (typeof messagesHistory === 'string') {
+      try {
+        messagesHistory = JSON.parse(messagesHistory);
+      } catch (e) {
+        messagesHistory = [];
+      }
+    }
+    if (!Array.isArray(messagesHistory)) {
+      messagesHistory = [];
+    }
+
     res.json({
       success: true,
-      messages: JSON.parse(transfer.messages_history),
+      messages: messagesHistory,
       sessionMessages: sessionMessages.rows
     });
 
@@ -740,6 +872,9 @@ router.patch('/admin/transfers/:transferId/resolve', async (req, res) => {
     const { transferId } = req.params;
     const { resolvedBy, notes } = req.body;
 
+    console.log('🔧 Resolving transfer:', { transferId, resolvedBy });
+
+    // Update transfer status
     await db.query(`
       UPDATE ai_support_transfers 
       SET 
@@ -750,13 +885,17 @@ router.patch('/admin/transfers/:transferId/resolve', async (req, res) => {
       WHERE id = $3
     `, [resolvedBy, notes, transferId]);
 
-    // Send resolution message to the session
+    console.log('✅ Transfer status updated');
+
+    // Get session_id for this transfer
     const transferResult = await db.query(`
       SELECT session_id FROM ai_support_transfers WHERE id = $1
     `, [transferId]);
 
     if (transferResult.rows.length > 0) {
       const sessionId = transferResult.rows[0].session_id;
+      
+      console.log('📨 Sending resolution message to session:', sessionId);
       
       // Add resolution message to chat history
       await db.query(`
@@ -767,6 +906,8 @@ router.patch('/admin/transfers/:transferId/resolve', async (req, res) => {
         '✅ Tu caso ha sido resuelto por nuestro equipo de soporte. Si necesitas más ayuda, no dudes en contactarnos nuevamente.',
         JSON.stringify({ type: 'resolution', resolved_by: resolvedBy })
       ]);
+
+      console.log('✅ Resolution message sent');
     }
 
     res.json({
@@ -775,10 +916,11 @@ router.patch('/admin/transfers/:transferId/resolve', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error resolving transfer:', error);
+    console.error('❌ Error resolving transfer:', error);
     res.status(500).json({ 
       success: false, 
-      error: 'Error interno del servidor' 
+      error: 'Error interno del servidor',
+      details: error.message
     });
   }
 });
@@ -796,22 +938,41 @@ router.post('/admin/transfers/:transferId/reply', async (req, res) => {
       });
     }
 
-    // Store admin reply in chat sessions
-    await db.query(`
+    console.log('📤 Admin sending reply:', { transferId, sessionId, message: message.substring(0, 50) });
+
+    // Get the assigned agent name for this transfer
+    const transferData = await db.query(`
+      SELECT assigned_agent_name FROM ai_support_transfers WHERE id = $1
+    `, [transferId]);
+
+    const agentName = transferData.rows[0]?.assigned_agent_name || 'Soporte Genswave';
+
+    // Store admin reply in chat sessions with agent name
+    const result = await db.query(`
       INSERT INTO ai_chat_sessions (session_id, message, sender, context, created_at)
       VALUES ($1, $2, 'support', $3, NOW())
-    `, [sessionId, message, JSON.stringify({ type: 'admin_reply', transfer_id: transferId })]);
+      RETURNING id
+    `, [sessionId, message, JSON.stringify({ 
+      type: 'admin_reply', 
+      transfer_id: parseInt(transferId),
+      agent_name: agentName
+    })]);
+
+    console.log('✅ Reply stored with ID:', result.rows[0].id);
 
     res.json({
       success: true,
-      message: 'Reply sent successfully'
+      message: 'Reply sent successfully',
+      messageId: result.rows[0].id,
+      agentName: agentName
     });
 
   } catch (error) {
-    console.error('Error sending reply:', error);
+    console.error('❌ Error sending reply:', error);
     res.status(500).json({ 
       success: false, 
-      error: 'Error interno del servidor' 
+      error: 'Error interno del servidor',
+      details: error.message
     });
   }
 });
@@ -854,9 +1015,31 @@ router.get('/session/:sessionId/messages', async (req, res) => {
       ORDER BY created_at ASC
     `, [sessionId]);
 
+    // Get the assigned agent name for this session if transferred
+    const transferResult = await db.query(`
+      SELECT assigned_agent_name FROM ai_support_transfers 
+      WHERE session_id = $1 
+      ORDER BY created_at DESC 
+      LIMIT 1
+    `, [sessionId]);
+
+    const agentName = transferResult.rows[0]?.assigned_agent_name;
+
+    // Add agent name to support messages
+    const messagesWithAgent = result.rows.map(msg => {
+      if (msg.sender === 'support') {
+        return {
+          ...msg,
+          agent_name: agentName
+        };
+      }
+      return msg;
+    });
+
     res.json({
       success: true,
-      messages: result.rows
+      messages: messagesWithAgent,
+      agentName: agentName
     });
 
   } catch (error) {
@@ -869,3 +1052,101 @@ router.get('/session/:sessionId/messages', async (req, res) => {
 });
 
 export default router;
+
+
+// Mark session as inactive (chat closed)
+router.post('/session/:sessionId/close', async (req, res) => {
+  try {
+    const { sessionId } = req.params;
+
+    // Mark all transfers for this session as needing attention
+    await db.query(`
+      UPDATE ai_support_transfers 
+      SET status = 'user_disconnected'
+      WHERE session_id = $1 AND status != 'resolved'
+    `, [sessionId]);
+
+    res.json({
+      success: true,
+      message: 'Session marked as closed'
+    });
+
+  } catch (error) {
+    console.error('Error closing session:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: 'Error interno del servidor'
+    });
+  }
+});
+
+// Check if session is still active
+router.get('/session/:sessionId/status', async (req, res) => {
+  try {
+    const { sessionId } = req.params;
+
+    const result = await db.query(`
+      SELECT status FROM ai_support_transfers 
+      WHERE session_id = $1 
+      ORDER BY created_at DESC 
+      LIMIT 1
+    `, [sessionId]);
+
+    res.json({
+      success: true,
+      active: result.rows.length === 0 || result.rows[0].status !== 'user_disconnected'
+    });
+
+  } catch (error) {
+    console.error('Error checking session status:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: 'Error interno del servidor'
+    });
+  }
+});
+
+// Delete disconnected transfer (admin action)
+router.delete('/admin/transfers/:transferId', async (req, res) => {
+  try {
+    const { transferId } = req.params;
+
+    // Get session_id before deleting
+    const transferResult = await db.query(`
+      SELECT session_id FROM ai_support_transfers WHERE id = $1
+    `, [transferId]);
+
+    if (transferResult.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        error: 'Transfer not found'
+      });
+    }
+
+    const sessionId = transferResult.rows[0].session_id;
+
+    // Delete all messages for this session
+    await db.query(`
+      DELETE FROM ai_chat_sessions WHERE session_id = $1
+    `, [sessionId]);
+
+    // Delete the transfer
+    await db.query(`
+      DELETE FROM ai_support_transfers WHERE id = $1
+    `, [transferId]);
+
+    console.log(`✅ Deleted transfer ${transferId} and all messages for session ${sessionId}`);
+
+    res.json({
+      success: true,
+      message: 'Transfer and messages deleted successfully'
+    });
+
+  } catch (error) {
+    console.error('Error deleting transfer:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: 'Error interno del servidor'
+    });
+  }
+});

@@ -4542,3 +4542,63 @@ body {
   background: #064e3b;
   color: #6ee7b7;
 }
+
+
+/* Disconnected transfer styles */
+.conversation-item.disconnected {
+  border-left: 3px solid #ff6b6b;
+  background: rgba(255, 107, 107, 0.05);
+}
+
+.conversation-item.disconnected .conversation-avatar {
+  background: rgba(255, 107, 107, 0.1);
+  color: #ff6b6b;
+}
+
+.disconnected-warning {
+  display: inline-block;
+  color: #ff6b6b;
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-top: 0.25rem;
+  padding: 0.125rem 0.5rem;
+  background: rgba(255, 107, 107, 0.1);
+  border-radius: 4px;
+}
+
+.warning-text {
+  color: #ff6b6b;
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-top: 0.25rem;
+}
+
+.status-badge.status-user_disconnected {
+  background: rgba(255, 107, 107, 0.1);
+  color: #ff6b6b;
+}
+
+.btn-delete-transfer {
+  background: #ff6b6b;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s;
+}
+
+.btn-delete-transfer:hover {
+  background: #ff5252;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+}
+
+.btn-delete-transfer svg {
+  width: 18px;
+  height: 18px;
+}

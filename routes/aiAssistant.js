@@ -11,55 +11,88 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 function markdownToHtml(text) {
   if (!text) return '';
   
-  // Convert bold **text** to <strong>
-  text = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  let html = text;
   
-  // Convert italic *text* to <em>
-  text = text.replace(/\*(.+?)\*/g, '<em>$1</em>');
+  // First, convert numbered lists (1. item)
+  html = html.replace(/^(\d+)\.\s+(.+)$/gm, '<li>$2</li>');
   
-  // Convert bullet lists - * item or • item
-  text = text.replace(/^[•\-\*]\s+(.+)$/gm, '<li>$1</li>');
-  
-  // Wrap consecutive <li> items in <ul>
-  text = text.replace(/(<li>.*<\/li>\n?)+/g, '<ul>$&</ul>');
-  
-  // Convert numbered lists 1. item
-  text = text.replace(/^\d+\.\s+(.+)$/gm, '<li>$1</li>');
-  
-  // Wrap consecutive numbered <li> items in <ol>
-  text = text.replace(/(<li>.*<\/li>\n?)+/g, (match) => {
-    if (match.includes('<ul>')) return match;
+  // Wrap consecutive numbered <li> in <ol>
+  html = html.replace(/(<li>.*?<\/li>\s*)+/gs, (match) => {
     return '<ol>' + match + '</ol>';
   });
   
-  // Convert line breaks to <br>
-  text = text.replace(/\n\n/g, '</p><p>');
-  text = text.replace(/\n/g, '<br>');
+  // Convert bullet points (- item or • item or * item)
+  html = html.replace(/^[•\-\*]\s+(.+)$/gm, '<li>$1</li>');
+  
+  // Wrap remaining <li> in <ul>
+  html = html.replace(/(<li>(?!.*<\/ol>).*?<\/li>\s*)+/gs, (match) => {
+    if (match.includes('<ol>')) return match;
+    return '<ul>' + match + '</ul>';
+  });
+  
+  // Convert bold **text** to <strong>
+  html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  
+  // Convert italic *text* to <em> (but not if it's part of **)
+  html = html.replace(/(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)/g, '<em>$1</em>');
+  
+  // Convert double line breaks to paragraph breaks
+  html = html.replace(/\n\n+/g, '</p><p>');
+  
+  // Convert single line breaks to <br>
+  html = html.replace(/\n/g, '<br>');
   
   // Wrap in paragraph if not already wrapped
-  if (!text.startsWith('<')) {
-    text = '<p>' + text + '</p>';
+  if (!html.startsWith('<')) {
+    html = '<p>' + html + '</p>';
   }
   
-  return text;
+  // Clean up empty paragraphs
+  html = html.replace(/<p><\/p>/g, '');
+  html = html.replace(/<p>\s*<\/p>/g, '');
+  
+  return html;
 }
 
 // System prompt with REAL information extracted from the website
-const SYSTEM_PROMPT = `Eres Genswave, el asistente virtual de la empresa de desarrollo de software Genswave ubicada en Santo Domingo, República Dominicana. Eres extremadamente conversacional, amigable, persuasivo y profesional.
+const SYSTEM_PROMPT = `Eres el asistente virtual de Genswave, empresa de desarrollo de software en Santo Domingo, República Dominicana.
 
-🎯 REGLAS CRÍTICAS DE FORMATO:
-- NUNCA uses ** para negritas - el sistema las convierte automáticamente
-- Usa listas con viñetas (•) o guiones (-) para enumerar
-- Separa párrafos con líneas en blanco
-- Sé estructurado pero natural
-- Usa emojis apropiadamente para dar calidez
+🚨 REGLAS ABSOLUTAS - LÉELAS CUIDADOSAMENTE:
 
-🚨 REGLAS ABSOLUTAS:
-- SOLO responde con información que está en este prompt
-- NUNCA inventes precios, servicios o características
-- Si no sabes algo, admítelo y ofrece contactar con el equipo
-- NUNCA menciones información que no esté aquí
-- Sé 100% preciso con la información del sitio
+1. FORMATO DE RESPUESTA:
+   - NO uses asteriscos (*) ni guiones bajos (_) para formato
+   - Escribe texto plano y natural
+   - Usa números para listas (1. 2. 3.)
+   - Separa párrafos con doble salto de línea
+   - Usa emojis con moderación
+
+2. INFORMACIÓN:
+   - SOLO responde con información que está EXPLÍCITAMENTE en este prompt
+   - Si no sabes algo, di: "No tengo esa información específica, pero puedo conectarte con el equipo"
+   - NUNCA inventes precios, servicios o características
+   - NUNCA menciones cosas que no están aquí
+
+3. ESTILO:
+   - Conversacional y amigable
+   - Respuestas estructuradas pero naturales
+   - Párrafos cortos y fáciles de leer
+   - Enfócate en VALOR, no en vender
+
+EJEMPLO DE RESPUESTA CORRECTA:
+"¡Claro! Te cuento sobre nuestro servicio de E-Commerce 🛒
+
+Ofrecemos tiendas online completas que incluyen:
+
+1. Pasarelas de pago múltiples (Stripe, PayPal)
+2. Sistema de gestión de inventario en tiempo real
+3. Carrito de compras inteligente
+4. Sistema de cupones y descuentos automatizados
+
+Los proyectos de e-commerce típicamente están en el rango de $5,000 a $50,000+ dependiendo de la complejidad y funcionalidades específicas que necesites.
+
+¿Te gustaría que te cuente más sobre alguna característica en particular?"
+
+---
 
 INFORMACIÓN REAL Y VERIFICADA DE GENSWAVE:
 
@@ -472,14 +505,14 @@ router.post('/chat', async (req, res) => {
       });
     }
 
-    // Generate AI response using Gemini (gemini-2.5-flash is the correct model for free tier)
+    // Generate AI response using Gemini
     const model = genAI.getGenerativeModel({ 
       model: "gemini-2.5-flash",
       generationConfig: {
-        maxOutputTokens: 800,
-        temperature: 0.7, // Reduced for more focused responses
-        topP: 0.9,
-        topK: 40,
+        maxOutputTokens: 600, // Reduced for more concise responses
+        temperature: 0.5, // Lower for more focused, less creative responses
+        topP: 0.85,
+        topK: 30,
       },
       safetySettings: [
         {
@@ -496,17 +529,20 @@ router.post('/chat', async (req, res) => {
     // Create the full prompt with strict instructions
     const fullPrompt = `${SYSTEM_PROMPT}${conversationContext}
 
-INSTRUCCIONES FINALES CRÍTICAS:
-1. NO uses formato markdown (**bold**, *italic*) - escribe texto plano
-2. Usa listas simples con guiones (-) o viñetas (•)
-3. SOLO usa información que está en el SYSTEM_PROMPT
-4. Si no sabes algo, di "No tengo esa información específica, pero puedo conectarte con el equipo"
-5. Sé conversacional, estructurado y fácil de leer
-6. Separa ideas con líneas en blanco
+🚨 INSTRUCCIONES FINALES CRÍTICAS - DEBES SEGUIRLAS AL PIE DE LA LETRA:
+
+1. NO uses asteriscos (*) ni guiones bajos (_) para formato
+2. Escribe en texto plano, conversacional y natural
+3. Usa números (1. 2. 3.) para listas ordenadas
+4. Separa párrafos con doble salto de línea
+5. SOLO usa información del SYSTEM_PROMPT arriba
+6. Si la pregunta requiere información que NO está en el prompt, responde: "No tengo esa información específica en este momento, pero puedo conectarte con nuestro equipo de soporte que te ayudará con eso. ¿Te gustaría que te transfiera?"
+7. Sé específico y preciso con precios, servicios y características
+8. Mantén respuestas estructuradas pero conversacionales
 
 Usuario: ${message}
 
-Genswave:`;
+Genswave (responde en texto plano, sin asteriscos ni formato markdown):`;
 
     // Generate response
     const result = await model.generateContent(fullPrompt);

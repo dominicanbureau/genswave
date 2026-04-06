@@ -1197,6 +1197,14 @@ function ChatsSection() {
             message: newMessage
           })
         });
+
+        if (response.ok) {
+          setNewMessage('');
+          loadInstagramMessages(selectedInstagramConversation.instagram_user_id);
+        } else {
+          const errorData = await response.json();
+          alert('Error al enviar mensaje: ' + errorData.message);
+        }
       }
     } catch (error) {
       console.error('Error sending message:', error);
@@ -1257,19 +1265,6 @@ function ChatsSection() {
     } catch (error) {
       console.error('Error resolving transfer:', error);
       alert('❌ Error al resolver el caso');
-    }
-  };
-
-        if (response.ok) {
-          setNewMessage('');
-          loadInstagramMessages(selectedInstagramConversation.instagram_user_id);
-        } else {
-          const error = await response.json();
-          alert('Error al enviar mensaje: ' + error.message);
-        }
-      }
-    } catch (error) {
-      console.error('Error al enviar mensaje:', error);
     }
   };
 

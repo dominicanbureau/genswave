@@ -1051,8 +1051,6 @@ router.get('/session/:sessionId/messages', async (req, res) => {
   }
 });
 
-export default router;
-
 
 // Mark session as inactive (chat closed)
 router.post('/session/:sessionId/close', async (req, res) => {

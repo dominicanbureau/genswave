@@ -1150,3 +1150,103 @@ router.delete('/admin/transfers/:transferId', async (req, res) => {
     });
   }
 });
+
+// Voice intent recognition endpoint
+router.post('/voice-intent', async (req, res) => {
+  try {
+    const { command, context } = req.body;
+
+    if (!command) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Command is required' 
+      });
+    }
+
+    const model = genAI.getGenerativeModel({ 
+      model: 'models/gemini-2.0-flash-exp',
+      generationConfig: {
+        temperature: 0.3,
+        maxOutputTokens: 500,
+      }
+    });
+
+    const prompt = `Eres un asistente de navegación inteligente para Genswave, una empresa de desarrollo de software y tecnología.
+
+Analiza el siguiente comando de voz del usuario y determina su intención:
+
+Comando: "${command}"
+Contexto actual: ${context.currentUrl}
+
+ACCIONES DISPONIBLES:
+1. NAVEGACIÓN a páginas:
+   - "/" (inicio/home)
+   - "/servicios" (servicios, qué hacemos, ofertas)
+   - "/proceso" (proceso, metodología, cómo trabajamos)
+   - "/contacto" (contacto, ubicación, información)
+   - "/login" (login, registro, autenticación, crear cuenta, sign up)
+   - "/privacidad" (privacidad, datos personales)
+   - "/terminos" (términos, condiciones, legal)
+   - "/cookies" (cookies, política de cookies)
+   - "/preguntas-frecuentes" (FAQ, preguntas comunes)
+
+2. ACCIONES ESPECIALES:
+   - "openChat" - Abrir chat de soporte (para dudas, preguntas, ayuda, soporte, consultas, problemas)
+   - "mailto" - Abrir correo electrónico (para enviar email, escribir correo)
+   - "instagram" - Abrir Instagram (para redes sociales, IG, Instagram)
+
+REGLAS:
+- Si el usuario tiene una duda o pregunta sin especificar dónde ir → openChat
+- Si menciona "registrarse" o "crear cuenta" → /login
+- Si menciona "correo" o "email" → mailto
+- Si menciona "instagram" o "redes" → instagram
+- Si no entiendes bien → openChat (como fallback)
+
+Responde SOLO con un JSON válido en este formato exacto:
+{
+  "destination": "/ruta" o null,
+  "action": "openChat" o "mailto" o "instagram" o null,
+  "response": "Mensaje corto y natural en español para el usuario",
+  "confidence": 0.0 a 1.0
+}
+
+Ejemplo 1:
+Comando: "quiero registrarme"
+Respuesta: {"destination": "/login", "action": null, "response": "Te llevaré al registro", "confidence": 0.95}
+
+Ejemplo 2:
+Comando: "tengo una duda sobre precios"
+Respuesta: {"destination": null, "action": "openChat", "response": "Abriendo el chat para ayudarte con tu consulta", "confidence": 0.9}
+
+Ejemplo 3:
+Comando: "quiero enviar un correo"
+Respuesta: {"destination": null, "action": "mailto", "response": "Abriendo tu cliente de correo", "confidence": 0.95}`;
+
+    const result = await model.generateContent(prompt);
+    const responseText = result.response.text();
+    
+    // Extract JSON from response
+    const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+      throw new Error('No JSON found in response');
+    }
+
+    const intent = JSON.parse(jsonMatch[0]);
+
+    res.json({
+      success: true,
+      intent: intent,
+      rawCommand: command
+    });
+
+  } catch (error) {
+    console.error('Error processing voice intent:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: 'Error processing voice command',
+      details: error.message 
+    });
+  }
+});
+
+module.exports = router;

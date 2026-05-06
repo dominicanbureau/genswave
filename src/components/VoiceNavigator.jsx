@@ -9,6 +9,8 @@ function VoiceNavigator() {
   const [transcript, setTranscript] = useState('');
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [status, setStatus] = useState('idle'); // idle, listening, processing, speaking
+  const [agentMessage, setAgentMessage] = useState('');
+  const [micPermission, setMicPermission] = useState(null); // null, 'granted', 'denied'
   const recognitionRef = useRef(null);
   const timeoutRef = useRef(null);
   const navigate = useNavigate();
@@ -125,6 +127,9 @@ function VoiceNavigator() {
         // Cancel any ongoing speech
         window.speechSynthesis.cancel();
         
+        // Set agent message to display above modal
+        setAgentMessage(text);
+        
         const utterance = new SpeechSynthesisUtterance(text);
         utterance.lang = 'es-ES';
         utterance.rate = 1.0;
@@ -138,18 +143,26 @@ function VoiceNavigator() {
         utterance.onend = () => {
           setIsSpeaking(false);
           setStatus('idle');
+          // Clear agent message after speaking
+          setTimeout(() => setAgentMessage(''), 2000);
           resolve();
         };
         
         utterance.onerror = () => {
           setIsSpeaking(false);
           setStatus('idle');
+          setTimeout(() => setAgentMessage(''), 2000);
           resolve();
         };
         
         window.speechSynthesis.speak(utterance);
       } else {
-        resolve();
+        // Just show the message if speech synthesis not available
+        setAgentMessage(text);
+        setTimeout(() => {
+          setAgentMessage('');
+          resolve();
+        }, 3000);
       }
     });
   };
@@ -158,30 +171,43 @@ function VoiceNavigator() {
     if (recognitionRef.current && !isListening) {
       setTranscript('');
       
-      // First, greet the user
-      await speak('¿Qué te gustaría hacer el día de hoy?');
-      
-      // Wait a bit more before starting to listen
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      // Then start listening
+      // Request microphone permission explicitly
       try {
-        if (recognitionRef.current) {
-          recognitionRef.current.start();
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        // Permission granted, stop the stream
+        stream.getTracks().forEach(track => track.stop());
+        setMicPermission('granted');
+        
+        // First, greet the user
+        await speak('¿Qué te gustaría hacer el día de hoy?');
+        
+        // Wait a bit more before starting to listen
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        // Then start listening
+        try {
+          if (recognitionRef.current) {
+            recognitionRef.current.start();
+          }
+        } catch (error) {
+          console.error('Error starting recognition:', error);
+          // If already started, stop and restart
+          if (error.message && error.message.includes('already started')) {
+            recognitionRef.current.stop();
+            setTimeout(() => {
+              try {
+                recognitionRef.current.start();
+              } catch (e) {
+                console.error('Error restarting recognition:', e);
+              }
+            }, 100);
+          }
         }
       } catch (error) {
-        console.error('Error starting recognition:', error);
-        // If already started, stop and restart
-        if (error.message && error.message.includes('already started')) {
-          recognitionRef.current.stop();
-          setTimeout(() => {
-            try {
-              recognitionRef.current.start();
-            } catch (e) {
-              console.error('Error restarting recognition:', e);
-            }
-          }, 100);
-        }
+        console.error('Microphone permission denied:', error);
+        setMicPermission('denied');
+        setAgentMessage('Necesito permiso para usar el micrófono');
+        setStatus('idle');
       }
     }
   };
@@ -192,44 +218,74 @@ function VoiceNavigator() {
     
     let destination = null;
     let response = '';
+    let action = null;
 
-    // Analyze command and determine destination
-    if (lowerCommand.includes('servicio') || lowerCommand.includes('servicios')) {
-      destination = '/servicios';
-      response = 'Te llevaré a la página de servicios';
-    } else if (lowerCommand.includes('proceso') || lowerCommand.includes('procesos')) {
-      destination = '/proceso';
-      response = 'Te llevaré a la página de proceso';
-    } else if (lowerCommand.includes('contacto') || lowerCommand.includes('contactar') || lowerCommand.includes('contacta')) {
-      destination = '/contacto';
-      response = 'Te llevaré a la página de contacto';
-    } else if (lowerCommand.includes('inicio') || lowerCommand.includes('home') || lowerCommand.includes('principal')) {
-      destination = '/';
-      response = 'Te llevaré a la página de inicio';
-    } else if (lowerCommand.includes('login') || lowerCommand.includes('iniciar sesión') || lowerCommand.includes('entrar')) {
-      destination = '/login';
-      response = 'Te llevaré al inicio de sesión';
-    } else if (lowerCommand.includes('privacidad')) {
-      destination = '/privacidad';
-      response = 'Te llevaré a la política de privacidad';
-    } else if (lowerCommand.includes('términos') || lowerCommand.includes('terminos')) {
-      destination = '/terminos';
-      response = 'Te llevaré a los términos y condiciones';
-    } else if (lowerCommand.includes('cookies')) {
-      destination = '/cookies';
-      response = 'Te llevaré a la política de cookies';
-    } else if (lowerCommand.includes('preguntas') || lowerCommand.includes('faq')) {
-      destination = '/preguntas-frecuentes';
-      response = 'Te llevaré a las preguntas frecuentes';
-    } else {
-      response = 'Lo siento, no entendí tu solicitud. Puedes pedirme que te lleve a servicios, proceso, contacto, o inicio';
+    // Use AI to understand the intent
+    try {
+      const aiResponse = await fetch('/api/ai-assistant/voice-intent', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          command: command,
+          context: {
+            currentUrl: window.location.pathname,
+            timestamp: new Date().toISOString()
+          }
+        }),
+      });
+
+      const data = await aiResponse.json();
+      
+      if (data.success && data.intent) {
+        destination = data.intent.destination;
+        response = data.intent.response;
+        action = data.intent.action;
+      } else {
+        // Fallback to rule-based system
+        const result = analyzeCommandLocally(lowerCommand);
+        destination = result.destination;
+        response = result.response;
+        action = result.action;
+      }
+    } catch (error) {
+      console.error('Error processing with AI:', error);
+      // Fallback to rule-based system
+      const result = analyzeCommandLocally(lowerCommand);
+      destination = result.destination;
+      response = result.response;
+      action = result.action;
     }
 
     // Speak the response
     await speak(response);
     
-    // Navigate if destination was found
-    if (destination) {
+    // Execute action
+    if (action === 'openChat') {
+      // Open AI chat assistant
+      setTimeout(() => {
+        setIsOpen(false);
+        // Trigger AI chat button click
+        const aiChatButton = document.querySelector('.ai-assistant-button');
+        if (aiChatButton) {
+          aiChatButton.click();
+        }
+      }, 500);
+    } else if (action === 'mailto') {
+      // Open email client
+      setTimeout(() => {
+        setIsOpen(false);
+        window.location.href = 'mailto:support@genswave.org';
+      }, 500);
+    } else if (action === 'instagram') {
+      // Open Instagram
+      setTimeout(() => {
+        setIsOpen(false);
+        window.open('https://instagram.com/genswave', '_blank');
+      }, 500);
+    } else if (destination) {
+      // Navigate to destination
       setTimeout(() => {
         setIsOpen(false);
         navigate(destination);
@@ -238,6 +294,99 @@ function VoiceNavigator() {
       setStatus('idle');
       setTranscript('');
     }
+  };
+
+  const analyzeCommandLocally = (lowerCommand) => {
+    let destination = null;
+    let response = '';
+    let action = null;
+
+    // Registration / Auth
+    if (lowerCommand.includes('registr') || lowerCommand.includes('crear cuenta') || 
+        lowerCommand.includes('sign up') || lowerCommand.includes('cuenta nueva')) {
+      destination = '/login';
+      response = 'Te llevaré al registro';
+    }
+    // Login / Auth
+    else if (lowerCommand.includes('login') || lowerCommand.includes('iniciar sesión') || 
+             lowerCommand.includes('entrar') || lowerCommand.includes('autenticar')) {
+      destination = '/login';
+      response = 'Te llevaré al inicio de sesión';
+    }
+    // Services
+    else if (lowerCommand.includes('servicio') || lowerCommand.includes('servicios') ||
+             lowerCommand.includes('qué hacen') || lowerCommand.includes('que ofrecen')) {
+      destination = '/servicios';
+      response = 'Te llevaré a nuestros servicios';
+    }
+    // Process
+    else if (lowerCommand.includes('proceso') || lowerCommand.includes('procesos') ||
+             lowerCommand.includes('cómo trabajan') || lowerCommand.includes('metodología')) {
+      destination = '/proceso';
+      response = 'Te llevaré a nuestro proceso de trabajo';
+    }
+    // Contact
+    else if (lowerCommand.includes('contacto') || lowerCommand.includes('contactar') || 
+             lowerCommand.includes('contacta') || lowerCommand.includes('hablar con')) {
+      destination = '/contacto';
+      response = 'Te llevaré a la página de contacto';
+    }
+    // Email
+    else if (lowerCommand.includes('correo') || lowerCommand.includes('email') || 
+             lowerCommand.includes('enviar mensaje') || lowerCommand.includes('escribir')) {
+      action = 'mailto';
+      response = 'Abriendo tu cliente de correo';
+    }
+    // Instagram
+    else if (lowerCommand.includes('instagram') || lowerCommand.includes('ig') || 
+             lowerCommand.includes('redes sociales') || lowerCommand.includes('social')) {
+      action = 'instagram';
+      response = 'Abriendo nuestro Instagram';
+    }
+    // Help / Support / Questions
+    else if (lowerCommand.includes('ayuda') || lowerCommand.includes('soporte') || 
+             lowerCommand.includes('pregunta') || lowerCommand.includes('duda') ||
+             lowerCommand.includes('consulta') || lowerCommand.includes('asistencia') ||
+             lowerCommand.includes('necesito') || lowerCommand.includes('problema')) {
+      action = 'openChat';
+      response = 'Abriendo el chat de soporte para ayudarte';
+    }
+    // Home
+    else if (lowerCommand.includes('inicio') || lowerCommand.includes('home') || 
+             lowerCommand.includes('principal') || lowerCommand.includes('portada')) {
+      destination = '/';
+      response = 'Te llevaré a la página de inicio';
+    }
+    // Privacy
+    else if (lowerCommand.includes('privacidad') || lowerCommand.includes('datos') ||
+             lowerCommand.includes('información personal')) {
+      destination = '/privacidad';
+      response = 'Te llevaré a la política de privacidad';
+    }
+    // Terms
+    else if (lowerCommand.includes('términos') || lowerCommand.includes('terminos') ||
+             lowerCommand.includes('condiciones') || lowerCommand.includes('legal')) {
+      destination = '/terminos';
+      response = 'Te llevaré a los términos y condiciones';
+    }
+    // Cookies
+    else if (lowerCommand.includes('cookies') || lowerCommand.includes('galletas')) {
+      destination = '/cookies';
+      response = 'Te llevaré a la política de cookies';
+    }
+    // FAQ
+    else if (lowerCommand.includes('preguntas frecuentes') || lowerCommand.includes('faq') ||
+             lowerCommand.includes('preguntas comunes')) {
+      destination = '/preguntas-frecuentes';
+      response = 'Te llevaré a las preguntas frecuentes';
+    }
+    // Default
+    else {
+      action = 'openChat';
+      response = 'No estoy seguro de entender. Te abriré el chat para que puedas hablar con nuestro asistente';
+    }
+
+    return { destination, response, action };
   };
 
   const handleOpen = () => {
@@ -297,6 +446,21 @@ function VoiceNavigator() {
               exit={{ opacity: 0 }}
               onClick={handleClose}
             />
+
+            {/* Agent Message - Above Modal */}
+            <AnimatePresence>
+              {agentMessage && (
+                <motion.div
+                  className="voice-agent-message"
+                  initial={{ opacity: 0, y: -20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <p>{agentMessage}</p>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
             {/* Modal */}
             <motion.div

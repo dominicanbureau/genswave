@@ -73,12 +73,44 @@
   justify-content: center;
   gap: 2rem;
   overflow: visible;
+  max-height: 90vh;
 }
 
 /* Dark mode support */
 .dark-mode .voice-navigator-modal {
   background: #1a1a1a;
   border: 1px solid #333333;
+}
+
+/* Agent Message - Above Modal */
+.voice-agent-message {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, calc(-50% - 280px));
+  width: 90%;
+  max-width: 480px;
+  z-index: 10003;
+  text-align: center;
+  pointer-events: none;
+}
+
+.voice-agent-message p {
+  margin: 0;
+  padding: 1rem 1.5rem;
+  background: rgba(0, 0, 0, 0.9);
+  color: #ffffff;
+  border-radius: 16px;
+  font-size: 1.125rem;
+  font-weight: 500;
+  line-height: 1.5;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
+}
+
+.dark-mode .voice-agent-message p {
+  background: rgba(255, 255, 255, 0.95);
+  color: #1a1a1a;
 }
 
 /* Close Button */
@@ -261,8 +293,24 @@
   }
 
   .voice-navigator-modal {
-    width: 95%;
+    width: 90%;
+    max-width: 90%;
     padding: 2.5rem 1.5rem;
+    max-height: 80vh;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  .voice-agent-message {
+    width: 85%;
+    max-width: 85%;
+    transform: translate(-50%, calc(-50% - 240px));
+  }
+
+  .voice-agent-message p {
+    font-size: 1rem;
+    padding: 0.875rem 1.25rem;
   }
 
   .voice-icon-container {
@@ -291,6 +339,7 @@
 
   .voice-transcript {
     padding: 1.25rem 1.5rem;
+    width: 90%;
   }
 
   .voice-transcript p {

@@ -4,6 +4,7 @@ import { gsap } from 'gsap';
 import { ScrollToPlugin } from 'gsap/ScrollToPlugin';
 import HeroVisual from '../components/HeroVisual';
 import Footer from '../components/Footer';
+import VoiceNavigator from '../components/VoiceNavigator';
 import './Home.css';
 
 // Register GSAP plugin
@@ -668,6 +669,9 @@ function Home() {
       </div>
 
       <Footer />
+      
+      {/* Voice Navigator */}
+      <VoiceNavigator />
     </div>
     </div>
   );

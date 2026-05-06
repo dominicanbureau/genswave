@@ -173,7 +173,9 @@ function VoiceNavigator() {
       
       // Request microphone permission explicitly
       try {
+        console.log('Requesting microphone permission...');
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        console.log('Microphone permission granted');
         // Permission granted, stop the stream
         stream.getTracks().forEach(track => track.stop());
         setMicPermission('granted');
@@ -182,31 +184,39 @@ function VoiceNavigator() {
         await speak('¿Qué te gustaría hacer el día de hoy?');
         
         // Wait a bit more before starting to listen
-        await new Promise(resolve => setTimeout(resolve, 500));
+        await new Promise(resolve => setTimeout(resolve, 800));
         
         // Then start listening
         try {
+          console.log('Starting speech recognition...');
           if (recognitionRef.current) {
             recognitionRef.current.start();
+            console.log('Speech recognition started successfully');
           }
         } catch (error) {
           console.error('Error starting recognition:', error);
           // If already started, stop and restart
           if (error.message && error.message.includes('already started')) {
+            console.log('Recognition already started, restarting...');
             recognitionRef.current.stop();
             setTimeout(() => {
               try {
                 recognitionRef.current.start();
               } catch (e) {
                 console.error('Error restarting recognition:', e);
+                setAgentMessage('Error al iniciar el reconocimiento de voz. Por favor, intenta de nuevo.');
+                setStatus('idle');
               }
             }, 100);
+          } else {
+            setAgentMessage('Error al iniciar el reconocimiento de voz. Por favor, intenta de nuevo.');
+            setStatus('idle');
           }
         }
       } catch (error) {
         console.error('Microphone permission denied:', error);
         setMicPermission('denied');
-        setAgentMessage('Necesito permiso para usar el micrófono');
+        setAgentMessage('Necesito permiso para usar el micrófono. Por favor, permite el acceso en la configuración de tu navegador.');
         setStatus('idle');
       }
     }
@@ -530,6 +540,20 @@ function VoiceNavigator() {
                 {status === 'listening' && <p>Escuchando...</p>}
                 {status === 'processing' && <p>Procesando...</p>}
               </motion.div>
+
+              {/* Manual start button if not listening */}
+              {!isListening && !isSpeaking && status === 'idle' && micPermission !== 'denied' && (
+                <motion.button
+                  className="voice-start-button"
+                  onClick={startListening}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  Iniciar escucha
+                </motion.button>
+              )}
 
               {/* Transcript Display - Always visible when listening */}
               <AnimatePresence>

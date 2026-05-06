@@ -88,11 +88,12 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, calc(-50% - 280px));
-  width: 90%;
+  width: 85%;
   max-width: 480px;
   z-index: 10003;
   text-align: center;
   pointer-events: none;
+  padding: 0 1rem;
 }
 
 .voice-agent-message p {
@@ -106,6 +107,9 @@
   line-height: 1.5;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
   backdrop-filter: blur(10px);
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
 }
 
 .dark-mode .voice-agent-message p {
@@ -246,6 +250,36 @@
   color: #f3f4f6;
 }
 
+/* Manual start button */
+.voice-start-button {
+  padding: 0.875rem 2rem;
+  background: #000000;
+  color: #ffffff;
+  border: 2px solid #000000;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 2;
+}
+
+.voice-start-button:hover {
+  background: #1a1a1a;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.dark-mode .voice-start-button {
+  background: #ffffff;
+  color: #000000;
+  border-color: #ffffff;
+}
+
+.dark-mode .voice-start-button:hover {
+  background: #f3f4f6;
+}
+
 /* Transcript Display */
 .voice-transcript {
   background: #f9fafb;
@@ -303,14 +337,16 @@
   }
 
   .voice-agent-message {
-    width: 85%;
-    max-width: 85%;
-    transform: translate(-50%, calc(-50% - 240px));
+    width: 80%;
+    max-width: 80%;
+    transform: translate(-50%, calc(-50% - 200px));
+    padding: 0 0.5rem;
   }
 
   .voice-agent-message p {
-    font-size: 1rem;
-    padding: 0.875rem 1.25rem;
+    font-size: 0.9375rem;
+    padding: 0.75rem 1rem;
+    line-height: 1.4;
   }
 
   .voice-icon-container {

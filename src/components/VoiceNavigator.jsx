@@ -21,6 +21,12 @@ function VoiceNavigator() {
     // Check if browser supports Speech Recognition
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     
+    if (!SpeechRecognition) {
+      console.error('Speech Recognition not supported in this browser');
+      setAgentMessage('Tu navegador no soporta reconocimiento de voz. Por favor, usa Chrome o Safari.');
+      return;
+    }
+    
     if (SpeechRecognition) {
       recognitionRef.current = new SpeechRecognition();
       recognitionRef.current.continuous = false; // Stop after getting result
@@ -96,7 +102,7 @@ function VoiceNavigator() {
       };
 
       recognitionRef.current.onerror = (event) => {
-        console.error('Speech recognition error:', event.error);
+        console.error('Speech recognition error:', event.error, event);
         setIsListening(false);
         
         // Clear timeout
@@ -105,9 +111,21 @@ function VoiceNavigator() {
           timeoutRef.current = null;
         }
         
-        if (event.error !== 'no-speech' && event.error !== 'aborted') {
-          setStatus('idle');
+        // Show specific error messages
+        if (event.error === 'not-allowed' || event.error === 'permission-denied') {
+          setAgentMessage('Permiso de micrófono denegado. Por favor, permite el acceso en la configuración.');
+          setMicPermission('denied');
+        } else if (event.error === 'no-speech') {
+          setAgentMessage('No detecté ninguna voz. Intenta de nuevo.');
+        } else if (event.error === 'audio-capture') {
+          setAgentMessage('No se pudo acceder al micrófono. Verifica que esté conectado.');
+        } else if (event.error === 'network') {
+          setAgentMessage('Error de red. Verifica tu conexión a internet.');
+        } else if (event.error !== 'aborted') {
+          setAgentMessage('Error al escuchar. Por favor, intenta de nuevo.');
         }
+        
+        setStatus('idle');
       };
     }
 

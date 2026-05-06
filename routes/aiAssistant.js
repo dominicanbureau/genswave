@@ -1249,4 +1249,4 @@ Respuesta: {"destination": null, "action": "mailto", "response": "Abriendo tu cl
   }
 });
 
-module.exports = router;
+export default router;
